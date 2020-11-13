@@ -1,4 +1,4 @@
-import { createJwt, SimpleSigner } from "did-jwt";
+import { createJwt, SimpleSigner } from "@cef-ebsi/did-jwt";
 import { JWK } from "jose";
 import { ethers } from "ethers";
 import * as util from "../../utils/util";
