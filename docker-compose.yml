@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  ssi-eidas-bridge:
+    build: .
+    restart: always
+    logging:
+      options:
+        max-size: "100m"
+        max-file: "50"
+    ports:
+      - 8080:9000
+    environment:
+      - BRIDGE_ENV=${BRIDGE_ENV:?Missing BRIDGE_ENV variable}
+      - API_PRIVATE_KEY=${API_PRIVATE_KEY:?Missing BRIDGE_ENV variable}
