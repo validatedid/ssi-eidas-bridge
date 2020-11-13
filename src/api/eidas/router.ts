@@ -2,11 +2,7 @@ import * as express from "express";
 import cors from "cors";
 import Controller from "./controller";
 import { BRIDGE_SERVICE } from "../../config";
-import {
-  BadRequestError,
-  UnauthorizedError,
-  ApiErrorMessages,
-} from "../../errors";
+import { BadRequestError, ApiErrorMessages } from "../../errors";
 
 class Router {
   constructor(server: express.Express, swaggerDoc: any) {
