@@ -23,10 +23,6 @@ class Router {
       cors(),
       async (req: express.Request, res: express.Response, next) => {
         try {
-          if (!req.params.authenticated)
-            throw new UnauthorizedError(UnauthorizedError.defaultTitle, {
-              detail: `The method '${req.method} ${req.path}' is not available for anonymous access`,
-            });
           const result = await Controller.EIDASsignature(req.body);
           res.status(201).json(result);
         } catch (error) {
@@ -40,10 +36,6 @@ class Router {
       cors(),
       async (req: express.Request, res: express.Response, next) => {
         try {
-          if (!req.params.authenticated)
-            throw new UnauthorizedError(UnauthorizedError.defaultTitle, {
-              detail: `The method '${req.method} ${req.path}' is not available for anonymous access`,
-            });
           if (!req.body.proof)
             throw new BadRequestError(BadRequestError.defaultTitle, {
               detail: ApiErrorMessages.BAD_CREDENTIAL_PARAMETERS,
