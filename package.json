@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@cef-ebsi/app-jwt": "0.0.11",
+    "@cef-ebsi/did-jwt": "^0.0.9",
     "@cef-ebsi/express-problem-details": "^0.0.2",
     "@cef-ebsi/problem-details-errors": "^0.0.3",
     "@validatedid/vid-did-resolver": "0.0.1",
@@ -78,7 +79,6 @@
     "yamljs": "^0.3.0"
   },
   "husky": {
-    "hooks": {
-    }
+    "hooks": {}
   }
 }

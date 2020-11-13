@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eidas-bridge-deployment
+  labels:
+    app: eidas-bridge
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: eidas-bridge
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: eidas-bridge
+    spec:
+      containers:
+      - image: k8scrvidchainpro.azurecr.io/eidas-bridge:latest
+        imagePullPolicy: "Always"
+        name: eidas-bridge
+        ports:
+        - containerPort: 9002
+        env:
+        - name: BRIDGE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: eidas-bridge-configmap
+              key: BRIDGE_ENV
+        - name: DEBUG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: eidas-bridge-configmap
+              key: DEBUG_LEVEL
+        - name: EIDAS_TEST_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: eidas-bridge-configmap
+              key: EIDAS_TEST_MODE
+        - name: DID_REGISTRY_SC_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: did-registry-sc-address
+              key: ethereum-did-registry-address
+        - name: API_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: eidas-bridge
+              key: api-private-key
+      restartPolicy: Always
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: eidas-bridge-service
+  labels:
+    app: eidas-bridge
+spec:
+  type: ClusterIP
+  ports:
+  - name: "9002"
+    port: 9002
+  selector:
+    app: eidas-bridge
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: eidas-bridge-ingress
+  namespace: production
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 10m
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 10m
+spec:
+  tls:
+  - hosts:
+    - api.vidchain.net
+    secretName: tls-secret-production
+  rules:
+  - host: api.vidchain.net
+    http:
+      paths:
+      - path: /eidas-bridge
+        backend:
+          serviceName: eidas-bridge-service
+          servicePort: 9002

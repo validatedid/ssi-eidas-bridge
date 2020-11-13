@@ -74,7 +74,7 @@ Start the swagger service API
 yarn start
 ```
 
-This command starts a node server exposing the SSI eIDAS Bridge Swagger API at <http://localhost:9000/ssi-eidas-bridge/v1/api-docs/> where you can play with the API.
+This command starts a node server exposing the SSI eIDAS Bridge Swagger API at <http://localhost:9002/ssi-eidas-bridge/v1/api-docs/> where you can play with the API.
 
 ## Testing
 

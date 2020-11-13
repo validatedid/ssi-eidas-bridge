@@ -81,7 +81,7 @@ const BRIDGE_SERVICE_BASE_URL = {
 };
 
 const BRIDGE_SERVICE_PORT = {
-  EIDAS: process.env.EIDAS_PORT ? +process.env.EIDAS_PORT : 9000,
+  EIDAS: process.env.EIDAS_PORT ? +process.env.EIDAS_PORT : 9002,
 };
 
 const BRIDGE_SERVICE_SWAGGER = {
