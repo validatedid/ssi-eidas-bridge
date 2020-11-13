@@ -1,8 +1,7 @@
 import httpMocks from "node-mocks-http";
-import { decodeJwt } from "did-jwt";
+import { decodeJwt } from "@cef-ebsi/did-jwt";
 import axios from "axios";
 import { EventEmitter } from "events";
-import * as auth from "../../src/middleware/auth";
 import {
   GrantType,
   AccessTokenRequestBody,
@@ -128,7 +127,7 @@ describe("auth middleware test suite", () => {
       .spyOn(axios, "get")
       .mockResolvedValueOnce({
         data: {
-          appName: "ssi-eidas-bridge",
+          appName: "ebsi-eidas-bridge",
           pubKey:
             "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUFvRFFnQUVMeWlydDEvOWNuWm1Nd1Y2VjczSEhtaDhPSFdjZ05CVQpmL0U0T3M4Y1QyVWYrUjNsVzloQ2lQbTM3ZjlvakNxb2VyaG9HZm9NZ2lOSklSaEsrckRVZlE9PQotLS0tLUVORCBQVUJMSUMgS0VZLS0tLS0=",
         },

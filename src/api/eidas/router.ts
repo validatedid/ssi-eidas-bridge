@@ -7,7 +7,6 @@ import {
   UnauthorizedError,
   ApiErrorMessages,
 } from "../../errors";
-import * as auth from "../../middleware/auth";
 
 class Router {
   constructor(server: express.Express, swaggerDoc: any) {
@@ -17,7 +16,7 @@ class Router {
     );
 
     // sessions call managed by auth middleware
-    router.post(BRIDGE_SERVICE.CALL.BRIDGE_LOGIN, auth.callNewSession);
+    router.post(BRIDGE_SERVICE.CALL.BRIDGE_LOGIN);
 
     router.post(
       `${BRIDGE_SERVICE.CALL.SIGNATURE_CREATION}`,

@@ -1,4 +1,4 @@
-import { decodeJwt } from "did-jwt";
+import { decodeJWT } from "did-jwt";
 import { SignPayload } from "../../dtos/secureEnclave";
 import { EIDASSignatureOutput } from "../../dtos/eidas";
 import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
@@ -94,7 +94,7 @@ export default class Controller {
   }
 
   static getIssuanceDate(jwt: string): string {
-    const { payload } = decodeJwt(jwt);
+    const { payload } = decodeJWT(jwt);
     const iat = payload.iat ? payload.iat : new Date();
     const issuanceDate = new Date(iat).toISOString();
     return issuanceDate;

@@ -1,11 +1,11 @@
-import { decodeJwt, verifyJwt } from "did-jwt";
+import { decodeJwt, ebsiVerifyJwt } from "@cef-ebsi/did-jwt";
 import { Verifier } from "../../../src/libs/secureEnclave";
 import { VerifiedJwt } from "../../../src/libs/secureEnclave/jwt";
 import { ApiErrorMessages, BadRequestError } from "../../../src/errors";
 
-jest.mock("did-jwt", () => ({
+jest.mock("@cef-ebsi/did-jwt", () => ({
   decodeJwt: jest.fn(),
-  verifyJwt: jest.fn(),
+  ebsiVerifyJwt: jest.fn(),
 }));
 
 describe("verifier", () => {
@@ -17,7 +17,7 @@ describe("verifier", () => {
       (decodeJwt as jest.Mock) = jest
         .fn()
         .mockImplementation(() => ({ payload: {} }));
-      (verifyJwt as jest.Mock) = jest.fn().mockImplementation(() => ({
+      (ebsiVerifyJwt as jest.Mock) = jest.fn().mockImplementation(() => ({
         payload: {
           iss: did,
         },
@@ -35,7 +35,7 @@ describe("verifier", () => {
       (decodeJwt as jest.Mock) = jest.fn().mockImplementation(() => ({
         payload: { aud: "https://self.issued.me" },
       }));
-      (verifyJwt as jest.Mock) = jest.fn().mockImplementation(() => ({
+      (ebsiVerifyJwt as jest.Mock) = jest.fn().mockImplementation(() => ({
         payload: {
           iss: did,
         },
@@ -54,7 +54,7 @@ describe("verifier", () => {
       (decodeJwt as jest.Mock) = jest.fn().mockImplementation(() => ({
         payload: { aud: did },
       }));
-      (verifyJwt as jest.Mock) = jest.fn().mockImplementation(() => ({
+      (ebsiVerifyJwt as jest.Mock) = jest.fn().mockImplementation(() => ({
         payload: {
           iss: did,
         },
@@ -72,7 +72,7 @@ describe("verifier", () => {
       (decodeJwt as jest.Mock) = jest.fn().mockImplementation(() => ({
         payload: {},
       }));
-      (verifyJwt as jest.Mock) = jest
+      (ebsiVerifyJwt as jest.Mock) = jest
         .fn()
         .mockRejectedValue(new Error("Error on verify"));
 

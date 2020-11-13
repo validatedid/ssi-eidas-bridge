@@ -1,4 +1,4 @@
-import { decodeJwt, verifyJwt } from "did-jwt";
+import { decodeJwt, ebsiVerifyJwt } from "@cef-ebsi/did-jwt";
 import * as config from "../../config";
 import { PRINT_ERROR } from "../../utils/util";
 import { ApiErrorMessages, BadRequestError } from "../../errors";
@@ -48,7 +48,7 @@ export default class Verifier {
       }
     }
     try {
-      const result = await verifyJwt(data, options);
+      const result = await ebsiVerifyJwt(data, options);
       return result;
     } catch (error) {
       PRINT_ERROR(error);
