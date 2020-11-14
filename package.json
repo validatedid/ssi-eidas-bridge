@@ -69,6 +69,7 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "did-jwt": "^4.6.2",
+    "did-resolver": "^2.1.1",
     "dotenv": "^8.2.0",
     "eciesjs": "^0.3.5",
     "ethers": "^5.0.8",

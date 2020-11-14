@@ -10,6 +10,11 @@ const BRIDGE_API_PROD_URL = "https://api.vidchain.net";
 const OPENAPI_PATH = "../../api/openapi.yaml";
 const API_VERSION = "v1";
 
+const checkStrVar = (variable: string | undefined, name: string): string => {
+  if (!variable) throw new Error(`undefined variable: ${name}`);
+  return variable;
+};
+
 // GLOBAL ENVIRONMENT CONFIG AND URLS PER EACH ENV
 const GLOBAL_CONFIG = {
   production: {
@@ -112,7 +117,9 @@ const BRIDGE_SERVICE_SWAGGER_FULL_URL = {
 
 const BRIDGE_SERVICE_EXTERNAL_SWAGGER_FULL_URL = {
   EIDAS:
-    BRIDGE_EXTERNAL_API_BASE_URL + BRIDGE_BASE_PATH.EIDAS + BRIDGE_BASE_PATH.API_DOCS,
+    BRIDGE_EXTERNAL_API_BASE_URL +
+    BRIDGE_BASE_PATH.EIDAS +
+    BRIDGE_BASE_PATH.API_DOCS,
 };
 
 const BRIDGE_SERVICE = {
@@ -137,6 +144,16 @@ const API_PRIVATE_KEY = process.env.API_PRIVATE_KEY
   ? process.env.API_PRIVATE_KEY
   : throwError("API_PRIVATE_KEY");
 
+const LEDGER = {
+  provider: checkStrVar(
+    process.env.DID_PROVIDER_RPC_URL,
+    "DID_PROVIDER_RPC_URL"
+  ),
+  didRegistry: checkStrVar(
+    process.env.DID_REGISTRY_SC_ADDRESS,
+    "DID_REGISTRY_SC_ADDRESS"
+  ),
+};
 export {
   API_NAME,
   LOG_LEVEL,
@@ -145,5 +162,6 @@ export {
   OPENAPI_PATH,
   API_PRIVATE_KEY,
   BRIDGE_DID_IDENTIFIERS,
-  WALLET
+  WALLET,
+  LEDGER,
 };

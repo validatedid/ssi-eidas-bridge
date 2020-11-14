@@ -1,4 +1,6 @@
-import { decodeJWT } from "did-jwt";
+import { decodeJWT, verifyJWT } from "did-jwt";
+import VidDidResolver from "@validatedid/vid-did-resolver";
+import { Resolver } from "did-resolver";
 import { SignPayload } from "../../dtos/secureEnclave";
 import {
   Credential,
@@ -7,14 +9,18 @@ import {
 } from "../../dtos/eidas";
 import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
 import { Proof } from "../../libs/eidas/types";
-import { SignatureTypes, VerifiedJwt } from "../../libs/secureEnclave/jwt";
-import Verifier from "../../libs/secureEnclave/verifier";
+import {
+  JWTVerifyOptions,
+  SignatureTypes,
+  VerifiedJwt,
+} from "../../libs/secureEnclave/jwt";
 import {
   DEFAULT_PROOF_PURPOSE,
   DEFAULT_EIDAS_VERIFICATION_METHOD,
 } from "../../libs/eidas/constants";
 import { validateEIDASProofAttributes } from "../../libs/eidas";
 import { EnterpriseWallet } from "../../libs/secureEnclave";
+import * as config from "../../config";
 
 export default class Controller {
   /**
@@ -89,15 +95,20 @@ export default class Controller {
       });
 
     validateEIDASProofAttributes(proof);
-    // check if issuer is a TrustedIssuer TODO: on EBSI V2
-    const verifiedJWT: VerifiedJwt = await Verifier.Instance.verifyVcJwt(
-      proof.jws
-    );
-    if (!verifiedJWT)
+    const options: JWTVerifyOptions = {
+      resolver: new Resolver(
+        VidDidResolver.getResolver({
+          rpcUrl: config.LEDGER.provider,
+          registry: config.LEDGER.didRegistry,
+        })
+      ),
+    };
+    const result = await verifyJWT(proof.jws, options);
+    if (!result)
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.ERROR_VERIFYING_SIGNATURE,
       });
-    return verifiedJWT;
+    return result;
   }
 
   static getIssuanceDate(jwt: string): string {

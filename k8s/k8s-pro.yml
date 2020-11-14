@@ -47,6 +47,11 @@ spec:
             secretKeyRef:
               name: did-registry-sc-address
               key: ethereum-did-registry-address
+        - name: DID_PROVIDER_RPC_URL
+          valueFrom:
+            secretKeyRef:
+              name: did-provider-rpc-url
+              key: ethereum-url
         - name: API_PRIVATE_KEY
           valueFrom:
             secretKeyRef:
