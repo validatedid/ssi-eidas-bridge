@@ -50,6 +50,8 @@ export default class Controller {
 
     return {
       issuer,
+      payload,
+      type,
       proof: {
         type,
         created: Controller.getIssuanceDate(jws),

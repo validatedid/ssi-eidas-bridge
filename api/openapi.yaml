@@ -13,7 +13,9 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - url: https://api.vidchain.net
-    description: Validated ID API Docs
+    description: Validated ID API 
+  - url: https://dev.vidchain.net
+    description: Validated ID API Dev
 tags:
   - name: eIDAS Bridge
     description: Sign and validate signatures
@@ -217,6 +219,33 @@ components:
           description: DID of the issuer
           type: string
           example: did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D
+        type: 
+          description: Credential type
+          type: string
+          example: EidasSeal2019
+        payload:
+          description: Payload to sign
+          type: object
+          example: 
+            "@context":
+              - "https://www.w3.org/2018/credentials/v1"
+              - "https://api.vidchain.net/credentials/verifiableId/v1"
+            id: "vid:type-version-of-the-credential"
+            type: "['VerifiableCredential','VerifiableID']"
+            issuer: "did:vid:0x5208431C6EC2ec4097aeA7182bB92d018766498c"
+            issuanceDate: "2019-06-22T14:11:44Z"
+            expirationDate: "2019-06-22T14:11:44Z"
+            credentialSubject:
+              id: "did:vid:0x8707CCa835C961334D3F6450C6a61a0AD6592460"
+              firstName: "Eva"
+              lastName: "Monroe"
+              gender: "Female"
+              dateOfBirth: "12/11/1970"
+              placeOfBirth: "Madrid"
+              currentAddress: "Arago 179 4a"
+              city: "Barcelona"
+              state: "Catalunya"
+              zip: "08011"
         proof:
           $ref: "#/components/schemas/Proof"
     Problem:
