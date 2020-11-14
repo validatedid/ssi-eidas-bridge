@@ -19,6 +19,7 @@
     "compile:dev": "tsc -w",
     "coverage": "jest --coverage",
     "lint": "eslint 'src/**/*.{js,ts}' 'tests/**/*.{js,ts}' --quiet",
+    "lint:openapi": "openapi lint api/openapi.yaml",
     "full-lint": "tsc --noEmit && eslint 'src/**/*.{js,ts}' --quiet --fix && prettier --write 'src/**/*.{js,ts}'",
     "format": "prettier --write 'src/**/*.{js,ts}' 'tests/**/*.{js,ts}'",
     "test:unit": "jest --clearCache && jest --runInBand --verbose false --testPathPattern=\"^.+\\.(spec|test)\\.ts$\"",
@@ -27,6 +28,7 @@
     "clearCache": "jest --clearCache"
   },
   "devDependencies": {
+    "@redocly/openapi-cli": "^1.0.0-beta.20",
     "@types/body-parser": "^1.19.0",
     "@types/cors": "^2.8.7",
     "@types/dotenv": "^8.2.0",
