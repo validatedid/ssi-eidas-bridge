@@ -2,9 +2,7 @@ import { Proof } from "../libs/eidas/types";
 
 export interface EIDASSignatureOutput {
   issuer: string;
-  payload: Credential;
-  type: string;
-  proof: Proof;
+  vc: VerifiableCredential;
 }
 export interface CredentialSubject {
   [x: string]: unknown;
@@ -19,11 +17,16 @@ export interface InputCredential {
   type: string[];
   credentialSubject: CredentialSubject;
   issuer: string;
-  issuanceDate?: string;
+  issuanceDate: string;
   expirationDate?: string;
   credentialStatus?: CredentialStatus;
   [x: string]: unknown;
 }
 export interface Credential extends InputCredential {
   "@context": string[];
+}
+export interface VerifiableCredential extends Credential {
+  issuer: string;
+  issuanceDate: string;
+  proof: Proof;
 }

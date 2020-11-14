@@ -1,6 +1,10 @@
 import { decodeJWT } from "did-jwt";
 import { SignPayload } from "../../dtos/secureEnclave";
-import { EIDASSignatureOutput } from "../../dtos/eidas";
+import {
+  Credential,
+  EIDASSignatureOutput,
+  VerifiableCredential,
+} from "../../dtos/eidas";
 import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
 import { Proof } from "../../libs/eidas/types";
 import { SignatureTypes, VerifiedJwt } from "../../libs/secureEnclave/jwt";
@@ -47,11 +51,8 @@ export default class Controller {
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.ERROR_SIGNATURE_CREATION,
       });
-
-    return {
-      issuer,
-      payload,
-      type,
+    const vc: VerifiableCredential = {
+      ...(payload as Credential),
       proof: {
         type,
         created: Controller.getIssuanceDate(jws),
@@ -59,6 +60,10 @@ export default class Controller {
         verificationMethod: `${issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
         jws,
       } as Proof,
+    };
+    return {
+      issuer,
+      vc,
     };
   }
 

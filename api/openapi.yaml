@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: SSI Bridge API
+  title: SSI EIDAS Bridge API
   description: |
     SSI eIDAS Bridge API is a component linking the European
     Trust and Legal Framework, named eIDAS (electronic IDentification,
@@ -16,8 +16,10 @@ servers:
     description: Validated ID API 
   - url: https://dev.vidchain.net
     description: Validated ID API Dev
+  - url: https://localhost:9002
+    description: localhost
 tags:
-  - name: eIDAS Bridge
+  - name: SSI EIDAS Bridge
     description: Sign and validate signatures
 paths:
   /eidas-bridge/v1/signatures:
@@ -219,14 +221,10 @@ components:
           description: DID of the issuer
           type: string
           example: did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D
-        type: 
-          description: Credential type
-          type: string
-          example: EidasSeal2019
-        payload:
-          description: Payload to sign
-          type: object
-          example: 
+        vc: 
+          description: Signed verifiable credential
+          $ref: "#/components/schemas/verifiableCred"
+          example:
             "@context":
               - "https://www.w3.org/2018/credentials/v1"
               - "https://api.vidchain.net/credentials/verifiableId/v1"
@@ -235,19 +233,23 @@ components:
             issuer: "did:vid:0x5208431C6EC2ec4097aeA7182bB92d018766498c"
             issuanceDate: "2019-06-22T14:11:44Z"
             expirationDate: "2019-06-22T14:11:44Z"
-            credentialSubject:
-              id: "did:vid:0x8707CCa835C961334D3F6450C6a61a0AD6592460"
-              firstName: "Eva"
-              lastName: "Monroe"
-              gender: "Female"
-              dateOfBirth: "12/11/1970"
-              placeOfBirth: "Madrid"
-              currentAddress: "Arago 179 4a"
-              city: "Barcelona"
-              state: "Catalunya"
-              zip: "08011"
-        proof:
-          $ref: "#/components/schemas/Proof"
+            credentialSubject: 
+                id: "did:vid:0x8707CCa835C961334D3F6450C6a61a0AD6592460"
+                firstName: "Eva"
+                lastName: "Monroe"
+                gender: "Female"
+                dateOfBirth: "12/11/1970"
+                placeOfBirth: "Madrid"
+                currentAddress: "Arago 179 4a"
+                city: "Barcelona"
+                state: "Catalunya"
+                zip: "08011"
+            proof:
+                type: "EidasSeal2019"
+                created: "1970-01-19T13:55:54.448Z"
+                proofPurpose: "assertionMethod"
+                verificationMethod: "did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D#eidasKey"
+                jws: "eyJhbGciOiJFUzI1NkstUiIsInR5cCI6IkpXVCIsImtpZCI6ImRpZDp2aWQ6MHhCNTUxYjcwZDY1MDg5MmQyM2RFM0JlMjAxQTk1YzFGY0JlYTk4QTNEI2VpZGFzS2V5In0.eyJpYXQiOjE2MDUzNTQ0NDgsIkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly9hcGkudmlkY2hhaW4ubmV0L2NyZWRlbnRpYWxzL3ZlcmlmaWFibGVJZC92MSJdLCJpZCI6InZpZDp0eXBlLXZlcnNpb24tb2YtdGhlLWNyZWRlbnRpYWwiLCJ0eXBlIjoiWydWZXJpZmlhYmxlQ3JlZGVudGlhbCcsJ1ZlcmlmaWFibGVJRCddIiwiaXNzdWVyIjoiZGlkOnZpZDoweDUyMDg0MzFDNkVDMmVjNDA5N2FlQTcxODJiQjkyZDAxODc2NjQ5OGMiLCJpc3N1YW5jZURhdGUiOiIyMDE5LTA2LTIyVDE0OjExOjQ0WiIsImV4cGlyYXRpb25EYXRlIjoiMjAxOS0wNi0yMlQxNDoxMTo0NFoiLCJjcmVkZW50aWFsU3ViamVjdCI6eyJpZCI6ImRpZDp2aWQ6MHg4NzA3Q0NhODM1Qzk2MTMzNEQzRjY0NTBDNmE2MWEwQUQ2NTkyNDYwIiwiZmlyc3ROYW1lIjoiRXZhIiwibGFzdE5hbWUiOiJNb25yb2UiLCJnZW5kZXIiOiJGZW1hbGUiLCJkYXRlT2ZCaXJ0aCI6IjEyLzExLzE5NzAiLCJwbGFjZU9mQmlydGgiOiJNYWRyaWQiLCJjdXJyZW50QWRkcmVzcyI6IkFyYWdvIDE3OSA0YSIsImNpdHkiOiJCYXJjZWxvbmEiLCJzdGF0ZSI6IkNhdGFsdW55YSIsInppcCI6IjA4MDExIn0sImlzcyI6ImRpZDp2aWQ6MHg1ZTQ2MWFGZkYzQjM5MmI3OTM3RDA1Q0FhMDk2NkI1MzhlQTQ1QjdmIn0.fEkAQlWyQaUNoo5g2FfCVi1-S_6g96E8znAjGSyKjVJLO2uNBnbR-Vxn-3NwVVr2UzmcQF--8mqpKTV3co3wXAE"
     Problem:
       description: A Problem Details object (RFC 7807)
       type: object
@@ -284,6 +286,128 @@ components:
           description: |
             An absolute URI that identifies the specific occurrence of the problem.
             It may or may not yield further information if dereferenced.
+    verifiableCred:
+      type: object
+      description: Verifiable Credential Data Model
+      example:
+        simple verifiable credential:
+          "@context":
+            - "https://www.w3.org/2018/credentials/v1"
+            - "https://www.w3.org/2018/credentials/examples/v1"
+          id: "http://example.edu/credentials/1872"
+          type:
+            - VerifiableCredential
+            - AlumniCredential
+          issuer: "https://example.edu/issuers/565049"
+          issuanceDate: "2010-01-01T19:73:24Z"
+          credentialSubject:
+            id: "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            alumniOf:
+              id: "did:example:c276e12ec21ebfeb1f712ebc6f1"
+              name:
+                - value: Example University
+                  lang: en
+                - value: "Exemple d'Université"
+                  lang: fr
+          proof:
+            type: RsaSignature2018
+            created: "2017-06-18T21:19:10Z"
+            proofPurpose: assertionMethod
+            verificationMethod: "https://example.edu/issuers/keys/1"
+            jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
+      title: Verifiable Credential
+      properties:
+        id:
+          type: string
+          example: "https://example.edu/credentials/1872"
+          description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
+          format: uri
+        "@context":
+          description: "An ordered set where the first item is a URI https://www.w3.org/2018/credentials/v1. It is used to define terms and help to express specific identifiers in a compact manner."
+          items:
+            type: string
+          uniqueItems: true
+          example:
+            - "https://www.w3.org/2018/credentials/v1"
+          type: array
+        type:
+          type: array
+          description: Type of the object or the datatype of the typed value.
+          example:
+            - VerifiableCredential
+            - UniversityDegreeCredential
+          items:
+            type: string
+        credentialSubject:
+          description: A set of objects that contain one or more properties that are each related to the subject of the credential.
+          oneOf:
+            - type: array
+              uniqueItems: true
+              items:
+                $ref: "#/components/schemas/subject"
+            - $ref: "#/components/schemas/subject"
+        issuer:
+          description: "A URI or an object containing an id property. Example: DID of the verifiable credential/presentation issuer."
+          oneOf:
+            - type: string
+              description: DID of the verifiable credential/presentation issuer.
+              format: uri
+              example: "did:vid:0x454253492d52554c45532d4d414c494e41524148"
+            - type: object
+              description: Object containing an id property to identify the issuer.
+              properties:
+                id:
+                  type: string
+                  description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
+                  format: uri
+                  example: "did:example:76e12ec712ebc6f1c221ebfeb1f"
+        issuanceDate:
+          type: string
+          description: Date and time at which the information associated with the verifiable credential/presentation becomes valid.
+          format: date-time
+          example: "2010-01-01T19:23:24Z"
+        expirationDate:
+          type: string
+          format: date-time
+          example: "2020-01-01T19:23:24Z"
+          description: Date and time at which a credential/presentation ceases to be valid.
+        proof:
+          $ref: "#/components/schemas/Proof"
+      required:
+        - "@context"
+        - type
+        - credentialSubject
+        - issuer
+        - issuanceDate
+    subject:
+      title: Subject
+      type: object
+      description: A thing about which claims are made
+      properties:
+        id:
+          type: string
+          description: "Object MAY contain an id"
+          example: "did:example:ebfeb1f712ebc6f1c276e12ec21"
+      example:
+        Diploma:
+          id: "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          degree:
+            type: BachelorDegree
+            name: Bachelor of Science and Arts
+        Affiliation:
+          id: "did:example:c276e12ec21ebfeb1f712ebc6f1"
+          name: Morgan Doe
+          spouse: "did:example:ebfeb1f712ebc6f1c276e12ec21"
+        ESSIF eID:
+          id: "did:vid:evas-did"
+          personIdentifier: BE/BE/02635542Y
+          currentFamilyName: Eva
+          currentGivenName: Adams
+          birthName: Eva
+          dateOfBirth: "1998-02-14"
+          placeOfBirth: Brussels
+          currentAddress: "44, rue de Fame"
+          gender: Female
   examples:
     BadRequest:
       value:
@@ -322,3 +446,4 @@ components:
         detail: |
           The server encountered an internal error and was unable to complete
           your request
+  
