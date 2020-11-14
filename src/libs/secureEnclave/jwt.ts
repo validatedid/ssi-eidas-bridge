@@ -12,7 +12,7 @@ export interface JWTVerifyOptions {
   auth?: boolean;
   audience?: string;
   callbackUrl?: string;
-  resolver: string | Resolver;
+  resolver: Resolver;
 }
 
 export interface JWTHeader {
