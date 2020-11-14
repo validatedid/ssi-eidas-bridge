@@ -15,53 +15,9 @@ servers:
   - url: https://api.vidchain.net
     description: Validated ID API Docs
 tags:
-  - name: Authentication
-    description: Authenticate to the SSI eIDAS Bridge API
   - name: eIDAS Bridge
     description: Sign and validate signatures
 paths:
-  /eidas-bridge/v1/sessions:
-    post:
-      tags:
-        - Authentication
-      summary: Login to the eIDAS Bridge services
-      description: Login to the eIDAS Bridge services
-      operationId: post-eidas-bridge-v1-sessions
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SessionsRequest"
-        required: true
-      responses:
-        "200":
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SessionsResponse"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-              examples:
-                Bad Request:
-                  $ref: "#/components/examples/BadRequest"
-                Token Expired:
-                  $ref: "#/components/examples/ExpiredToken"
-                Issuer Not Found:
-                  $ref: "#/components/examples/IssuerNotFound"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-              examples:
-                Internal Server Error:
-                  $ref: "#/components/examples/InternalError"
   /eidas-bridge/v1/signatures:
     post:
       tags:
@@ -167,8 +123,6 @@ paths:
               examples:
                 Internal Server Error:
                   $ref: "#/components/examples/InternalError"
-      security:
-        - bearerAuth: []
   /eidas-bridge/v1/signature-validations:
     post:
       tags:
@@ -227,14 +181,7 @@ paths:
               examples:
                 Internal Server Error:
                   $ref: "#/components/examples/InternalError"
-      security:
-        - bearerAuth: []
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
   schemas:
     Proof:
       description: |
@@ -272,44 +219,6 @@ components:
           example: did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D
         proof:
           $ref: "#/components/schemas/Proof"
-    SessionsRequest:
-      title: Sessions Request
-      description: Request for OAuth 2.0 JWT bearer assertion grant.
-      type: object
-      required:
-        - grantType
-        - assertion
-      properties:
-        grantType:
-          description: OAuth 2.0 grant type. Must be set to
-            "urn:ietf:params:oauth:grant-type:jwt-bearer"
-          type: string
-          example: "urn:ietf:params:oauth:grant-type:jwt-bearer"
-        assertion:
-          type: string
-          description: Self-signed JWT
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-    SessionsResponse:
-      title: Sessions Response
-      description: Authentication JWT
-      type: object
-      properties:
-        accessToken:
-          description: Authentication JWT to access the API.
-          type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-        tokenType:
-          description: Type of the authentication token. Supported type "bearer".
-          type: string
-          example: Bearer
-        expiresIn:
-          description: JWT expiration in seconds.
-          type: integer
-          example: 900
-        issuedAt:
-          description: "Time of JWT issuance. Format: unix timestamp"
-          type: string
-          example: "1467841035013"
     Problem:
       description: A Problem Details object (RFC 7807)
       type: object
