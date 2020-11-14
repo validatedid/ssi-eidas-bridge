@@ -13,15 +13,15 @@ variables:
   DOCKER_BUILDKIT: 1
   # Image repository
   Repo: "eidas-bridge"
-  RepoEndpoint: "k8scrvidchaindev.azurecr.io/eidas-bridge"
+  RepoEndpoint: "k8scrvidchainpro.azurecr.io/eidas-bridge"
   # Repository directory
   dir: "./"
   # Dockerfile
   Dockerfile: "Dockerfile"
   # Kubernetes YAML
-  k8s: "k8s/k8s-dev.yml"
+  k8s: "k8s/k8s-pro.yml"
   # Configmaps
-  configMap: "k8s/configmap-dev.yml"
+  configMap: "k8s/configmap-pro.yml"
   # package.json
   packageJson: "package.json"
   # Kubernetes namespace
