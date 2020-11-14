@@ -25,7 +25,7 @@ variables:
   # package.json
   packageJson: "package.json"
   # Kubernetes namespace
-  namespace: "development"
+  namespace: "production"
   # Image tagging: application version - build
   tag: $(Build.BuildNumber)
   # Agent VM image name
@@ -75,7 +75,7 @@ stages:
         displayName: "Deploy eidas-bridge"
         pool:
           vmImage: $(vmImageName)
-        environment: "development"
+        environment: "production"
         strategy:
           runOnce:
             deploy:
