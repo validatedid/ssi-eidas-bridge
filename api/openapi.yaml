@@ -15,8 +15,6 @@ servers:
   - url: https://api.vidchain.net
     description: Validated ID API Docs
 tags:
-  - name: Authentication
-    description: Authenticate to the SSI eIDAS Bridge API
   - name: eIDAS Bridge
     description: Sign and validate signatures
 paths:
