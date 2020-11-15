@@ -130,7 +130,6 @@ describe("controller tests should", () => {
       },
     };
     const response = await Controller.EIDASsignature(signPayload);
-    console.log(response.vc);
     expect(response).toBeDefined();
     expect(response.vc).toBeDefined();
     expect(response.vc.proof).toBeDefined();
