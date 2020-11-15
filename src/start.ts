@@ -11,6 +11,9 @@ const startAll = async (): Promise<void> => {
   );
 };
 
-startAll();
+startAll().then(
+  () => {},
+  () => {}
+);
 
 export default startAll;
