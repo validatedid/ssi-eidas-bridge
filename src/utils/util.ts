@@ -1,6 +1,7 @@
 import { JWK } from "jose";
 import * as util from "util";
 import { AxiosError } from "axios";
+import { decodeJWT } from "did-jwt";
 import LOGGER from "../logger";
 import { ENVIRONMENT } from "../config";
 import { ProblemDetailsError } from "../errors";
@@ -60,6 +61,13 @@ const PRINT_SILLY = (data: any, operation?: string): void => {
   PRINT(`\n${toPrint}`, "silly", operation);
 };
 
+const getIssuanceDate = (jwt: string): string => {
+  const { payload } = decodeJWT(jwt);
+  const iat = payload.iat ? payload.iat : new Date();
+  const issuanceDate = new Date(iat).toISOString();
+  return issuanceDate;
+};
+
 export {
   toHex,
   PRINT_INFO,
@@ -68,4 +76,5 @@ export {
   PRINT_SILLY,
   generateKeys,
   prefixWith0x,
+  getIssuanceDate,
 };

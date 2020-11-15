@@ -3,6 +3,9 @@ export interface Proof {
   created: string;
   proofPurpose: string;
   verificationMethod: string;
-  jws: string;
-  [x: string]: string;
+  jws?: string;
+}
+export interface EidasProof extends Proof {
+  domain?: string;
+  cades?: string;
 }

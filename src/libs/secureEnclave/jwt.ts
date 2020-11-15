@@ -111,4 +111,5 @@ export interface AccessTokenResponseBody {
 export enum SignatureTypes {
   EcdsaSecp256k1Signature2019 = "EcdsaSecp256k1Signature2019",
   EidasSeal2019 = "EidasSeal2019",
+  CAdESRSASignature2020 = "CAdESRSASignature2020",
 }

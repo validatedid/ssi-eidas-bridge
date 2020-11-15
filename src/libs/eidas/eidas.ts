@@ -1,9 +1,14 @@
+import { SignPayload } from "../../dtos/secureEnclave";
+import { InternalError, ApiErrorMessages, BadRequestError } from "../../errors";
+import { getIssuanceDate } from "../../utils/util";
+import { EnterpriseWallet } from "../secureEnclave";
+import { SignatureTypes } from "../secureEnclave/jwt";
 import {
   DEFAULT_EIDAS_PROOF_TYPE,
   DEFAULT_PROOF_PURPOSE,
   DEFAULT_EIDAS_VERIFICATION_METHOD,
 } from "./constants";
-import { Proof } from "./types";
+import { EidasProof, Proof } from "./types";
 
 const PROOF_REQUIRED_KEYS = [
   "type",
@@ -66,4 +71,41 @@ const validateEIDASProofAttributes = (proof: Proof): void => {
   validateProofKeys(proof);
 };
 
-export default validateEIDASProofAttributes;
+const signEidas = async (signPayload: SignPayload): Promise<EidasProof> => {
+  let payloadToSign = signPayload.payload;
+  if (signPayload.payload.proof) {
+    // removing proof
+    payloadToSign = (({ proof, ...o }) => o)(signPayload.payload);
+  }
+  let jws: string;
+  let proof: EidasProof;
+
+  switch (signPayload.type) {
+    case SignatureTypes.EidasSeal2019:
+    case SignatureTypes.EcdsaSecp256k1Signature2019:
+      jws = await EnterpriseWallet.signDidJwt(
+        signPayload.issuer,
+        Buffer.from(JSON.stringify(payloadToSign)),
+        signPayload.expiresIn
+      );
+      if (!jws)
+        throw new InternalError(InternalError.defaultTitle, {
+          detail: ApiErrorMessages.ERROR_SIGNATURE_CREATION,
+        });
+
+      proof = {
+        type: signPayload.type,
+        created: getIssuanceDate(jws),
+        proofPurpose: DEFAULT_PROOF_PURPOSE,
+        verificationMethod: `${signPayload.issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
+        jws,
+      };
+      return proof;
+    default:
+      throw new BadRequestError(BadRequestError.defaultTitle, {
+        detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
+      });
+  }
+};
+
+export { validateEIDASProofAttributes, signEidas };
