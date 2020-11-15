@@ -1,4 +1,4 @@
-FROM node:12.16.1-alpine as base
+FROM node:14.15.0-alpine3.12 as base
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --silent --production && yarn cache clean
 
