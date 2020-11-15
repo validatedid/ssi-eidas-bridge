@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redisBridge
+  labels:
+    app: redisBridge
+spec:
+  selector:
+    matchLabels:
+      app: redisBridge
+  replicas: 1
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        app: redisBridge
+    spec:
+      containers:
+      - name: master
+        image: redis
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 6380
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redisBridge
+  labels:
+    app: redisBridge
+spec:
+  ports:
+  - port: 6380
+    targetPort: 6380
+  selector:
+    app: redisBridge

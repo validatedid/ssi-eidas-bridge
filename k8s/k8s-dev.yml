@@ -42,6 +42,16 @@ spec:
             configMapKeyRef:
               name: eidas-bridge-configmap
               key: EIDAS_TEST_MODE
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: eidas-bridge-configmap
+              key: REDIS_URL
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: eidas-bridge-configmap
+              key: REDIS_PORT
         - name: DID_REGISTRY_SC_ADDRESS
           valueFrom:
             secretKeyRef:

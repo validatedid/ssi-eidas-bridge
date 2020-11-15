@@ -7,6 +7,7 @@ import {
   EIDASSignatureOutput,
   VerifiableCredential,
 } from "../../dtos/eidas";
+import { RedisInsertion } from "../../dtos/redis";
 import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
 import { Proof } from "../../libs/eidas/types";
 import {
@@ -22,6 +23,7 @@ import { validateEIDASProofAttributes } from "../../libs/eidas";
 import { EnterpriseWallet } from "../../libs/secureEnclave";
 import * as config from "../../config";
 import { EidasKeysOptions } from "../../dtos/keys";
+import redis from "../../libs/storage/redis";
 
 export default class Controller {
   /**
@@ -69,7 +71,7 @@ export default class Controller {
     };
     let proofs: Proof[] = [];
     if (Array.isArray(payload.proof)) {
-      proofs = payload.proof;
+      proofs = payload.proof as Proof[];
       proofs.push(proof);
     }
     if (payload.proof && !Array.isArray(payload.proof)) {
@@ -131,17 +133,25 @@ export default class Controller {
     return issuanceDate;
   }
 
-  static putEidasKeys(opts: EidasKeysOptions): string {
+  static async putEidasKeys(opts: EidasKeysOptions): Promise<RedisInsertion> {
     if (
       !opts ||
       !opts.did ||
       !opts.eidasKey ||
       !opts.keyType ||
+      !["RSA", "EC", "OKP"].includes(opts.keyType) ||
       (opts.keyType === ("EC" || "OKP") && !opts.curveType)
     )
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
-    return opts.eidasKey;
+    let firstInsertion = true;
+    const previousKeys = await redis.get(opts.did);
+    if (previousKeys) firstInsertion = false;
+    await redis.set(opts.did, opts.eidasKey);
+    return {
+      eidasKey: opts.eidasKey,
+      firstInsertion,
+    };
   }
 }

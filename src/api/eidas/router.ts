@@ -45,6 +45,17 @@ class Router {
       }
     );
 
+    router.put(
+      `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`,
+      cors(),
+      async (req: express.Request, res: express.Response) => {
+        const { eidasKey, firstInsertion } = await Controller.putEidasKeys(
+          req.body
+        );
+        if (firstInsertion) res.status(201).json(eidasKey);
+        res.status(200).json(eidasKey);
+      }
+    );
     router.options("*", cors());
     server.use(BRIDGE_SERVICE.BASE_PATH.EIDAS, router);
   }
