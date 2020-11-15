@@ -98,6 +98,7 @@ const BRIDGE_SERVICE_CALL = {
   BRIDGE_LOGIN: "/sessions",
   SIGNATURE_CREATION: "/signatures",
   SIGNATURE_VALIDATION: "/signature-validations",
+  ADD_EIDAS_KEY: "/eidas-keys",
 };
 
 const BRIDGE_SERVICE_URL = {
