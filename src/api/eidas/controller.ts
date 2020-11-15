@@ -132,6 +132,16 @@ export default class Controller {
   }
 
   static putEidasKeys(opts: EidasKeysOptions): string {
+    if (
+      !opts ||
+      !opts.did ||
+      !opts.eidasKey ||
+      !opts.keyType ||
+      (opts.keyType === ("EC" || "OKP") && !opts.curveType)
+    )
+      throw new BadRequestError(BadRequestError.defaultTitle, {
+        detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
+      });
     return opts.eidasKey;
   }
 }

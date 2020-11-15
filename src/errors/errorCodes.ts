@@ -12,6 +12,7 @@ export enum ApiErrorMessages {
   SIGNATURE_BAD_TYPE = "Signature type  not supported.",
   NO_AUDIENCE = "No audience provided",
   INVALID_AUDIENCE = "Invalid audience. Should be a string",
+  BAD_INPUT_EIDAS_KEYS_PARAMS = "Eidas keys call requires an EidasKeysOptions filled with the correct attributes",
 }
 
 export default { ApiErrorMessages };
