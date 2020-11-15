@@ -21,6 +21,7 @@ import {
 import { validateEIDASProofAttributes } from "../../libs/eidas";
 import { EnterpriseWallet } from "../../libs/secureEnclave";
 import * as config from "../../config";
+import { EidasKeysOptions } from "../../dtos/keys";
 
 export default class Controller {
   /**
@@ -128,5 +129,9 @@ export default class Controller {
     const iat = payload.iat ? payload.iat : new Date();
     const issuanceDate = new Date(iat).toISOString();
     return issuanceDate;
+  }
+
+  static putEidasKeys(opts: EidasKeysOptions): string {
+    return opts.eidasKey;
   }
 }
