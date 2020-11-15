@@ -52,8 +52,7 @@ class Router {
         const { eidasKey, firstInsertion } = await Controller.putEidasKeys(
           req.body
         );
-        if (firstInsertion) res.status(201).json(eidasKey);
-        res.status(200).json(eidasKey);
+        res.status(firstInsertion ? 201 : 200).json(eidasKey);
       }
     );
     router.options("*", cors());
