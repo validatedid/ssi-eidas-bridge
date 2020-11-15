@@ -26,7 +26,5 @@ export interface Credential extends InputCredential {
   "@context": string[];
 }
 export interface VerifiableCredential extends Credential {
-  issuer: string;
-  issuanceDate: string;
-  proof: Proof;
+  proof: Proof | Proof[];
 }

@@ -39,33 +39,45 @@ export default class Controller {
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,
       });
-
     const { issuer, payload, type, expiresIn } = signPayload;
-
+    let payloadToSign = payload;
     if (type !== SignatureTypes.EidasSeal2019)
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
       });
-
+    if (payload.proof) {
+      // removing proof
+      payloadToSign = (({ proof, ...o }) => o)(payload);
+    }
     // sign with another keypair
     const jws: string = await EnterpriseWallet.signDidJwt(
       issuer,
-      Buffer.from(JSON.stringify(payload)),
+      Buffer.from(JSON.stringify(payloadToSign)),
       expiresIn
     );
     if (!jws)
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.ERROR_SIGNATURE_CREATION,
       });
+    const proof: Proof = {
+      type,
+      created: Controller.getIssuanceDate(jws),
+      proofPurpose: DEFAULT_PROOF_PURPOSE,
+      verificationMethod: `${issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
+      jws,
+    };
+    let proofs: Proof[] = [];
+    if (Array.isArray(payload.proof)) {
+      proofs = payload.proof;
+      proofs.push(proof);
+    }
+    if (payload.proof && !Array.isArray(payload.proof)) {
+      proofs.push(payload.proof as Proof);
+      proofs.push(proof);
+    }
     const vc: VerifiableCredential = {
       ...(payload as Credential),
-      proof: {
-        type,
-        created: Controller.getIssuanceDate(jws),
-        proofPurpose: DEFAULT_PROOF_PURPOSE,
-        verificationMethod: `${issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
-        jws,
-      } as Proof,
+      proof: proofs && proofs.length > 0 ? proofs : proof,
     };
     return {
       issuer,
