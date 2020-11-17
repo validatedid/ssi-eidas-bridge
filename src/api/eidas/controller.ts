@@ -145,13 +145,11 @@ export default class Controller {
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
-    let firstInsertion = true;
     const previousKeys = await redis.get(opts.did);
-    if (previousKeys) firstInsertion = false;
     await redis.set(opts.did, opts.eidasKey);
     return {
       eidasKey: opts.eidasKey,
-      firstInsertion,
+      firstInsertion: !previousKeys,
     };
   }
 }

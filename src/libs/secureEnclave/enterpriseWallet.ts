@@ -13,16 +13,10 @@ export default class EnterpriseWallet {
     data: Buffer,
     expiresIn?: number
   ): Promise<string> {
-    let jwk = util.generateKeys();
     const storedKeys = await redis.get(issuer);
-    if (storedKeys) {
-      const wallet: ethers.Wallet = new ethers.Wallet(
-        util.prefixWith0x(storedKeys)
-      );
-      const { privateKey } = new ethers.utils.SigningKey(wallet.privateKey);
-      const { publicKey } = new ethers.utils.SigningKey(wallet.privateKey);
-      jwk = getJWKfromHex(publicKey, privateKey);
-    }
+    const jwk = storedKeys
+      ? this.getJwkfromKeys(storedKeys)
+      : util.generateKeys();
     const signer = SimpleSigner(util.toHex(<string>jwk.d).replace("0x", "")); // Removing 0x from wallet private key as input of SimpleSigner
     const header: JWTHeader = {
       alg: JWT_ALG,
@@ -41,6 +35,13 @@ export default class EnterpriseWallet {
     );
 
     return jwt;
+  }
+
+  static getJwkfromKeys(keys: string): JWK.ECKey {
+    const wallet: ethers.Wallet = new ethers.Wallet(util.prefixWith0x(keys));
+    const { privateKey } = new ethers.utils.SigningKey(wallet.privateKey);
+    const { publicKey } = new ethers.utils.SigningKey(wallet.privateKey);
+    return getJWKfromHex(publicKey, privateKey);
   }
 
   static getDid(jwk: JWK.ECKey): string {
