@@ -6,3 +6,5 @@ data:
   BRIDGE_ENV: "development"
   DEBUG_LEVEL: "debug" # { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
   EIDAS_TEST_MODE: "false"
+  REDIS_URL: redisBridge
+  REDIS_PORT: 6380

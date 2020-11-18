@@ -2,8 +2,8 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
   rootDir: ".",
-  roots: ["<rootDir>/src/", "<rootDir>/api/", "<rootDir>/tests/"],
-  testMatch: ["**/?(*.)+(spec|test).+(ts|tsx|js)"],
+  roots: ["<rootDir>/src/", "<rootDir>/tests/"],
+  testMatch: ["**/?(*.)+(spec|test|tests).+(ts|tsx|js)"],
   transform: {
     "^.+\\.(ts|tsx)?$": "ts-jest",
   },
@@ -15,7 +15,7 @@ module.exports = {
     "!**/node_modules/**",
   ],
   collectCoverage: true,
-  reporters: ["default", "jest-sonar"],
+  reporters: ["default", ["jest-junit", { outputDirectory: "./coverage" }]],
   globals: {
     "ts-jest": {
       diagnostics: true,

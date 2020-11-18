@@ -1,5 +1,5 @@
-import Controller from "../../../src/api/eidas/controller";
-import { SignPayload } from "../../../src/dtos/secureEnclave";
+import Controller from "../../src/api/eidas/controller";
+import { SignPayload } from "../../src/dtos/secureEnclave";
 
 describe("controller tests should", () => {
   it("create a proof from a given credential", async () => {
@@ -130,7 +130,6 @@ describe("controller tests should", () => {
       },
     };
     const response = await Controller.EIDASsignature(signPayload);
-    console.log(response.vc);
     expect(response).toBeDefined();
     expect(response.vc).toBeDefined();
     expect(response.vc.proof).toBeDefined();
