@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redisBridge
+  name: redisbrige
   labels:
-    app: redisBridge
+    app: redisbrige
 spec:
   selector:
     matchLabels:
-      app: redisBridge
+      app: redisbrige
   replicas: 1
   revisionHistoryLimit: 1
   template:
     metadata:
       labels:
-        app: redisBridge
+        app: redisbrige
     spec:
       containers:
       - name: master
@@ -29,12 +29,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: redisBridge
+  name: redisbrige
   labels:
-    app: redisBridge
+    app: redisbrige
 spec:
   ports:
   - port: 6380
     targetPort: 6380
   selector:
-    app: redisBridge
+    app: redisbrige
