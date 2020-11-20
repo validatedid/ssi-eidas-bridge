@@ -7,6 +7,7 @@ import {
   EIDASSignatureOutput,
   VerifiableCredential,
 } from "../../dtos/eidas";
+import { RedisInsertion } from "../../dtos/redis";
 import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
 import { Proof } from "../../libs/eidas/types";
 import {
@@ -21,6 +22,8 @@ import {
 import { validateEIDASProofAttributes } from "../../libs/eidas";
 import { EnterpriseWallet } from "../../libs/secureEnclave";
 import * as config from "../../config";
+import { EidasKeysOptions } from "../../dtos/keys";
+import redis from "../../libs/storage/redis";
 
 export default class Controller {
   /**
@@ -39,33 +42,45 @@ export default class Controller {
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,
       });
-
     const { issuer, payload, type, expiresIn } = signPayload;
-
+    let payloadToSign = payload;
     if (type !== SignatureTypes.EidasSeal2019)
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
       });
-
+    if (payload.proof) {
+      // removing proof
+      payloadToSign = (({ proof, ...o }) => o)(payload);
+    }
     // sign with another keypair
     const jws: string = await EnterpriseWallet.signDidJwt(
       issuer,
-      Buffer.from(JSON.stringify(payload)),
+      Buffer.from(JSON.stringify(payloadToSign)),
       expiresIn
     );
     if (!jws)
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.ERROR_SIGNATURE_CREATION,
       });
+    const proof: Proof = {
+      type,
+      created: Controller.getIssuanceDate(jws),
+      proofPurpose: DEFAULT_PROOF_PURPOSE,
+      verificationMethod: `${issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
+      jws,
+    };
+    let proofs: Proof[] = [];
+    if (Array.isArray(payload.proof)) {
+      proofs = payload.proof as Proof[];
+      proofs.push(proof);
+    }
+    if (payload.proof && !Array.isArray(payload.proof)) {
+      proofs.push(payload.proof as Proof);
+      proofs.push(proof);
+    }
     const vc: VerifiableCredential = {
       ...(payload as Credential),
-      proof: {
-        type,
-        created: Controller.getIssuanceDate(jws),
-        proofPurpose: DEFAULT_PROOF_PURPOSE,
-        verificationMethod: `${issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
-        jws,
-      } as Proof,
+      proof: proofs && proofs.length > 0 ? proofs : proof,
     };
     return {
       issuer,
@@ -116,5 +131,25 @@ export default class Controller {
     const iat = payload.iat ? payload.iat : new Date();
     const issuanceDate = new Date(iat).toISOString();
     return issuanceDate;
+  }
+
+  static async putEidasKeys(opts: EidasKeysOptions): Promise<RedisInsertion> {
+    if (
+      !opts ||
+      !opts.did ||
+      !opts.eidasKey ||
+      !opts.keyType ||
+      !["RSA", "EC", "OKP"].includes(opts.keyType) ||
+      (opts.keyType === ("EC" || "OKP") && !opts.curveType)
+    )
+      throw new BadRequestError(BadRequestError.defaultTitle, {
+        detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
+      });
+    const previousKeys = await redis.get(opts.did);
+    await redis.set(opts.did, opts.eidasKey);
+    return {
+      eidasKey: opts.eidasKey,
+      firstInsertion: !previousKeys,
+    };
   }
 }
