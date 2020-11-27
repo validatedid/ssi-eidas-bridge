@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 // import { JWK } from "jose";
-import { KJUR } from "jsrsasign";
+import { KJUR, ASN1HEX } from "jsrsasign";
 import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
 /*
 const generateKeys = (): JWK.RSAKey =>
@@ -14,7 +14,7 @@ const pemTestCertificate =
 const pemTestPrivKey =
   "-----BEGIN PRIVATE KEY-----MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDfdOqotHd55SYO0dLz2oXengw/tZ+q3ZmOPeVmMuOMIYO/Cv1wk2U0OK4pug4OBSJPhl09Zs6IwB8NwPOU7EDTgMOcQUYB/6QNCI1J7Zm2oLtuchzz4pIb+o4ZAhVprLhRyvqi8OTKQ7kfGfs5Tuwmn1M/0fQkfzMxADpjOKNgf0uy6lN6utjdTrPKKFUQNdc6/Ty8EeTnQEwUlsT2LAXCfEKxTn5RlRljDztS7Sfgs8VL0FPy1Qi8B+dFcgRYKFrcpsVaZ1lBmXKsXDRu5QR/Rg3f9DRq4GR1sNH8RLY9uApMl2SNz+sR4zRPG85R/se5Q06Gu0BUQ3UPm67ETVZLAgMBAAECggEADjU54mYvHpICXHjc5+JiFqiH8NkUgOG8LL4kwt3DeBp9bP0+5hSJH8vmzwJkeGG9L79EWG4b/bfxgYdeNX7cFFagmWPRFrlxbd64VRYFawZHRJt+2cbzMVI6DL8EK4bu5Ux5qTiV44Jw19hoD9nDzCTfPzSTSGrKD3iLPdnREYaIGDVxcjBv3Tx6rrv3Z2lhHHKhEHb0RRjATcjAVKV9NZhMajJ4l9pqJ3A4IQrCBl95ux6Xm1oXP0i6aR78cjchsCpcMXdP3WMsvHgTlsZT0RZLFHrvkiNHlPiil4G2/eHkwvT//CrcbO6SmI/zCtMmypuHJqcr+Xb7GPJoa64WoQKBgQDwrfelf3Rdfo9kaK/brBmbu1++qWpYVPTedQy84DK2p3GE7YfKyI+fhbnw5ol3W1jjfvZCmK/p6eZR4jgyJ0KJ76z53T8HoDTF+FTkR55oM3TEM46XzI36RppWP1vgcNHdz3U4DAqkMlAh4lVm3GiKPGX5JHHe7tWz/uZ55Kk58QKBgQDtrkqdSzWlOjvYD4mq4m8jPgS7v3hiHd+1OT8S37zdoT8VVzo2T4SF+fBhI2lWYzpQp2sCjLmCwK9k/Gur55H2kTBTwzlQ6WSLTe9Zj+eoMGklIirA+8YdQHXrO+CCw9BTJAF+c3c3xeUOLXafzyW29bASGfUtA7AxQAsR+Rr3+wKBgAwfZxrh6ZWP+17+WuVArOWIMZFj7SRX2yGdWa/lxwgmNPSSFkXjhkBttujoY8IsSrTivzqpgCrTCjPTpir4iURzWw4W08bpjd7u3C/HX7Y16Uq8ohEJT5lslveDJ3iNljSK74eMK7kLg7fBM7YDogxccHJ1IHsvInp3e1pmZxOxAoGAO+bSTUQ4N/UuQezgkF3TDrnBraO67leDGwRbfiE/U0ghQvqh5DA0QSPVzlWDZc9KUitvj8vxsR9o1PW9GS0an17GJEYuetLnkShKK3NWOhBBX6d1yP9rVdH6JhgIJEy/g0Suz7TAFiFc8i7JF8u4QJ05C8bZAMhOLotqftQeVOMCgYAid8aaRvaM2Q8a42Jn6ZTT5ms6AvNr98sv0StnfmNQ+EYXN0bEk2huSW+w2hN34TYYBTjViQmHbhudwwu8lVjEccDmIXsUFbHVK+kTIpWGGchy5cYPs3k9s1nMR2av0Lojtw9WRY76xRXvN8W6R7EhwA2ax3+gEEYpGhjM/lO2Lg==-----END PRIVATE KEY-----";
 
-const signCadesRsa = (_input: CadesSignatureInput): CadesSignatureOutput => {
+const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
   /*
   const rsaKey = generateKeys();
   const privateKeyPem = rsaKey.toPEM(true);
@@ -96,6 +96,7 @@ const signCadesRsa = (_input: CadesSignatureInput): CadesSignatureOutput => {
     cert: pemTestCertificate,
   });
   console.log(signerIdentifier); */
+  /*
   const sd = new KJUR.asn1.cms.SignedData({
     version: 1,
     hashalgs: ["sha256"],
@@ -132,8 +133,44 @@ const signCadesRsa = (_input: CadesSignatureInput): CadesSignatureOutput => {
       },
     ],
   });
+*/
 
-  const hex = sd.getContentInfoEncodedHex();
+  const params = {
+    version: 1,
+    hashalgs: ["sha256"],
+    econtent: {
+      type: "data",
+      content: { str: input.data },
+    },
+    sinfos: [
+      {
+        version: 1,
+        id: { type: "isssn", cert: input.pemCert },
+        hashalg: "sha256",
+        sattrs: {
+          array: [
+            {
+              attr: "contentType",
+              type: "data",
+            },
+            {
+              attr: "signingTime",
+              str: "131231235959Z",
+            },
+            {
+              attr: "messageDigest",
+              hex: input.hash,
+            },
+          ],
+        },
+        sigalg: "SHA256withRSA",
+        signkey: input.pemPrivKey,
+      },
+    ],
+  };
+  const signedData = new KJUR.asn1.cms.SignedData(params);
+  const hex = signedData.getContentInfoEncodedHex();
+  // console.warn(ASN1HEX.dump(hex));
 
   const cadesOuput: CadesSignatureOutput = {
     cades: hex,
@@ -142,4 +179,8 @@ const signCadesRsa = (_input: CadesSignatureInput): CadesSignatureOutput => {
   return cadesOuput;
 };
 
-export default signCadesRsa;
+const verifyCadesSignature = (hexSignature: string): boolean => {
+  return false;
+};
+
+export { signCadesRsa, verifyCadesSignature };

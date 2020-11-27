@@ -4,6 +4,9 @@ export interface CadesSignatureOutput {
 }
 
 export interface CadesSignatureInput {
-  issuer: string;
-  data: Buffer;
+  issuer?: string;
+  data: string;
+  hash: string;
+  pemCert: string;
+  pemPrivKey: string;
 }
