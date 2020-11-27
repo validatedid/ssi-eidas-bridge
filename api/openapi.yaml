@@ -231,7 +231,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EidasKey"
-                "400":
+        "400":
           description: Bad Request
           content:
             application/problem+json:
