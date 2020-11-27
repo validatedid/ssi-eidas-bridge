@@ -155,6 +155,12 @@ const LEDGER = {
     "DID_REGISTRY_SC_ADDRESS"
   ),
 };
+
+const REDIS = {
+  PORT: process.env.REDIS_PORT,
+  URL: process.env.REDIS_URL,
+};
+
 export {
   API_NAME,
   LOG_LEVEL,
@@ -165,4 +171,5 @@ export {
   BRIDGE_DID_IDENTIFIERS,
   WALLET,
   LEDGER,
+  REDIS,
 };

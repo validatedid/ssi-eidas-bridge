@@ -16,7 +16,7 @@ servers:
     description: Validated ID API 
   - url: https://dev.vidchain.net
     description: Validated ID API Dev
-  - url: https://localhost:9002
+  - url: http://localhost:9002
     description: localhost
 tags:
   - name: SSI EIDAS Bridge
@@ -25,7 +25,7 @@ paths:
   /eidas-bridge/v1/signatures:
     post:
       tags:
-        - eIDAS Bridge
+        - SSI EIDAS Bridge
       summary: Creates a JWT ES256K eIDAS eSeal signature
       description: "Creates a JWT ES256K eIDAS eSeal signature"
       operationId: post-eidas-bridge-v1-signatures
@@ -130,7 +130,7 @@ paths:
   /eidas-bridge/v1/signature-validations:
     post:
       tags:
-        - eIDAS Bridge
+        - SSI EIDAS Bridge
       summary: Validates a JWT ES256K eIDAS eSeal signature
       description: "Validates a JWT ES256K eIDAS eSeal signature"
       operationId: post-eidas-bridge-v1-signature-validations
@@ -150,6 +150,88 @@ paths:
         "204":
           description: Valid
         "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Bad Request:
+                  $ref: "#/components/examples/BadRequest"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Unauthorized:
+                  $ref: "#/components/examples/Unauthorized"
+        "403":
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Forbidden:
+                  $ref: "#/components/examples/Forbidden"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Internal Server Error:
+                  $ref: "#/components/examples/InternalError"
+  /eidas-bridge/v1/eidas-keys:
+    put:
+      tags:
+        - SSI EIDAS Bridge
+      summary: Updates the keys used to sign
+      description: "Stores eidas keys used to sign"
+      operationId: put-eidas-bridge-v1-eidas-keys
+      requestBody:
+        description: Include in the body EidasKeysOptions
+        content:
+          application/json:
+            schema:
+              required:
+                - EidasKeysOptions
+              type: object
+              properties:
+                did:
+                  description: Did of the signer
+                  type: string
+                  example: did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D
+                eidasKey:
+                  description: hexPrivateKey for secp256k1 or PEM RSA key 
+                  type: string
+                  example: "c07394b3e13e114406144d8fa4e90429a27e20131c68f070c40533a059fef51f"
+                keyType:
+                  description: Specifies type of key used, i.e. "RSA", "EC" or "OKP"
+                  type: string
+                  example: "EC"
+                curveType:
+                  description: If keyType is "EC" or "OKP", the curveType can be specified as well as "P-256", "secp256k1","P-384" or "P-521"
+                  type: object
+                  example: "secp256k1"
+        required: true
+      responses:
+        "201":
+          description: Keys stored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EidasKey"
+        "200":
+          description: Keys updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EidasKey"
+                "400":
           description: Bad Request
           content:
             application/problem+json:
@@ -408,37 +490,32 @@ components:
           placeOfBirth: Brussels
           currentAddress: "44, rue de Fame"
           gender: Female
+    EidasKey:
+      title: EidasKey
+      type: string
+      description: |
+        hexPrivateKey for secp256k1 or PEM RSA key stored that will be used to sign.
+      properties:
+        id:
+          type: string
+          description: "key used to sign"
+      example: "c07394b3e13e114406144d8fa4e90429a27e20131c68f070c40533a059fef51f"
   examples:
     BadRequest:
       value:
         title: Bad Request
         status: 400
         detail: Bad request
-    InvalidToken:
-      value:
-        title: Bad Request
-        status: 400
-        detail: Invalid token
     Unauthorized:
       value:
         title: Unauthorized
         status: 401
         detail: Unauthorized
-    IssuerNotFound:
-      value:
-        title: Issuer Not Found
-        status: 400
-        detail: Issuer not found in the list of trusted apps.
     Forbidden:
       value:
         title: Forbidden
         status: 403
         detail: Forbidden
-    ExpiredToken:
-      value:
-        title: Token Expired
-        status: 400
-        detail: The token has expired.
     InternalError:
       value:
         title: Internal Server Error

@@ -7,21 +7,20 @@ import {
   EIDASSignatureOutput,
   VerifiableCredential,
 } from "../../dtos/eidas";
+import { RedisInsertion } from "../../dtos/redis";
 import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
-import { EidasProof, Proof } from "../../libs/eidas/types";
+import { Proof } from "../../libs/eidas/types";
 import {
   JWTVerifyOptions,
   SignatureTypes,
   VerifiedJwt,
 } from "../../libs/secureEnclave/jwt";
-import {
-  DEFAULT_PROOF_PURPOSE,
-  DEFAULT_EIDAS_VERIFICATION_METHOD,
-} from "../../libs/eidas/constants";
+
 import { validateEIDASProofAttributes } from "../../libs/eidas";
 import * as config from "../../config";
 import { EidasKeysOptions } from "../../dtos/keys";
 import { signEidas } from "../../libs/eidas/eidas";
+import redis from "../../libs/storage/redis";
 
 export default class Controller {
   /**
@@ -102,17 +101,30 @@ export default class Controller {
     return result;
   }
 
-  static putEidasKeys(opts: EidasKeysOptions): string {
+  static getIssuanceDate(jwt: string): string {
+    const { payload } = decodeJWT(jwt);
+    const iat = payload.iat ? payload.iat : new Date();
+    const issuanceDate = new Date(iat).toISOString();
+    return issuanceDate;
+  }
+
+  static async putEidasKeys(opts: EidasKeysOptions): Promise<RedisInsertion> {
     if (
       !opts ||
       !opts.did ||
       !opts.eidasKey ||
       !opts.keyType ||
+      !["RSA", "EC", "OKP"].includes(opts.keyType) ||
       (opts.keyType === ("EC" || "OKP") && !opts.curveType)
     )
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
-    return opts.eidasKey;
+    const previousKeys = await redis.get(opts.did);
+    await redis.set(opts.did, opts.eidasKey);
+    return {
+      eidasKey: opts.eidasKey,
+      firstInsertion: !previousKeys,
+    };
   }
 }
