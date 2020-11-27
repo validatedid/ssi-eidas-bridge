@@ -19,9 +19,179 @@ servers:
   - url: http://localhost:9002
     description: localhost
 tags:
+  - name: Authentication Service
+    description: Manage Entities Authentication
   - name: SSI EIDAS Bridge
     description: Sign and validate EIDAS signatures
 paths:
+  /eidas-bridge/v1/authentication/requests:
+    post:
+      operationId: post-eidas-bridge-v1-authentication-requests
+      tags:
+        - Authentication Service
+      summary: Initiate a DID Authentication Request
+      description: Initiate a DID Authentication Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionsRequest"
+            examples:
+              User Session Request:
+                value:
+                  grantType: urn:ietf:params:oauth:grant-type:jwt-bearer
+                  assertion: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                  scope: eidas profile user
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionsResponse"
+              examples:
+                Access Token:
+                  value:
+                    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                    tokenType: bearer
+                    expiresIn: 900
+                    issuedAt: "1467841035013"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Bad Request:
+                  $ref: "#/components/examples/BadRequest"
+                Issuer Not Found:
+                  $ref: "#/components/examples/IssuerNotFound"
+                Expired Token:
+                  $ref: "#/components/examples/ExpiredToken"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Internal Server Error:
+                  $ref: "#/components/examples/InternalError"
+  /eidas-bridge/v1/authentication/request-jwts:
+    get:
+      operationId: post-eidas-bridge-v1-authentication-request-jwts
+      tags:
+        - Authentication Service
+      summary: Retrieves a JWT token Authentication Request
+      description: Retrieves a JWT token Authentication Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionsRequest"
+            examples:
+              User Session Request:
+                value:
+                  grantType: urn:ietf:params:oauth:grant-type:jwt-bearer
+                  assertion: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                  scope: eidas profile user
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionsResponse"
+              examples:
+                Access Token:
+                  value:
+                    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                    tokenType: bearer
+                    expiresIn: 900
+                    issuedAt: "1467841035013"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Bad Request:
+                  $ref: "#/components/examples/BadRequest"
+                Issuer Not Found:
+                  $ref: "#/components/examples/IssuerNotFound"
+                Expired Token:
+                  $ref: "#/components/examples/ExpiredToken"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Internal Server Error:
+                  $ref: "#/components/examples/InternalError"
+  /eidas-bridge/v1/authentication/sessions:
+    post:
+      operationId: post-eidas-bridge-v1-authentication-sessions
+      tags:
+        - Authentication Service
+      summary: Requests a Sessions Token
+      description: | 
+       Requests a Sessions Token to call the protected API calls. 
+       This call requires to send an Authentication Response Token after
+       calling the Authentication Request endpoint.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionsRequest"
+            examples:
+              User Session Request:
+                value:
+                  grantType: urn:ietf:params:oauth:grant-type:jwt-bearer
+                  assertion: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                  scope: eidas profile user
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionsResponse"
+              examples:
+                Access Token:
+                  value:
+                    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                    tokenType: bearer
+                    expiresIn: 900
+                    issuedAt: "1467841035013"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Bad Request:
+                  $ref: "#/components/examples/BadRequest"
+                Issuer Not Found:
+                  $ref: "#/components/examples/IssuerNotFound"
+                Expired Token:
+                  $ref: "#/components/examples/ExpiredToken"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              examples:
+                Internal Server Error:
+                  $ref: "#/components/examples/InternalError"
   /eidas-bridge/v1/signatures:
     post:
       tags:
@@ -29,6 +199,8 @@ paths:
       summary: Creates an eIDAS eSeal signature
       description: Creates an eIDAS eSeal signature using the associated EIDAS keys with a DID
       operationId: post-eidas-bridge-v1-signatures
+      security:
+        - bearerAuth: []
       requestBody:
         description: |
           It requires the following fields:
@@ -201,6 +373,8 @@ paths:
       summary: Validates a W3C Verifiable Credential eSealed with an EIDAS QEC
       description: Validates a W3C Verifiable Credential eSealed with an EIDAS QEC
       operationId: post-eidas-bridge-v1-signature-validations
+      security:
+        - bearerAuth: []
       requestBody:
         description: W3C Verifiable Credential with an Ades Proof
         content:
@@ -314,6 +488,8 @@ paths:
       summary: Set up a DID with an eIDAS QEC to eSeal W3C Verifiable Credentials
       description: Set up a DID with an eIDAS QEC to eSeal W3C Verifiable Credentials
       operationId: put-eidas-bridge-v1-eidas-keys
+      security:
+        - bearerAuth: []
       requestBody:
         description: Set-up options for linking a DID with its eIDAS QEC
         content:
@@ -873,7 +1049,6 @@ components:
           description: DID of EIDAS key owner
           example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
       example: 
-        Response:
           id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
     Problem:
       description: A Problem Details object (RFC 7807)
@@ -911,6 +1086,51 @@ components:
           description: |
             An absolute URI that identifies the specific occurrence of the problem.
             It may or may not yield further information if dereferenced.
+    SessionsRequest:
+      title: Sessions Request
+      description: Request for OAuth 2.0 JWT bearer assertion grant.
+      type: object
+      properties:
+        grantType:
+          description: 'OAuth 2.0 grant type. Must be set to "urn:ietf:params:oauth:grant-type:jwt-bearer"'
+          type: string
+          example: "urn:ietf:params:oauth:grant-type:jwt-bearer"
+        assertion:
+          type: string
+          description: Self-signed JWT
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        scope:
+          type: string
+          description: Scope is used to define the authentication method.
+          enum:
+            - eidas profile user
+            - eidas profile entity
+          example: vidchain profile user
+      required:
+        - grantType
+        - assertion
+        - scope
+    SessionsResponse:
+      title: Sessions Response
+      type: object
+      properties:
+        accessToken:
+          description: Authentication JWT to access the API.
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        tokenType:
+          description: 'Type of the authentication token. Supported type "bearer".'
+          type: string
+          example: Bearer
+        expiresIn:
+          description: JWT expiration in seconds.
+          type: integer
+          example: 900
+        issuedAt:
+          description: "Time of JWT issuance. Format: unix timestamp"
+          type: string
+          example: "1467841035013"
+      description: Authentication JWT
   examples:
     BadRequest:
       value:
@@ -927,6 +1147,16 @@ components:
         title: Forbidden
         status: 403
         detail: Forbidden
+    IssuerNotFound:
+      value:
+        title: Issuer Not Found
+        status: 400
+        detail: Issuer not found in the trusted apps registry.
+    ExpiredToken:
+      value:
+        title: Token Expired
+        status: 400
+        detail: The token has expired.
     InternalError:
       value:
         title: Internal Server Error
@@ -934,4 +1164,8 @@ components:
         detail: |
           The server encountered an internal error and was unable to complete
           your request
-  
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
