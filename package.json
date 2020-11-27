@@ -80,6 +80,7 @@
     "express": "^4.17.1",
     "ioredis": "^4.19.2",
     "jose": "^2.0.3",
+    "jsrsasign": "^10.1.4",
     "moment": "^2.25.3",
     "swagger-ui-express": "^4.1.4",
     "winston": "^3.2.1",
