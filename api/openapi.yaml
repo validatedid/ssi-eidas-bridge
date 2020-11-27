@@ -318,18 +318,17 @@ paths:
                         city: "Barcelona"
                         state: "Catalunya"
                         zip: "08011"
-                    proof: [{
-                      type: "EcdsaSecp256k1Signature2019",
-                      created: "2019-06-22T14:11:44Z",
-                      proofPurpose: "assertionMethod",
-                      verificationMethod: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme#keys-1,
-                      jws: "eyJhbGciOiJFU...pKTV3co3wXAE"},
-                      {type: "CAdESRSASignature2020",
-                      created: "2020-06-22T14:11:44Z",
-                      proofPurpose: "assertionMethod",
-                      verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----",
-                      cades: 308204c906092a864886f70d010702...266ad9fee3375d8095}
-                    ]
+                    proof: 
+                      - type: "EcdsaSecp256k1Signature2019"
+                        created: "2019-06-22T14:11:44Z"
+                        proofPurpose: "assertionMethod"
+                        verificationMethod: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme#keys-1
+                        jws: "eyJhbGciOiJFU...pKTV3co3wXAE"
+                      - type: "CAdESRSASignature2020"
+                        created: "2020-06-22T14:11:44Z"
+                        proofPurpose: "assertionMethod"
+                        verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+                        cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
         "400":
           description: Bad Request
           content:
@@ -373,8 +372,6 @@ paths:
       summary: Validates a W3C Verifiable Credential eSealed with an EIDAS QEC
       description: Validates a W3C Verifiable Credential eSealed with an EIDAS QEC
       operationId: post-eidas-bridge-v1-signature-validations
-      security:
-        - bearerAuth: []
       requestBody:
         description: W3C Verifiable Credential with an Ades Proof
         content:
@@ -593,6 +590,12 @@ components:
           type: string
           example: eyJ...Wuc
       additionalProperties: true
+      required: 
+        - type
+        - created
+        - proofPurpose
+        - verificationMethod
+        - jws
       example:
         type: EcdsaSecp256k1Signature2019
         created: "2019-06-18T21:19:10Z"
@@ -625,6 +628,52 @@ components:
           type: string
           example: 308204c906092a864886f70d010702...266ad9fee3375d8095
       additionalProperties: true
+      required: 
+        - type
+        - created
+        - proofPurpose
+        - verificationMethod
+        - cades
+      example:
+        type: "CAdESRSASignature2020"
+        created: "2020-06-22T14:11:44Z"
+        proofPurpose: "assertionMethod"
+        verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+        cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+    GlobalProof:
+      description: |
+        General Proof type to admit either AdesProof or Secp256k1 proof
+      type: object
+      properties:
+        type:
+          description: Type of signature
+          type: string
+          example: EcdsaSecp256k1Signature2019
+        created:
+          description: Creation time
+          type: string
+          example: "2019-06-22T14:11:44Z"
+        proofPurpose:
+          description: Purpose of the proof
+          type: string
+          example: assertionMethod
+        verificationMethod:
+          description: Verification method
+          type: string
+          example: "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme#keys-1"
+        jws:
+          description: JSON Web Signature
+          type: string
+          example: eyJ...Wuc
+        cades:
+          description: CADES Signature in hexadecimal format
+          type: string
+      additionalProperties: true
+      required: 
+        - type
+        - created
+        - proofPurpose
+        - verificationMethod
       example:
         type: "CAdESRSASignature2020"
         created: "2020-06-22T14:11:44Z"
@@ -691,9 +740,10 @@ components:
           example: "2020-01-01T19:23:24Z"
           description: Date and time at which a credential/presentation ceases to be valid.
         proof:
+          type: object
           oneOf:
             - $ref: "#/components/schemas/AdesProof"
-            - $ref: "#/components/schemas/arrayProof"
+            - $ref: "#/components/schemas/arrayGeneralProof"
       example:
         "@context":
           - "https://www.w3.org/2018/credentials/v1"
@@ -866,10 +916,11 @@ components:
           example: "2020-01-01T19:23:24Z"
           description: Date and time at which a credential/presentation ceases to be valid.
         proof:
+          type: object
           oneOf:
             - $ref: "#/components/schemas/Proof"
             - $ref: "#/components/schemas/AdesProof"
-            - $ref: "#/components/schemas/arrayProof"
+            - $ref: "#/components/schemas/arrayGeneralProof"
       required:
         - "@context"
         - type
@@ -904,12 +955,12 @@ components:
           placeOfBirth: Brussels
           currentAddress: "44, rue de Fame"
           gender: Female
-    arrayProof:
-      title: Array of Proofs
-      type: object
-      oneOf:
-        - $ref: "#/components/schemas/Proof"
-        - $ref: "#/components/schemas/AdesProof"
+    arrayGeneralProof:
+      title: Array of Proofs (either Ades or secp256k1)
+      type: array
+      uniqueItems: true
+      items:
+          $ref: "#/components/schemas/GlobalProof"
     credential:
       type: object
       description: Credential Data Model without Proof
