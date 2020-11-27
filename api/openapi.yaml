@@ -97,6 +97,67 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/verifiableCredentialEsealed"
+              examples:
+                One Proof EIDAS Signature:
+                  value:
+                    "@context":
+                      - "https://www.w3.org/2018/credentials/v1"
+                      - "https://api.vidchain.net/credentials/verifiableId/v1"
+                    id: http://example.vid/credentials/1872
+                    type: ['VerifiableCredential','VerifiableID']
+                    issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                    issuanceDate: "2019-06-22T14:11:44Z"
+                    expirationDate: "2019-06-22T14:11:44Z"
+                    credentialSubject: 
+                        id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                        firstName: "Eva"
+                        lastName: "Monroe"
+                        gender: "Female"
+                        dateOfBirth: "12/11/1970"
+                        placeOfBirth: "Madrid"
+                        currentAddress: "Arago 179 4a"
+                        city: "Barcelona"
+                        state: "Catalunya"
+                        zip: "08011"
+                    proof:
+                        type: "CAdESRSASignature2020"
+                        created: "2020-06-22T14:11:44Z"
+                        proofPurpose: "assertionMethod"
+                        verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+                        cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+                Mutiple Proofs EIDAS Signature:
+                  value:
+                    "@context":
+                      - "https://www.w3.org/2018/credentials/v1"
+                      - "https://api.vidchain.net/credentials/verifiableId/v1"
+                    id: http://example.vid/credentials/1872
+                    type: ['VerifiableCredential','VerifiableID']
+                    issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                    issuanceDate: "2019-06-22T14:11:44Z"
+                    expirationDate: "2019-06-22T14:11:44Z"
+                    credentialSubject: 
+                        id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                        firstName: "Eva"
+                        lastName: "Monroe"
+                        gender: "Female"
+                        dateOfBirth: "12/11/1970"
+                        placeOfBirth: "Madrid"
+                        currentAddress: "Arago 179 4a"
+                        city: "Barcelona"
+                        state: "Catalunya"
+                        zip: "08011"
+                    proof: [{
+                      type: "EcdsaSecp256k1Signature2019",
+                      created: "2019-06-22T14:11:44Z",
+                      proofPurpose: "assertionMethod",
+                      verificationMethod: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme#keys-1,
+                      jws: "eyJhbGciOiJFU...pKTV3co3wXAE"},
+                      {type: "CAdESRSASignature2020",
+                      created: "2020-06-22T14:11:44Z",
+                      proofPurpose: "assertionMethod",
+                      verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----",
+                      cades: 308204c906092a864886f70d010702...266ad9fee3375d8095}
+                    ]
         "400":
           description: Bad Request
           content:
@@ -145,12 +206,67 @@ paths:
         content:
           application/json:
             schema:
-              required:
-                - proof
-              type: object
-              properties:
-                proof:
-                  $ref: "#/components/schemas/verifiableCredentialEsealed"
+              $ref: "#/components/schemas/verifiableCredentialEsealed"
+            examples:
+              One Proof EIDAS Signature:
+                value:
+                  "@context":
+                    - "https://www.w3.org/2018/credentials/v1"
+                    - "https://api.vidchain.net/credentials/verifiableId/v1"
+                  id: http://example.vid/credentials/1872
+                  type: ['VerifiableCredential','VerifiableID']
+                  issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                  issuanceDate: "2019-06-22T14:11:44Z"
+                  expirationDate: "2019-06-22T14:11:44Z"
+                  credentialSubject: 
+                      id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                      firstName: "Eva"
+                      lastName: "Monroe"
+                      gender: "Female"
+                      dateOfBirth: "12/11/1970"
+                      placeOfBirth: "Madrid"
+                      currentAddress: "Arago 179 4a"
+                      city: "Barcelona"
+                      state: "Catalunya"
+                      zip: "08011"
+                  proof:
+                      type: "CAdESRSASignature2020"
+                      created: "2020-06-22T14:11:44Z"
+                      proofPurpose: "assertionMethod"
+                      verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+                      cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+              Mutiple Proofs EIDAS Signature:
+                value:
+                  "@context":
+                    - "https://www.w3.org/2018/credentials/v1"
+                    - "https://api.vidchain.net/credentials/verifiableId/v1"
+                  id: http://example.vid/credentials/1872
+                  type: ['VerifiableCredential','VerifiableID']
+                  issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                  issuanceDate: "2019-06-22T14:11:44Z"
+                  expirationDate: "2019-06-22T14:11:44Z"
+                  credentialSubject: 
+                      id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                      firstName: "Eva"
+                      lastName: "Monroe"
+                      gender: "Female"
+                      dateOfBirth: "12/11/1970"
+                      placeOfBirth: "Madrid"
+                      currentAddress: "Arago 179 4a"
+                      city: "Barcelona"
+                      state: "Catalunya"
+                      zip: "08011"
+                  proof:
+                    - type: "EcdsaSecp256k1Signature2019"
+                      created: "2019-06-22T14:11:44Z"
+                      proofPurpose: "assertionMethod"
+                      verificationMethod: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme#keys-1
+                      jws: "eyJhbGciOiJFU...pKTV3co3wXAE"
+                    - type: "CAdESRSASignature2020"
+                      created: "2020-06-22T14:11:44Z"
+                      proofPurpose: "assertionMethod"
+                      verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+                      cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
         required: true
       responses:
         "204":
@@ -268,7 +384,7 @@ paths:
           examples: 
             Basic DID:
               summary:  a DID
-              value: "did:vid:0xE3f80bcbb360F04865AfA795B7507d384154216C"
+              value: "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme"
           required: true
           description: DID to identify eIDAS keys associated with it
           allowEmptyValue: false
@@ -302,12 +418,11 @@ components:
           example: eyJ...Wuc
       additionalProperties: true
       example:
-        EcdsaSecp256k1Signature2019 Proof:
-          type: EcdsaSecp256k1Signature2019
-          created: "2019-06-18T21:19:10Z"
-          proofPurpose: assertionMethod
-          verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
-          jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
+        type: EcdsaSecp256k1Signature2019
+        created: "2019-06-18T21:19:10Z"
+        proofPurpose: assertionMethod
+        verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
+        jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
     AdesProof:
       description: |
         Ades Proof using an EIDAS QEC and signing with CADES and RSA keys.
@@ -335,12 +450,11 @@ components:
           example: 308204c906092a864886f70d010702...266ad9fee3375d8095
       additionalProperties: true
       example:
-        CAdESRSASignature2020 Proof:
-          type: "CAdESRSASignature2020"
-          created: "2020-06-22T14:11:44Z"
-          proofPurpose: "assertionMethod"
-          verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
-          cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+        type: "CAdESRSASignature2020"
+        created: "2020-06-22T14:11:44Z"
+        proofPurpose: "assertionMethod"
+        verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+        cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
     verifiableCredentialEsealed:
       type: object
       title: Signature Response
@@ -404,68 +518,36 @@ components:
           oneOf:
             - $ref: "#/components/schemas/AdesProof"
             - $ref: "#/components/schemas/arrayProof"
+      example:
+        "@context":
+          - "https://www.w3.org/2018/credentials/v1"
+          - "https://api.vidchain.net/credentials/verifiableId/v1"
+        id: "type-version-of-the-credential"
+        type: "['VerifiableCredential','VerifiableID']"
+        issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+        issuanceDate: "2019-06-22T14:11:44Z"
+        expirationDate: "2019-06-22T14:11:44Z"
+        credentialSubject: 
+            id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+            firstName: "Eva"
+            lastName: "Monroe"
+            gender: "Female"
+            dateOfBirth: "12/11/1970"
+            placeOfBirth: "Madrid"
+            currentAddress: "Arago 179 4a"
+            city: "Barcelona"
+            state: "Catalunya"
+            zip: "08011"
+        proof:
+            type: "CAdESRSASignature2020"
+            created: "2020-06-22T14:11:44Z"
+            proofPurpose: "assertionMethod"
+            verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+            cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
       required:
         - "@context"
         - type
         - proof
-      example:
-        One Proof EIDAS Signature:
-          "@context":
-            - "https://www.w3.org/2018/credentials/v1"
-            - "https://api.vidchain.net/credentials/verifiableId/v1"
-          id: "type-version-of-the-credential"
-          type: "['VerifiableCredential','VerifiableID']"
-          issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
-          issuanceDate: "2019-06-22T14:11:44Z"
-          expirationDate: "2019-06-22T14:11:44Z"
-          credentialSubject: 
-              id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-              firstName: "Eva"
-              lastName: "Monroe"
-              gender: "Female"
-              dateOfBirth: "12/11/1970"
-              placeOfBirth: "Madrid"
-              currentAddress: "Arago 179 4a"
-              city: "Barcelona"
-              state: "Catalunya"
-              zip: "08011"
-          proof:
-              type: "CAdESRSASignature2020"
-              created: "2020-06-22T14:11:44Z"
-              proofPurpose: "assertionMethod"
-              verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
-              cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
-        Mutiple Proofs EIDAS Signature:
-          "@context":
-            - "https://www.w3.org/2018/credentials/v1"
-            - "https://api.vidchain.net/credentials/verifiableId/v1"
-          id: "type-version-of-the-credential"
-          type: "['VerifiableCredential','VerifiableID']"
-          issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
-          issuanceDate: "2019-06-22T14:11:44Z"
-          expirationDate: "2019-06-22T14:11:44Z"
-          credentialSubject: 
-              id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-              firstName: "Eva"
-              lastName: "Monroe"
-              gender: "Female"
-              dateOfBirth: "12/11/1970"
-              placeOfBirth: "Madrid"
-              currentAddress: "Arago 179 4a"
-              city: "Barcelona"
-              state: "Catalunya"
-              zip: "08011"
-          proof:
-            - type: "EcdsaSecp256k1Signature2019"
-              created: "2019-06-22T14:11:44Z"
-              proofPurpose: "assertionMethod"
-              verificationMethod: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme#keys-1
-              jws: "eyJhbGciOiJFU...pKTV3co3wXAE"
-            - type: "CAdESRSASignature2020"
-              created: "2020-06-22T14:11:44Z"
-              proofPurpose: "assertionMethod"
-              verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
-              cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
     verifiableCred:
       type: object
       description: Verifiable Credential Data Model
@@ -750,57 +832,6 @@ components:
           oneOf:
             - $ref: "#/components/schemas/credential"
             - $ref: "#/components/schemas/verifiableCred"
-      example:
-        eSeal a Credential Payload:
-          value:
-            issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
-            payload:
-              "@context":
-                - "https://www.w3.org/2018/credentials/v1"
-                - "https://www.w3.org/2018/credentials/examples/v1"
-              id: "http://example.edu/credentials/1872"
-              type:
-                - VerifiableCredential
-                - AlumniCredential
-              issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-              issuanceDate: "2010-01-01T19:73:24Z"
-              credentialSubject:
-                id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-                alumniOf:
-                  id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
-                  name:
-                    - value: Example University
-                      lang: en
-                    - value: "Exemple d'Université"
-                      lang: fr
-        eSeal a Verifiable Credential Payload:
-          value:
-            issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
-            payload:
-              "@context":
-                - "https://www.w3.org/2018/credentials/v1"
-                - "https://www.w3.org/2018/credentials/examples/v1"
-              id: "http://example.edu/credentials/1872"
-              type:
-                - VerifiableCredential
-                - AlumniCredential
-              issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-              issuanceDate: "2010-01-01T19:73:24Z"
-              credentialSubject:
-                id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-                alumniOf:
-                  id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
-                  name:
-                    - value: Example University
-                      lang: en
-                    - value: "Exemple d'Université"
-                      lang: fr
-              proof:
-                type: EcdsaSecp256k1Signature2019
-                created: "2019-06-18T21:19:10Z"
-                proofPurpose: assertionMethod
-                verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
-                jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
       required:
         - issuer
         - payload
