@@ -20,69 +20,75 @@ servers:
     description: localhost
 tags:
   - name: SSI EIDAS Bridge
-    description: Sign and validate signatures
+    description: Sign and validate EIDAS signatures
 paths:
   /eidas-bridge/v1/signatures:
     post:
       tags:
         - SSI EIDAS Bridge
-      summary: Creates a JWT ES256K eIDAS eSeal signature
-      description: "Creates a JWT ES256K eIDAS eSeal signature"
+      summary: Creates an eIDAS eSeal signature
+      description: Creates an eIDAS eSeal signature using the associated EIDAS keys with a DID
       operationId: post-eidas-bridge-v1-signatures
       requestBody:
         description: |
           It requires the following fields:
           - **issuer**: DID of the issuer
-          - **type**: Type of signature
           - **payload**: Payload to sign
         content:
           application/json:
-            schema:
-              required:
-                - issuer
-                - type
-                - payload
-              type: object
-              properties:
-                issuer:
-                  description: DID of the Issuer
-                  type: string
-                type:
-                  description: Type of signature
-                  type: string
-                payload:
-                  description: Payload to sign
-                  type: object
+            schema: 
+              $ref: "#/components/schemas/SignatureInput"
             examples:
-              Empty Payload:
+              eSeal a Credential Payload:
                 value:
-                  issuer: did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D
-                  type: EidasSeal2019
-                  payload: {}
-              Complete Payload:
-                value:
-                  issuer: did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D
-                  type: EidasSeal2019
+                  issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
                   payload:
                     "@context":
                       - "https://www.w3.org/2018/credentials/v1"
-                      - "https://api.vidchain.net/credentials/verifiableId/v1"
-                    id: "vid:type-version-of-the-credential"
-                    type: "['VerifiableCredential','VerifiableID']"
-                    issuer: "did:vid:0x5208431C6EC2ec4097aeA7182bB92d018766498c"
-                    issuanceDate: "2019-06-22T14:11:44Z"
-                    expirationDate: "2019-06-22T14:11:44Z"
+                      - "https://www.w3.org/2018/credentials/examples/v1"
+                    id: "http://example.edu/credentials/1872"
+                    type:
+                      - VerifiableCredential
+                      - AlumniCredential
+                    issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                    issuanceDate: "2019-12-31T23:59:60Z"
                     credentialSubject:
-                      id: "did:vid:0x8707CCa835C961334D3F6450C6a61a0AD6592460"
-                      firstName: "Eva"
-                      lastName: "Monroe"
-                      gender: "Female"
-                      dateOfBirth: "12/11/1970"
-                      placeOfBirth: "Madrid"
-                      currentAddress: "Arago 179 4a"
-                      city: "Barcelona"
-                      state: "Catalunya"
-                      zip: "08011"
+                      id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                      alumniOf:
+                        id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
+                        name:
+                          - value: Example University
+                            lang: en
+                          - value: "Exemple d'Université"
+                            lang: fr
+              eSeal a Verifiable Credential Payload:
+                value:
+                  issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                  payload:
+                    "@context":
+                      - "https://www.w3.org/2018/credentials/v1"
+                      - "https://www.w3.org/2018/credentials/examples/v1"
+                    id: "http://example.edu/credentials/1872"
+                    type:
+                      - VerifiableCredential
+                      - AlumniCredential
+                    issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                    issuanceDate: "2019-12-31T23:59:60Z"
+                    credentialSubject:
+                      id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                      alumniOf:
+                        id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
+                        name:
+                          - value: Example University
+                            lang: en
+                          - value: "Exemple d'Université"
+                            lang: fr
+                    proof:
+                      type: EcdsaSecp256k1Signature2019
+                      created: "2019-06-18T21:19:10Z"
+                      proofPurpose: assertionMethod
+                      verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
+                      jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
         required: true
       responses:
         "201":
@@ -90,7 +96,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SignatureResponse"
+                $ref: "#/components/schemas/verifiableCredentialEsealed"
         "400":
           description: Bad Request
           content:
@@ -131,11 +137,11 @@ paths:
     post:
       tags:
         - SSI EIDAS Bridge
-      summary: Validates a JWT ES256K eIDAS eSeal signature
-      description: "Validates a JWT ES256K eIDAS eSeal signature"
+      summary: Validates a W3C Verifiable Credential eSealed with an EIDAS QEC
+      description: Validates a W3C Verifiable Credential eSealed with an EIDAS QEC
       operationId: post-eidas-bridge-v1-signature-validations
       requestBody:
-        description: Include in the body the proof to validate
+        description: W3C Verifiable Credential with an Ades Proof
         content:
           application/json:
             schema:
@@ -144,7 +150,7 @@ paths:
               type: object
               properties:
                 proof:
-                  $ref: "#/components/schemas/Proof"
+                  $ref: "#/components/schemas/verifiableCredentialEsealed"
         required: true
       responses:
         "204":
@@ -185,38 +191,25 @@ paths:
               examples:
                 Internal Server Error:
                   $ref: "#/components/examples/InternalError"
-  /eidas-bridge/v1/eidas-keys:
+  /eidas-bridge/v1/eidas-keys/{id}:
     put:
       tags:
         - SSI EIDAS Bridge
-      summary: Updates the keys used to sign
-      description: "Stores eidas keys used to sign"
+      summary: Set up a DID with an eIDAS QEC to eSeal W3C Verifiable Credentials
+      description: Set up a DID with an eIDAS QEC to eSeal W3C Verifiable Credentials
       operationId: put-eidas-bridge-v1-eidas-keys
       requestBody:
-        description: Include in the body EidasKeysOptions
+        description: Set-up options for linking a DID with its eIDAS QEC
         content:
           application/json:
             schema:
-              required:
-                - EidasKeysOptions
-              type: object
-              properties:
-                did:
-                  description: Did of the signer
-                  type: string
-                  example: did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D
-                eidasKey:
-                  description: hexPrivateKey for secp256k1 or PEM RSA key 
-                  type: string
-                  example: "c07394b3e13e114406144d8fa4e90429a27e20131c68f070c40533a059fef51f"
-                keyType:
-                  description: Specifies type of key used, i.e. "RSA", "EC" or "OKP"
-                  type: string
-                  example: "EC"
-                curveType:
-                  description: If keyType is "EC" or "OKP", the curveType can be specified as well as "P-256", "secp256k1","P-384" or "P-521"
-                  type: object
-                  example: "secp256k1"
+              $ref: "#/components/schemas/EidasQecInput"
+            examples: 
+              EIDAS QEC Example:
+                value:
+                  did: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                  eidasQec: (b'0\x82\x03\xc9\x02\x01\x030\x82\x03\x8f\x06\t*\x86H\x86\xf7\r\x01\x07\x01\xa0\x82\x03\x80\x04\x82\x03|0\x82\x03x0\x82\x02w\x06\t*\x86H\x86\xf7\r\x01\x07\x06\xa0\x82\x02h0\x82\x02d\x02\x01\x000\x82\x02]\x06\t*\x86H\x86\xf7\r\x01\x07\x010\x1c\x06\n*\x86H\x86\xf7\r\x01\x0c\x01\x060\x0e\x04\x08\'?\xfc\xa4]\xbf\x80k\x02\x02\x08\x00\x80\x82\x020}A9N;\x89/j\x8e8\xc57=\x1d!\xae!0\xcd\xaf7}cN>\xcac\xb6nqU\x8c>\x1ff\xce\xe45\xcf\r\xb8~O\xf1\xae\xd5\xde \x0ch\xe1\xe3]\x90\xbc\xa5cBv\xbc\xbf\xc3\x1a\xf2\x91\xa6\x9a\xd1\xac"?\xealH\x06\xf0\xce\xb8\x96s\xc7\xca\x0bK\xaa\xe7+\xa5\xe3\xb7\x82\x07\xfc\x1d%<\x95\x9d:\xff\xed\xc7\x03\xb9\x7f\xa5\xbb\xab\xfd`\x17\x01\x1fp\xe6W\xc7\x88\xde\xa4\xa7\xd2\x8f\xb48m[\xcdl\xb6\xba#0B\x97\xae[\x8d\xf4\x99\xa4\xcb\x94\xea>\x04\xbc\xc7\'\xc2\xc4\xc0b\x01\xe7\xb6O\xfe\xdaA~\xb7\xa8\x8a\x02\x82\x7f\xe9\x1f\xae\x8c\xef=\xf6\x90(\xddK\xe5\xeaB$XC\x84U\\N=ut\xc9\xe5]\xe2\x0b\xe8\x80\xc3\x84G~M\xa8+\xb1\xb0sL\xcb\xb7&\xb4jQM\x8c\x8c\x8b\xbe\xbe7Zghj\x1b\xf5\x00\xe1\x06f.\xbb\xf5\x98\xf8j$\xa2\xc9L\xe1\x08S\xbe\xc2Z\x14f\xb6\xa3\xa2\x8dI\xd1\x07~\x08\x9e\xdf\xd2"\xc9\xaa\xc8a\xc5Q\x89\xac\x91{\x967H]c0\xa2N\xe4\xbe\x14\x18\xe3aC\x88B\x80\r\x84\x90\xcf\xf8\x9c2\xccs\xea~bg\x99OU\x04WU:\xc9\x03\x9e\xfa\x96\x13D\x89}\xed\x92\xc5?G\xf7\xdb\xa3\x0eg;\x01\x93-\x88\xa5;\xc6\xc1:\xe3\x93\xfa\x9a9\xde\xe5:\\\x88\x8a\x92\xf9T\xb4|\xa4\xf3\xecT-\xc0\xa7Y\xf3\x0f\x0c\xb3\x92\x06\t\x9f\x1c\x96\x9c\xf4*\xfc.\x1b7.\xa2\x80\x1b\xd2\xf8DQ\xa4\x86\x13\x16E\x1b%\x90%\xeaO\xf0#\x06\x87\xe0\x8a\xfe\xcc\xb0\xb6F\x08\xb1y\xca\xc8\x92\x0bD\xd6\xd0\xb2\xfd\xa4[[\xe3\xcf\xe2\x9c\x00\x97\xbc\x95\x0f\x8a\xaf\xbb\x8c\xa6\xaa]5\xb3\x01[\xc1a\xe9\x06@\x8a\xbc\xd8]\xba\'&\xd6\xaa_\x9e+c\xfb\x9d\xc6\xbc\xd8\x1d\xe5t\xe8\x9eL@\x80\x99\xeeV\x12\x06\x04a\xaa7J\xbd\xa1\xe3p2_\x9b\xd7\xb6\xdd\x98\xf1kx\x19\x9a\xc8\xdeXP\xa6\x15\xd7\xb5\xc9\xb1N\xefbZ\xb6\x8e\x91\xff\xa2\x877\x84f\xc1\xee\xcd7\x1dZp\xc4\xce\xe3\x1f\xda\x0e\x9fY\xa3\xce\x0b~N\xaa\xe6\x91\xee<\xf0\x13\xa1:\x1a\x0f\xdf\xce%0\x81\xfa\x06\t*\x86H\x86\xf7\r\x01\x07\x01\xa0\x81\xec\x04\x81\xe90\x81\xe60\x81\xe3\x06\x0b*\x86H\x86\xf7\r\x01\x0c\n\x01\x02\xa0\x81\xac0\x81\xa90\x1c\x06\n*\x86H\x86\xf7\r\x01\x0c\x01\x030\x0e\x04\x08\xfa\xe77\x12\xfb\xcbB\xe9\x02\x02\x08\x00\x04\x81\x88(\xde\x9f?\xc3\xcc#f\xb9>\x12\xa1\xd7\xefF\xea\xa3\xd8\x88v%\x1cv\xf8I\xb4K\x1e\xc6q\x85\xe2\x95a\x83*pI@\x13q\x19>\xdb\xce\xb0\x86 \x16n\xce\xc1\xe0cl\xd7_H\xc2\x8c\xac\xdc\xc5<\xb58\xe6\xfa\xfc\xf8\xf5HRH\x83\x17\xd5(\xcf;=z\x12r\x18z\x95\x7fz\xb4\xac\xeb0\xe8\xc4\xb5O\xae>\xa07C>,\xd2\xd3;\xbeQ\xab\xdc\xb0\x01\xd8\x93s\xfchu\xae\xbe\x97%\x19\xb5\xf4\xbc\xb9\x05\x83\xcc)/\xbc\x16e1%0#\x06\t*\x86H\x86\xf7\r\x01\t\x151\x16\x04\x14]F\x8e\xb5\xcd\x8c\r\xb1q\xcd\xf3\x87X\x80\x9f\x04\xac\x95\xeb\xc8010!0\t\x06\x05+\x0e\x03\x02\x1a\x05\x00\x04\x14\x13m\x9f\xe5m\x93^\xb5G\x81q\xf4\x1aN\xf2\x90\xdeb\xb06\x04\x08\xf9\x10\x1c\x1c:f\xca\xb7\x02\x02\x08\x00').hex()),
+                  password: ak!w6xsxp7?=
         required: true
       responses:
         "201":
@@ -224,13 +217,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EidasKey"
+                $ref: "#/components/schemas/EidasQecResponse"
         "200":
           description: Keys updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EidasKey"
+                $ref: "#/components/schemas/EidasQecResponse"
         "400":
           description: Bad Request
           content:
@@ -267,6 +260,18 @@ paths:
               examples:
                 Internal Server Error:
                   $ref: "#/components/examples/InternalError"
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          examples: 
+            Basic DID:
+              summary:  a DID
+              value: "did:vid:0xE3f80bcbb360F04865AfA795B7507d384154216C"
+          required: true
+          description: DID to identify eIDAS keys associated with it
+          allowEmptyValue: false
 components:
   schemas:
     Proof:
@@ -278,7 +283,7 @@ components:
         type:
           description: Type of signature
           type: string
-          example: EidasSeal2019
+          example: EcdsaSecp256k1Signature2019
         created:
           description: Creation time
           type: string
@@ -290,48 +295,555 @@ components:
         verificationMethod:
           description: Verification method
           type: string
-          example: "did:vid:0xB551b70...98A3D#eidasKey"
+          example: "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme#keys-1"
         jws:
           description: JSON Web Signature
           type: string
           example: eyJ...Wuc
-    SignatureResponse:
+      additionalProperties: true
+      example:
+        EcdsaSecp256k1Signature2019 Proof:
+          type: EcdsaSecp256k1Signature2019
+          created: "2019-06-18T21:19:10Z"
+          proofPurpose: assertionMethod
+          verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
+          jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
+    AdesProof:
+      description: |
+        Ades Proof using an EIDAS QEC and signing with CADES and RSA keys.
+      type: object
+      properties:
+        type:
+          description: Type of signature
+          type: string
+          example: CAdESRSASignature2020
+        created:
+          description: Creation time
+          type: string
+          example: "2019-06-22T14:11:44Z"
+        proofPurpose:
+          description: Purpose of the proof
+          type: string
+          example: assertionMethod
+        verificationMethod:
+          description: EIDAS Certificate from QEC
+          type: string
+          example: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+        cades:
+          description: CADES Signature in hexadecimal format
+          type: string
+          example: 308204c906092a864886f70d010702...266ad9fee3375d8095
+      additionalProperties: true
+      example:
+        CAdESRSASignature2020 Proof:
+          type: "CAdESRSASignature2020"
+          created: "2020-06-22T14:11:44Z"
+          proofPurpose: "assertionMethod"
+          verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+          cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+    verifiableCredentialEsealed:
       type: object
       title: Signature Response
       properties:
-        issuer:
-          description: DID of the issuer
+        id:
           type: string
-          example: did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D
-        vc: 
-          description: Signed verifiable credential
-          $ref: "#/components/schemas/verifiableCred"
+          example: "https://example.edu/credentials/1872"
+          description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
+          format: uri
+        "@context":
+          description: "An ordered set where the first item is a URI https://www.w3.org/2018/credentials/v1. It is used to define terms and help to express specific identifiers in a compact manner."
+          items:
+            type: string
+          uniqueItems: true
           example:
-            "@context":
-              - "https://www.w3.org/2018/credentials/v1"
-              - "https://api.vidchain.net/credentials/verifiableId/v1"
-            id: "vid:type-version-of-the-credential"
-            type: "['VerifiableCredential','VerifiableID']"
-            issuer: "did:vid:0x5208431C6EC2ec4097aeA7182bB92d018766498c"
-            issuanceDate: "2019-06-22T14:11:44Z"
-            expirationDate: "2019-06-22T14:11:44Z"
-            credentialSubject: 
-                id: "did:vid:0x8707CCa835C961334D3F6450C6a61a0AD6592460"
-                firstName: "Eva"
-                lastName: "Monroe"
-                gender: "Female"
-                dateOfBirth: "12/11/1970"
-                placeOfBirth: "Madrid"
-                currentAddress: "Arago 179 4a"
-                city: "Barcelona"
-                state: "Catalunya"
-                zip: "08011"
-            proof:
-                type: "EidasSeal2019"
-                created: "1970-01-19T13:55:54.448Z"
-                proofPurpose: "assertionMethod"
-                verificationMethod: "did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D#eidasKey"
-                jws: "eyJhbGciOiJFUzI1NkstUiIsInR5cCI6IkpXVCIsImtpZCI6ImRpZDp2aWQ6MHhCNTUxYjcwZDY1MDg5MmQyM2RFM0JlMjAxQTk1YzFGY0JlYTk4QTNEI2VpZGFzS2V5In0.eyJpYXQiOjE2MDUzNTQ0NDgsIkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly9hcGkudmlkY2hhaW4ubmV0L2NyZWRlbnRpYWxzL3ZlcmlmaWFibGVJZC92MSJdLCJpZCI6InZpZDp0eXBlLXZlcnNpb24tb2YtdGhlLWNyZWRlbnRpYWwiLCJ0eXBlIjoiWydWZXJpZmlhYmxlQ3JlZGVudGlhbCcsJ1ZlcmlmaWFibGVJRCddIiwiaXNzdWVyIjoiZGlkOnZpZDoweDUyMDg0MzFDNkVDMmVjNDA5N2FlQTcxODJiQjkyZDAxODc2NjQ5OGMiLCJpc3N1YW5jZURhdGUiOiIyMDE5LTA2LTIyVDE0OjExOjQ0WiIsImV4cGlyYXRpb25EYXRlIjoiMjAxOS0wNi0yMlQxNDoxMTo0NFoiLCJjcmVkZW50aWFsU3ViamVjdCI6eyJpZCI6ImRpZDp2aWQ6MHg4NzA3Q0NhODM1Qzk2MTMzNEQzRjY0NTBDNmE2MWEwQUQ2NTkyNDYwIiwiZmlyc3ROYW1lIjoiRXZhIiwibGFzdE5hbWUiOiJNb25yb2UiLCJnZW5kZXIiOiJGZW1hbGUiLCJkYXRlT2ZCaXJ0aCI6IjEyLzExLzE5NzAiLCJwbGFjZU9mQmlydGgiOiJNYWRyaWQiLCJjdXJyZW50QWRkcmVzcyI6IkFyYWdvIDE3OSA0YSIsImNpdHkiOiJCYXJjZWxvbmEiLCJzdGF0ZSI6IkNhdGFsdW55YSIsInppcCI6IjA4MDExIn0sImlzcyI6ImRpZDp2aWQ6MHg1ZTQ2MWFGZkYzQjM5MmI3OTM3RDA1Q0FhMDk2NkI1MzhlQTQ1QjdmIn0.fEkAQlWyQaUNoo5g2FfCVi1-S_6g96E8znAjGSyKjVJLO2uNBnbR-Vxn-3NwVVr2UzmcQF--8mqpKTV3co3wXAE"
+            - "https://www.w3.org/2018/credentials/v1"
+          type: array
+        type:
+          type: array
+          description: Type of the object or the datatype of the typed value.
+          example:
+            - VerifiableCredential
+            - UniversityDegreeCredential
+          items:
+            type: string
+        credentialSubject:
+          description: A set of objects that contain one or more properties that are each related to the subject of the credential.
+          type: object
+          oneOf:
+            - $ref: "#/components/schemas/subject"
+            - type: array
+              uniqueItems: true
+              items:
+                $ref: "#/components/schemas/subject"
+        issuer:
+          description: "A URI or an object containing an id property. Example: DID of the verifiable credential/presentation issuer."
+          oneOf:
+            - type: string
+              description: DID of the verifiable credential/presentation issuer.
+              format: uri
+              example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+            - type: object
+              description: Object containing an id property to identify the issuer.
+              properties:
+                id:
+                  type: string
+                  description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
+                  format: uri
+                  example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+        issuanceDate:
+          type: string
+          description: Date and time at which the information associated with the verifiable credential/presentation becomes valid.
+          format: date-time
+          example: "2010-01-01T19:23:24Z"
+        expirationDate:
+          type: string
+          format: date-time
+          example: "2020-01-01T19:23:24Z"
+          description: Date and time at which a credential/presentation ceases to be valid.
+        proof:
+          oneOf:
+            - $ref: "#/components/schemas/AdesProof"
+            - $ref: "#/components/schemas/arrayProof"
+      required:
+        - "@context"
+        - type
+        - proof
+      example:
+        One Proof EIDAS Signature:
+          "@context":
+            - "https://www.w3.org/2018/credentials/v1"
+            - "https://api.vidchain.net/credentials/verifiableId/v1"
+          id: "type-version-of-the-credential"
+          type: "['VerifiableCredential','VerifiableID']"
+          issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+          issuanceDate: "2019-06-22T14:11:44Z"
+          expirationDate: "2019-06-22T14:11:44Z"
+          credentialSubject: 
+              id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+              firstName: "Eva"
+              lastName: "Monroe"
+              gender: "Female"
+              dateOfBirth: "12/11/1970"
+              placeOfBirth: "Madrid"
+              currentAddress: "Arago 179 4a"
+              city: "Barcelona"
+              state: "Catalunya"
+              zip: "08011"
+          proof:
+              type: "CAdESRSASignature2020"
+              created: "2020-06-22T14:11:44Z"
+              proofPurpose: "assertionMethod"
+              verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+              cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+        Mutiple Proofs EIDAS Signature:
+          "@context":
+            - "https://www.w3.org/2018/credentials/v1"
+            - "https://api.vidchain.net/credentials/verifiableId/v1"
+          id: "type-version-of-the-credential"
+          type: "['VerifiableCredential','VerifiableID']"
+          issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+          issuanceDate: "2019-06-22T14:11:44Z"
+          expirationDate: "2019-06-22T14:11:44Z"
+          credentialSubject: 
+              id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+              firstName: "Eva"
+              lastName: "Monroe"
+              gender: "Female"
+              dateOfBirth: "12/11/1970"
+              placeOfBirth: "Madrid"
+              currentAddress: "Arago 179 4a"
+              city: "Barcelona"
+              state: "Catalunya"
+              zip: "08011"
+          proof:
+            - type: "EcdsaSecp256k1Signature2019"
+              created: "2019-06-22T14:11:44Z"
+              proofPurpose: "assertionMethod"
+              verificationMethod: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme#keys-1
+              jws: "eyJhbGciOiJFU...pKTV3co3wXAE"
+            - type: "CAdESRSASignature2020"
+              created: "2020-06-22T14:11:44Z"
+              proofPurpose: "assertionMethod"
+              verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+              cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+    verifiableCred:
+      type: object
+      description: Verifiable Credential Data Model
+      example:
+        simple verifiable credential:
+          "@context":
+            - "https://www.w3.org/2018/credentials/v1"
+            - "https://www.w3.org/2018/credentials/examples/v1"
+          id: "http://example.edu/credentials/1872"
+          type:
+            - VerifiableCredential
+            - AlumniCredential
+          issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+          issuanceDate: "2010-01-01T19:73:24Z"
+          credentialSubject:
+            id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+            alumniOf:
+              id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
+              name:
+                - value: Example University
+                  lang: en
+                - value: "Exemple d'Université"
+                  lang: fr
+          proof:
+            type: EcdsaSecp256k1Signature2019
+            created: "2019-06-18T21:19:10Z"
+            proofPurpose: assertionMethod
+            verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
+            jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
+        verifiable credential with ades proof:
+          "@context":
+            - "https://www.w3.org/2018/credentials/v1"
+            - "https://www.w3.org/2018/credentials/examples/v1"
+          id: "http://example.edu/credentials/1872"
+          type:
+            - VerifiableCredential
+            - AlumniCredential
+          issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+          issuanceDate: "2010-01-01T19:73:24Z"
+          credentialSubject:
+            id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+            alumniOf:
+              id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
+              name:
+                - value: Example University
+                  lang: en
+                - value: "Exemple d'Université"
+                  lang: fr
+          proof:
+            type: "CAdESRSASignature2020"
+            created: "2020-06-22T14:11:44Z"
+            proofPurpose: "assertionMethod"
+            verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+            cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+        verifiable credential with multiple proofs:
+          "@context":
+            - "https://www.w3.org/2018/credentials/v1"
+            - "https://www.w3.org/2018/credentials/examples/v1"
+          id: "http://example.edu/credentials/1872"
+          type:
+            - VerifiableCredential
+            - AlumniCredential
+          issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+          issuanceDate: "2010-01-01T19:73:24Z"
+          credentialSubject:
+            id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+            alumniOf:
+              id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
+              name:
+                - value: Example University
+                  lang: en
+                - value: "Exemple d'Université"
+                  lang: fr
+          proof:
+            - type: "EcdsaSecp256k1Signature2019"
+              created: "2019-06-22T14:11:44Z"
+              proofPurpose: "assertionMethod"
+              verificationMethod: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme#keys-1
+              jws: "eyJhbGciOiJFU...pKTV3co3wXAE"
+            - type: "CAdESRSASignature2020"
+              created: "2020-06-22T14:11:44Z"
+              proofPurpose: "assertionMethod"
+              verificationMethod: "-----BEGIN CERTIFICATE-----MIICUTCCAfugAwIBAgIBA... -----END CERTIFICATE-----"
+              cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+      title: Verifiable Credential
+      properties:
+        id:
+          type: string
+          example: "https://example.edu/credentials/1872"
+          description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
+          format: uri
+        "@context":
+          description: "An ordered set where the first item is a URI https://www.w3.org/2018/credentials/v1. It is used to define terms and help to express specific identifiers in a compact manner."
+          items:
+            type: string
+          uniqueItems: true
+          example:
+            - "https://www.w3.org/2018/credentials/v1"
+          type: array
+        type:
+          type: array
+          description: Type of the object or the datatype of the typed value.
+          example:
+            - VerifiableCredential
+            - UniversityDegreeCredential
+          items:
+            type: string
+        credentialSubject:
+          description: A set of objects that contain one or more properties that are each related to the subject of the credential.
+          type: object
+          oneOf:
+            - $ref: "#/components/schemas/subject"
+            - type: array
+              uniqueItems: true
+              items:
+                $ref: "#/components/schemas/subject"
+        issuer:
+          description: "A URI or an object containing an id property. Example: DID of the verifiable credential/presentation issuer."
+          oneOf:
+            - type: string
+              description: DID of the verifiable credential/presentation issuer.
+              format: uri
+              example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+            - type: object
+              description: Object containing an id property to identify the issuer.
+              properties:
+                id:
+                  type: string
+                  description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
+                  format: uri
+                  example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+        issuanceDate:
+          type: string
+          description: Date and time at which the information associated with the verifiable credential/presentation becomes valid.
+          format: date-time
+          example: "2010-01-01T19:23:24Z"
+        expirationDate:
+          type: string
+          format: date-time
+          example: "2020-01-01T19:23:24Z"
+          description: Date and time at which a credential/presentation ceases to be valid.
+        proof:
+          oneOf:
+            - $ref: "#/components/schemas/Proof"
+            - $ref: "#/components/schemas/AdesProof"
+            - $ref: "#/components/schemas/arrayProof"
+      required:
+        - "@context"
+        - type
+        - proof
+    subject:
+      title: Subject
+      type: object
+      description: A thing about which claims are made
+      properties:
+        id:
+          type: string
+          description: "Object MAY contain an id"
+          example: "did:example:ebfeb1f712ebc6f1c276e12ec21"
+      additionalProperties: true
+      example:
+        Diploma:
+          id: "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          degree:
+            type: BachelorDegree
+            name: Bachelor of Science and Arts
+        Affiliation:
+          id: "did:example:c276e12ec21ebfeb1f712ebc6f1"
+          name: Morgan Doe
+          spouse: "did:example:ebfeb1f712ebc6f1c276e12ec21"
+        ESSIF eID:
+          id: "did:vid:evas-did"
+          personIdentifier: BE/BE/02635542Y
+          currentFamilyName: Eva
+          currentGivenName: Adams
+          birthName: Eva
+          dateOfBirth: "1998-02-14"
+          placeOfBirth: Brussels
+          currentAddress: "44, rue de Fame"
+          gender: Female
+    arrayProof:
+      title: Array of Proofs
+      type: object
+      oneOf:
+        - $ref: "#/components/schemas/Proof"
+        - $ref: "#/components/schemas/AdesProof"
+    credential:
+      type: object
+      description: Credential Data Model without Proof
+      example:
+        simple credential payload:
+          "@context":
+            - "https://www.w3.org/2018/credentials/v1"
+            - "https://www.w3.org/2018/credentials/examples/v1"
+          id: "http://example.edu/credentials/1872"
+          type:
+            - VerifiableCredential
+            - AlumniCredential
+          issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+          issuanceDate: "2010-01-01T19:73:24Z"
+          credentialSubject:
+            id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+            alumniOf:
+              id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
+              name:
+                - value: Example University
+                  lang: en
+                - value: "Exemple d'Université"
+                  lang: fr
+      title: Credential
+      properties:
+        id:
+          type: string
+          example: "https://example.edu/credentials/1872"
+          description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
+          format: uri
+        "@context":
+          description: "An ordered set where the first item is a URI https://www.w3.org/2018/credentials/v1. It is used to define terms and help to express specific identifiers in a compact manner."
+          items:
+            type: string
+          uniqueItems: true
+          example:
+            - "https://www.w3.org/2018/credentials/v1"
+          type: array
+        type:
+          type: array
+          description: Type of the object or the datatype of the typed value.
+          example:
+            - VerifiableCredential
+            - UniversityDegreeCredential
+          items:
+            type: string
+        credentialSubject:
+          description: A set of objects that contain one or more properties that are each related to the subject of the credential.
+          type: object
+          oneOf:
+            - $ref: "#/components/schemas/subject"
+            - type: array
+              uniqueItems: true
+              items:
+                $ref: "#/components/schemas/subject"
+        issuer:
+          description: "A URI or an object containing an id property. Example: DID of the verifiable credential/presentation issuer."
+          oneOf:
+            - type: string
+              description: DID of the verifiable credential/presentation issuer.
+              format: uri
+              example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+            - type: object
+              description: Object containing an id property to identify the issuer.
+              properties:
+                id:
+                  type: string
+                  description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
+                  format: uri
+                  example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+        issuanceDate:
+          type: string
+          description: Date and time at which the information associated with the verifiable credential/presentation becomes valid.
+          format: date-time
+          example: "2010-01-01T19:23:24Z"
+        expirationDate:
+          type: string
+          format: date-time
+          example: "2020-01-01T19:23:24Z"
+          description: Date and time at which a credential/presentation ceases to be valid.
+      additionalProperties: true
+      required:
+        - "@context"
+        - type
+    SignatureInput:
+      title: Signature EIDAS Input
+      type: object
+      description: Input data to eSeal a given Credential or Verifiable Credential
+      properties:
+        issuer:
+          description: DID of the Issuer
+          type: string
+          example: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+        payload:
+          description: W3C Verifiable Credential or Credential (without Proof) to eSeal
+          oneOf:
+            - $ref: "#/components/schemas/credential"
+            - $ref: "#/components/schemas/verifiableCred"
+      example:
+        eSeal a Credential Payload:
+          value:
+            issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+            payload:
+              "@context":
+                - "https://www.w3.org/2018/credentials/v1"
+                - "https://www.w3.org/2018/credentials/examples/v1"
+              id: "http://example.edu/credentials/1872"
+              type:
+                - VerifiableCredential
+                - AlumniCredential
+              issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+              issuanceDate: "2010-01-01T19:73:24Z"
+              credentialSubject:
+                id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                alumniOf:
+                  id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
+                  name:
+                    - value: Example University
+                      lang: en
+                    - value: "Exemple d'Université"
+                      lang: fr
+        eSeal a Verifiable Credential Payload:
+          value:
+            issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+            payload:
+              "@context":
+                - "https://www.w3.org/2018/credentials/v1"
+                - "https://www.w3.org/2018/credentials/examples/v1"
+              id: "http://example.edu/credentials/1872"
+              type:
+                - VerifiableCredential
+                - AlumniCredential
+              issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+              issuanceDate: "2010-01-01T19:73:24Z"
+              credentialSubject:
+                id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                alumniOf:
+                  id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
+                  name:
+                    - value: Example University
+                      lang: en
+                    - value: "Exemple d'Université"
+                      lang: fr
+              proof:
+                type: EcdsaSecp256k1Signature2019
+                created: "2019-06-18T21:19:10Z"
+                proofPurpose: assertionMethod
+                verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
+                jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
+      required:
+        - issuer
+        - payload
+    EidasQecInput:
+      title: Input EIDAS QEC
+      type: object
+      description: Input data to associate eIDAS keys with a did
+      properties:
+        did:
+          type: string
+          description: DID of EIDAS key owner
+          example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+        eidasQec:
+          description: P12 file with a QEC to eSeal. Supported keys algorithms are RSA and EC with secp256k1 curve
+          type: string
+          format: binary
+          example: (b'0\x82\x03\xc9\x02\x01\x030\x82\x03\x8f\x06\t*\x86H\x86\xf7\r\x01\x07\x01\xa0\x82\x03\x80\x04\x82\x03|0\x82\x03x0\x82\x02w\x06\t*\x86H\x86\xf7\r\x01\x07\x06\xa0\x82\x02h0\x82\x02d\x02\x01\x000\x82\x02]\x06\t*\x86H\x86\xf7\r\x01\x07\x010\x1c\x06\n*\x86H\x86\xf7\r\x01\x0c\x01\x060\x0e\x04\x08\'?\xfc\xa4]\xbf\x80k\x02\x02\x08\x00\x80\x82\x020}A9N;\x89/j\x8e8\xc57=\x1d!\xae!0\xcd\xaf7}cN>\xcac\xb6nqU\x8c>\x1ff\xce\xe45\xcf\r\xb8~O\xf1\xae\xd5\xde \x0ch\xe1\xe3]\x90\xbc\xa5cBv\xbc\xbf\xc3\x1a\xf2\x91\xa6\x9a\xd1\xac"?\xealH\x06\xf0\xce\xb8\x96s\xc7\xca\x0bK\xaa\xe7+\xa5\xe3\xb7\x82\x07\xfc\x1d%<\x95\x9d:\xff\xed\xc7\x03\xb9\x7f\xa5\xbb\xab\xfd`\x17\x01\x1fp\xe6W\xc7\x88\xde\xa4\xa7\xd2\x8f\xb48m[\xcdl\xb6\xba#0B\x97\xae[\x8d\xf4\x99\xa4\xcb\x94\xea>\x04\xbc\xc7\'\xc2\xc4\xc0b\x01\xe7\xb6O\xfe\xdaA~\xb7\xa8\x8a\x02\x82\x7f\xe9\x1f\xae\x8c\xef=\xf6\x90(\xddK\xe5\xeaB$XC\x84U\\N=ut\xc9\xe5]\xe2\x0b\xe8\x80\xc3\x84G~M\xa8+\xb1\xb0sL\xcb\xb7&\xb4jQM\x8c\x8c\x8b\xbe\xbe7Zghj\x1b\xf5\x00\xe1\x06f.\xbb\xf5\x98\xf8j$\xa2\xc9L\xe1\x08S\xbe\xc2Z\x14f\xb6\xa3\xa2\x8dI\xd1\x07~\x08\x9e\xdf\xd2"\xc9\xaa\xc8a\xc5Q\x89\xac\x91{\x967H]c0\xa2N\xe4\xbe\x14\x18\xe3aC\x88B\x80\r\x84\x90\xcf\xf8\x9c2\xccs\xea~bg\x99OU\x04WU:\xc9\x03\x9e\xfa\x96\x13D\x89}\xed\x92\xc5?G\xf7\xdb\xa3\x0eg;\x01\x93-\x88\xa5;\xc6\xc1:\xe3\x93\xfa\x9a9\xde\xe5:\\\x88\x8a\x92\xf9T\xb4|\xa4\xf3\xecT-\xc0\xa7Y\xf3\x0f\x0c\xb3\x92\x06\t\x9f\x1c\x96\x9c\xf4*\xfc.\x1b7.\xa2\x80\x1b\xd2\xf8DQ\xa4\x86\x13\x16E\x1b%\x90%\xeaO\xf0#\x06\x87\xe0\x8a\xfe\xcc\xb0\xb6F\x08\xb1y\xca\xc8\x92\x0bD\xd6\xd0\xb2\xfd\xa4[[\xe3\xcf\xe2\x9c\x00\x97\xbc\x95\x0f\x8a\xaf\xbb\x8c\xa6\xaa]5\xb3\x01[\xc1a\xe9\x06@\x8a\xbc\xd8]\xba\'&\xd6\xaa_\x9e+c\xfb\x9d\xc6\xbc\xd8\x1d\xe5t\xe8\x9eL@\x80\x99\xeeV\x12\x06\x04a\xaa7J\xbd\xa1\xe3p2_\x9b\xd7\xb6\xdd\x98\xf1kx\x19\x9a\xc8\xdeXP\xa6\x15\xd7\xb5\xc9\xb1N\xefbZ\xb6\x8e\x91\xff\xa2\x877\x84f\xc1\xee\xcd7\x1dZp\xc4\xce\xe3\x1f\xda\x0e\x9fY\xa3\xce\x0b~N\xaa\xe6\x91\xee<\xf0\x13\xa1:\x1a\x0f\xdf\xce%0\x81\xfa\x06\t*\x86H\x86\xf7\r\x01\x07\x01\xa0\x81\xec\x04\x81\xe90\x81\xe60\x81\xe3\x06\x0b*\x86H\x86\xf7\r\x01\x0c\n\x01\x02\xa0\x81\xac0\x81\xa90\x1c\x06\n*\x86H\x86\xf7\r\x01\x0c\x01\x030\x0e\x04\x08\xfa\xe77\x12\xfb\xcbB\xe9\x02\x02\x08\x00\x04\x81\x88(\xde\x9f?\xc3\xcc#f\xb9>\x12\xa1\xd7\xefF\xea\xa3\xd8\x88v%\x1cv\xf8I\xb4K\x1e\xc6q\x85\xe2\x95a\x83*pI@\x13q\x19>\xdb\xce\xb0\x86 \x16n\xce\xc1\xe0cl\xd7_H\xc2\x8c\xac\xdc\xc5<\xb58\xe6\xfa\xfc\xf8\xf5HRH\x83\x17\xd5(\xcf;=z\x12r\x18z\x95\x7fz\xb4\xac\xeb0\xe8\xc4\xb5O\xae>\xa07C>,\xd2\xd3;\xbeQ\xab\xdc\xb0\x01\xd8\x93s\xfchu\xae\xbe\x97%\x19\xb5\xf4\xbc\xb9\x05\x83\xcc)/\xbc\x16e1%0#\x06\t*\x86H\x86\xf7\r\x01\t\x151\x16\x04\x14]F\x8e\xb5\xcd\x8c\r\xb1q\xcd\xf3\x87X\x80\x9f\x04\xac\x95\xeb\xc8010!0\t\x06\x05+\x0e\x03\x02\x1a\x05\x00\x04\x14\x13m\x9f\xe5m\x93^\xb5G\x81q\xf4\x1aN\xf2\x90\xdeb\xb06\x04\x08\xf9\x10\x1c\x1c:f\xca\xb7\x02\x02\x08\x00').hex()),
+        password:
+          type: string
+          description: Password to decode P12 file
+          format: password
+          example: ak!w6xsxp7?=
+      example: 
+        EIDAS QEC Example:
+          did: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+          eidasQec: (b'0\x82\x03\xc9\x02\x01\x030\x82\x03\x8f\x06\t*\x86H\x86\xf7\r\x01\x07\x01\xa0\x82\x03\x80\x04\x82\x03|0\x82\x03x0\x82\x02w\x06\t*\x86H\x86\xf7\r\x01\x07\x06\xa0\x82\x02h0\x82\x02d\x02\x01\x000\x82\x02]\x06\t*\x86H\x86\xf7\r\x01\x07\x010\x1c\x06\n*\x86H\x86\xf7\r\x01\x0c\x01\x060\x0e\x04\x08\'?\xfc\xa4]\xbf\x80k\x02\x02\x08\x00\x80\x82\x020}A9N;\x89/j\x8e8\xc57=\x1d!\xae!0\xcd\xaf7}cN>\xcac\xb6nqU\x8c>\x1ff\xce\xe45\xcf\r\xb8~O\xf1\xae\xd5\xde \x0ch\xe1\xe3]\x90\xbc\xa5cBv\xbc\xbf\xc3\x1a\xf2\x91\xa6\x9a\xd1\xac"?\xealH\x06\xf0\xce\xb8\x96s\xc7\xca\x0bK\xaa\xe7+\xa5\xe3\xb7\x82\x07\xfc\x1d%<\x95\x9d:\xff\xed\xc7\x03\xb9\x7f\xa5\xbb\xab\xfd`\x17\x01\x1fp\xe6W\xc7\x88\xde\xa4\xa7\xd2\x8f\xb48m[\xcdl\xb6\xba#0B\x97\xae[\x8d\xf4\x99\xa4\xcb\x94\xea>\x04\xbc\xc7\'\xc2\xc4\xc0b\x01\xe7\xb6O\xfe\xdaA~\xb7\xa8\x8a\x02\x82\x7f\xe9\x1f\xae\x8c\xef=\xf6\x90(\xddK\xe5\xeaB$XC\x84U\\N=ut\xc9\xe5]\xe2\x0b\xe8\x80\xc3\x84G~M\xa8+\xb1\xb0sL\xcb\xb7&\xb4jQM\x8c\x8c\x8b\xbe\xbe7Zghj\x1b\xf5\x00\xe1\x06f.\xbb\xf5\x98\xf8j$\xa2\xc9L\xe1\x08S\xbe\xc2Z\x14f\xb6\xa3\xa2\x8dI\xd1\x07~\x08\x9e\xdf\xd2"\xc9\xaa\xc8a\xc5Q\x89\xac\x91{\x967H]c0\xa2N\xe4\xbe\x14\x18\xe3aC\x88B\x80\r\x84\x90\xcf\xf8\x9c2\xccs\xea~bg\x99OU\x04WU:\xc9\x03\x9e\xfa\x96\x13D\x89}\xed\x92\xc5?G\xf7\xdb\xa3\x0eg;\x01\x93-\x88\xa5;\xc6\xc1:\xe3\x93\xfa\x9a9\xde\xe5:\\\x88\x8a\x92\xf9T\xb4|\xa4\xf3\xecT-\xc0\xa7Y\xf3\x0f\x0c\xb3\x92\x06\t\x9f\x1c\x96\x9c\xf4*\xfc.\x1b7.\xa2\x80\x1b\xd2\xf8DQ\xa4\x86\x13\x16E\x1b%\x90%\xeaO\xf0#\x06\x87\xe0\x8a\xfe\xcc\xb0\xb6F\x08\xb1y\xca\xc8\x92\x0bD\xd6\xd0\xb2\xfd\xa4[[\xe3\xcf\xe2\x9c\x00\x97\xbc\x95\x0f\x8a\xaf\xbb\x8c\xa6\xaa]5\xb3\x01[\xc1a\xe9\x06@\x8a\xbc\xd8]\xba\'&\xd6\xaa_\x9e+c\xfb\x9d\xc6\xbc\xd8\x1d\xe5t\xe8\x9eL@\x80\x99\xeeV\x12\x06\x04a\xaa7J\xbd\xa1\xe3p2_\x9b\xd7\xb6\xdd\x98\xf1kx\x19\x9a\xc8\xdeXP\xa6\x15\xd7\xb5\xc9\xb1N\xefbZ\xb6\x8e\x91\xff\xa2\x877\x84f\xc1\xee\xcd7\x1dZp\xc4\xce\xe3\x1f\xda\x0e\x9fY\xa3\xce\x0b~N\xaa\xe6\x91\xee<\xf0\x13\xa1:\x1a\x0f\xdf\xce%0\x81\xfa\x06\t*\x86H\x86\xf7\r\x01\x07\x01\xa0\x81\xec\x04\x81\xe90\x81\xe60\x81\xe3\x06\x0b*\x86H\x86\xf7\r\x01\x0c\n\x01\x02\xa0\x81\xac0\x81\xa90\x1c\x06\n*\x86H\x86\xf7\r\x01\x0c\x01\x030\x0e\x04\x08\xfa\xe77\x12\xfb\xcbB\xe9\x02\x02\x08\x00\x04\x81\x88(\xde\x9f?\xc3\xcc#f\xb9>\x12\xa1\xd7\xefF\xea\xa3\xd8\x88v%\x1cv\xf8I\xb4K\x1e\xc6q\x85\xe2\x95a\x83*pI@\x13q\x19>\xdb\xce\xb0\x86 \x16n\xce\xc1\xe0cl\xd7_H\xc2\x8c\xac\xdc\xc5<\xb58\xe6\xfa\xfc\xf8\xf5HRH\x83\x17\xd5(\xcf;=z\x12r\x18z\x95\x7fz\xb4\xac\xeb0\xe8\xc4\xb5O\xae>\xa07C>,\xd2\xd3;\xbeQ\xab\xdc\xb0\x01\xd8\x93s\xfchu\xae\xbe\x97%\x19\xb5\xf4\xbc\xb9\x05\x83\xcc)/\xbc\x16e1%0#\x06\t*\x86H\x86\xf7\r\x01\t\x151\x16\x04\x14]F\x8e\xb5\xcd\x8c\r\xb1q\xcd\xf3\x87X\x80\x9f\x04\xac\x95\xeb\xc8010!0\t\x06\x05+\x0e\x03\x02\x1a\x05\x00\x04\x14\x13m\x9f\xe5m\x93^\xb5G\x81q\xf4\x1aN\xf2\x90\xdeb\xb06\x04\x08\xf9\x10\x1c\x1c:f\xca\xb7\x02\x02\x08\x00').hex()),
+          password: ak!w6xsxp7?=
+      required:
+        - did
+        - eidasQec
+        - password
+    EidasQecResponse:
+      title: EidasQecResponse
+      type: object
+      description: Response for a sucessful eIDAS keys set-up.
+      properties:
+        id:
+          type: string
+          description: DID of EIDAS key owner
+          example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+      example: 
+        Response:
+          id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
     Problem:
       description: A Problem Details object (RFC 7807)
       type: object
@@ -368,138 +880,6 @@ components:
           description: |
             An absolute URI that identifies the specific occurrence of the problem.
             It may or may not yield further information if dereferenced.
-    verifiableCred:
-      type: object
-      description: Verifiable Credential Data Model
-      example:
-        simple verifiable credential:
-          "@context":
-            - "https://www.w3.org/2018/credentials/v1"
-            - "https://www.w3.org/2018/credentials/examples/v1"
-          id: "http://example.edu/credentials/1872"
-          type:
-            - VerifiableCredential
-            - AlumniCredential
-          issuer: "https://example.edu/issuers/565049"
-          issuanceDate: "2010-01-01T19:73:24Z"
-          credentialSubject:
-            id: "did:example:ebfeb1f712ebc6f1c276e12ec21"
-            alumniOf:
-              id: "did:example:c276e12ec21ebfeb1f712ebc6f1"
-              name:
-                - value: Example University
-                  lang: en
-                - value: "Exemple d'Université"
-                  lang: fr
-          proof:
-            type: RsaSignature2018
-            created: "2017-06-18T21:19:10Z"
-            proofPurpose: assertionMethod
-            verificationMethod: "https://example.edu/issuers/keys/1"
-            jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
-      title: Verifiable Credential
-      properties:
-        id:
-          type: string
-          example: "https://example.edu/credentials/1872"
-          description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
-          format: uri
-        "@context":
-          description: "An ordered set where the first item is a URI https://www.w3.org/2018/credentials/v1. It is used to define terms and help to express specific identifiers in a compact manner."
-          items:
-            type: string
-          uniqueItems: true
-          example:
-            - "https://www.w3.org/2018/credentials/v1"
-          type: array
-        type:
-          type: array
-          description: Type of the object or the datatype of the typed value.
-          example:
-            - VerifiableCredential
-            - UniversityDegreeCredential
-          items:
-            type: string
-        credentialSubject:
-          description: A set of objects that contain one or more properties that are each related to the subject of the credential.
-          oneOf:
-            - type: array
-              uniqueItems: true
-              items:
-                $ref: "#/components/schemas/subject"
-            - $ref: "#/components/schemas/subject"
-        issuer:
-          description: "A URI or an object containing an id property. Example: DID of the verifiable credential/presentation issuer."
-          oneOf:
-            - type: string
-              description: DID of the verifiable credential/presentation issuer.
-              format: uri
-              example: "did:vid:0x454253492d52554c45532d4d414c494e41524148"
-            - type: object
-              description: Object containing an id property to identify the issuer.
-              properties:
-                id:
-                  type: string
-                  description: "URI that is used to unambiguously refer to an object, such as a person, product, or organization."
-                  format: uri
-                  example: "did:example:76e12ec712ebc6f1c221ebfeb1f"
-        issuanceDate:
-          type: string
-          description: Date and time at which the information associated with the verifiable credential/presentation becomes valid.
-          format: date-time
-          example: "2010-01-01T19:23:24Z"
-        expirationDate:
-          type: string
-          format: date-time
-          example: "2020-01-01T19:23:24Z"
-          description: Date and time at which a credential/presentation ceases to be valid.
-        proof:
-          $ref: "#/components/schemas/Proof"
-      required:
-        - "@context"
-        - type
-        - credentialSubject
-        - issuer
-        - issuanceDate
-    subject:
-      title: Subject
-      type: object
-      description: A thing about which claims are made
-      properties:
-        id:
-          type: string
-          description: "Object MAY contain an id"
-          example: "did:example:ebfeb1f712ebc6f1c276e12ec21"
-      example:
-        Diploma:
-          id: "did:example:ebfeb1f712ebc6f1c276e12ec21"
-          degree:
-            type: BachelorDegree
-            name: Bachelor of Science and Arts
-        Affiliation:
-          id: "did:example:c276e12ec21ebfeb1f712ebc6f1"
-          name: Morgan Doe
-          spouse: "did:example:ebfeb1f712ebc6f1c276e12ec21"
-        ESSIF eID:
-          id: "did:vid:evas-did"
-          personIdentifier: BE/BE/02635542Y
-          currentFamilyName: Eva
-          currentGivenName: Adams
-          birthName: Eva
-          dateOfBirth: "1998-02-14"
-          placeOfBirth: Brussels
-          currentAddress: "44, rue de Fame"
-          gender: Female
-    EidasKey:
-      title: EidasKey
-      type: string
-      description: |
-        hexPrivateKey for secp256k1 or PEM RSA key stored that will be used to sign.
-      properties:
-        id:
-          type: string
-          description: "key used to sign"
-      example: "c07394b3e13e114406144d8fa4e90429a27e20131c68f070c40533a059fef51f"
   examples:
     BadRequest:
       value:
