@@ -6,8 +6,43 @@ import { JWTHeader } from "./jwt";
 import { DEFAULT_EIDAS_VERIFICATION_METHOD, JWT_ALG } from "../eidas/constants";
 import redis from "../storage/redis";
 import getJWKfromHex from "./jwk";
+import { keys } from "../../dtos";
+import { EidasKeysData } from "../../dtos/redis";
+import { ApiErrorMessages, InternalError } from "../../errors";
 
 export default class EnterpriseWallet {
+  private issuerPemCert!: string;
+
+  private issuerPemPrivateKey!: string;
+
+  private issuerKeyType!: keys.KeyType;
+
+  private issuerKeyCurve!: keys.Curves;
+
+  constructor(did: string) {
+    const asyncConstructor = async (
+      inputDid: string
+    ): Promise<EidasKeysData> => {
+      const data = await redis.get(inputDid);
+      if (!data) {
+        throw new InternalError(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
+      }
+      return JSON.parse(data) as EidasKeysData;
+    };
+    asyncConstructor(did)
+      .then((storedData) => {
+        const p12file = storedData.p12;
+        this.issuerKeyType = storedData.keyType;
+        if (storedData.keyCurve) this.issuerKeyCurve = storedData.keyCurve;
+      })
+      .catch((e) => {
+        throw new InternalError(
+          `${ApiErrorMessages.ERROR_ENTERPRISE_WALLET_CONSTRUCTOR} : 
+            ${(e as Error).message}`
+        );
+      });
+  }
+
   static async signDidJwt(
     issuer: string,
     data: Buffer,

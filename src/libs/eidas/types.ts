@@ -6,6 +6,6 @@ export interface Proof {
   jws?: string;
 }
 export interface EidasProof extends Proof {
-  domain?: string;
   cades?: string;
+  [x: string]: unknown;
 }

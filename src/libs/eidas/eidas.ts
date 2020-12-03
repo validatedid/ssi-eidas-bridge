@@ -79,33 +79,39 @@ const signEidas = async (signPayload: SignPayload): Promise<EidasProof> => {
   }
   let jws: string;
   let proof: EidasProof;
+  if (
+    signPayload.type !== SignatureTypes.EidasSeal2019 &&
+    signPayload.type !== SignatureTypes.EcdsaSecp256k1Signature2019 &&
+    signPayload.type !== SignatureTypes.CAdESRSASignature2020
+  )
+    throw new BadRequestError(BadRequestError.defaultTitle, {
+      detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
+    });
 
-  switch (signPayload.type) {
-    case SignatureTypes.EidasSeal2019:
-    case SignatureTypes.EcdsaSecp256k1Signature2019:
-      jws = await EnterpriseWallet.signDidJwt(
-        signPayload.issuer,
-        Buffer.from(JSON.stringify(payloadToSign)),
-        signPayload.expiresIn
-      );
-      if (!jws)
-        throw new InternalError(InternalError.defaultTitle, {
-          detail: ApiErrorMessages.ERROR_SIGNATURE_CREATION,
-        });
-
-      proof = {
-        type: signPayload.type,
-        created: getIssuanceDate(jws),
-        proofPurpose: DEFAULT_PROOF_PURPOSE,
-        verificationMethod: `${signPayload.issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
-        jws,
-      };
-      return proof;
-    default:
-      throw new BadRequestError(BadRequestError.defaultTitle, {
-        detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
+  if (
+    signPayload.type === SignatureTypes.EidasSeal2019 ||
+    signPayload.type === SignatureTypes.EcdsaSecp256k1Signature2019
+  ) {
+    jws = await EnterpriseWallet.signDidJwt(
+      signPayload.issuer,
+      Buffer.from(JSON.stringify(payloadToSign)),
+      signPayload.expiresIn
+    );
+    if (!jws)
+      throw new InternalError(InternalError.defaultTitle, {
+        detail: ApiErrorMessages.ERROR_SIGNATURE_CREATION,
       });
+
+    proof = {
+      type: signPayload.type,
+      created: getIssuanceDate(jws),
+      proofPurpose: DEFAULT_PROOF_PURPOSE,
+      verificationMethod: `${signPayload.issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
+      jws,
+    };
+    return proof;
   }
+  // At this point, signPayload.type is SignatureTypes.CAdESRSASignature2020
 };
 
 export { validateEIDASProofAttributes, signEidas };

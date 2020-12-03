@@ -1,10 +1,10 @@
 import { Resolver, DIDDocument } from "did-resolver";
 
 export interface VerifiedJwt {
-  payload: any;
+  payload: unknown;
   doc?: DIDDocument;
   issuer?: string;
-  signer?: object;
+  signer?: unknown;
   jwt: string;
 }
 

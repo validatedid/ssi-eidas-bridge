@@ -15,6 +15,8 @@ export enum ApiErrorMessages {
   BAD_INPUT_EIDAS_KEYS_PARAMS = "Eidas keys call requires an EidasKeysOptions filled with the correct attributes",
   INVALID_HASH_ALG = "Hash algorithm not supported. Only supported algorithms are SHA1, SHA256 and SHA512.",
   NO_PEM_CADES = "PEM CADES Signature not provided.",
+  ERROR_RETRIEVING_REDIS_DATA = "Error retrieving data from Redis",
+  ERROR_ENTERPRISE_WALLET_CONSTRUCTOR = "Error on EnterpriseWallet constructor",
 }
 
 export default { ApiErrorMessages };
