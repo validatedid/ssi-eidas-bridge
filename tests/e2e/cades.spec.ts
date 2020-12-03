@@ -1,4 +1,4 @@
-import { CadesSignatureInput } from "../../src/dtos/cades";
+import { CadesSignatureInput, HashAlg } from "../../src/dtos/cades";
 import { signCadesRsa, verifyCadesSignature } from "../../src/libs/eidas/cades";
 
 // _test/z4.* RSA 2048bit
@@ -52,46 +52,54 @@ const SZ4_CERPEM = `-----BEGIN CERTIFICATE-----
   -----END CERTIFICATE-----`;
 
 describe("cades tests should", () => {
-  /*
-  it.skip("create a rsa key", () => {
-    
-    expect.assertions(1);
-    const inputCades: CadesSignatureInput = {
-      issuer: "did:example:123456",
-      data: "Odyssey rocks the world!",
-    };
-    const outputCades = signCadesRsa(inputCades);
-    expect(outputCades).toBeDefined();
-  });
-  */
-
-  it.only("CMS sign a given string data and check it with the expected hex value", () => {
+  it("CADES-BES SHA256withRSA sign a given data and output a PEM CMS", () => {
     expect.assertions(1);
     const inputCades: CadesSignatureInput = {
       data: "jsrsasign",
-      hash: "84c24dd1d9f56eb3a07ae4a23445add4facbaed78c89475296ab7954284d9cd4",
+      hashAlg: HashAlg.SHA256,
       pemCert: SZ4_CERPEM,
       pemPrivKey: SZ4_PRVP8PPEM,
     };
     const cadesOuput = signCadesRsa(inputCades);
-    // console.warn(cadesOuput.cades);
-    const hExpect =
-      "308201fa06092a864886f70d010702a08201eb308201e7020101310f300d06096086480165030402010500301806092a864886f70d010701a00b04096a737273617369676e318201b5308201b1020101301f301a310b3009060355040613025553310b3009060355040a0c025a34020101300d06096086480165030402010500a069301806092a864886f70d010903310b06092a864886f70d010701301c06092a864886f70d010905310f170d3133313233313233353935395a302f06092a864886f70d0109043122042084c24dd1d9f56eb3a07ae4a23445add4facbaed78c89475296ab7954284d9cd4300d06092a864886f70d01010b0500048201002e102927a557ecef796fc36b5d858207e93927343361fe5136ce34e645347765ac5de316190ad57bc96bfdff34d7829c7cb6280470a32c3a3965149aed9f1032f9d4f92cecb5038c19b6f0b0f894e730e138cf2f5a7ce1f239535b829977ce1ad4b2fcf226953edecaabf6a5b7fcd179a5e6bd1b44c1f101341a4ac38f7d2d086c2d00cc3c6ad7fb07525cf7cb766420e5f628c36ddaefb708701666a301bc8f1b9c24ca0e50bf4626648d15b2c9eee1b87453f15ca27f3e0580095947a58bcc3ff685b7c4c2cedb3aefe77a87d8ed57eab22a082220e909088cfb18f951c65a9cd39213f9a7e3a81b13b6137f0283da99e0302a9c27238099e31cb5656e3200";
-    expect(cadesOuput.cades).toStrictEqual(hExpect);
+    expect(cadesOuput.cades).toBeDefined();
   });
-  /*
-  it("verify a CMS signature", () => {
+
+  it("CADES-BES SHA1withRSA sign a given data and output a PEM CMS", () => {
     expect.assertions(1);
     const inputCades: CadesSignatureInput = {
       data: "jsrsasign",
-      hash: "84c24dd1d9f56eb3a07ae4a23445add4facbaed78c89475296ab7954284d9cd4",
-      pemCert: SZ4_CERPEM(),
-      pemPrivKey: SZ4_PRVP8PPEM(),
+      hashAlg: HashAlg.SHA1,
+      pemCert: SZ4_CERPEM,
+      pemPrivKey: SZ4_PRVP8PPEM,
     };
     const cadesOuput = signCadesRsa(inputCades);
-    // console.warn(cadesOuput.cades);
-    const verification = verifyCadesSignature(cadesOuput.cades);
-    expect(verification).toBe(true);
+    expect(cadesOuput.cades).toBeDefined();
   });
-  */
+
+  it("CADES-BES SHA512withRSA sign a given data and output a PEM CMS", () => {
+    expect.assertions(1);
+    const inputCades: CadesSignatureInput = {
+      data: "jsrsasign",
+      hashAlg: HashAlg.SHA1,
+      pemCert: SZ4_CERPEM,
+      pemPrivKey: SZ4_PRVP8PPEM,
+    };
+    const cadesOuput = signCadesRsa(inputCades);
+    expect(cadesOuput.cades).toBeDefined();
+  });
+
+  it("verify a PEM CADES signature", () => {
+    expect.assertions(3);
+    const inputCades: CadesSignatureInput = {
+      data: "jsrsasign",
+      hashAlg: HashAlg.SHA256,
+      pemCert: SZ4_CERPEM,
+      pemPrivKey: SZ4_PRVP8PPEM,
+    };
+    const cadesOuput = signCadesRsa(inputCades);
+    const verificationOut = verifyCadesSignature(cadesOuput.cades);
+    expect(verificationOut).toBeDefined();
+    expect(verificationOut.isValid).toBe(true);
+    expect(verificationOut.parse).toBeDefined();
+  });
 });
