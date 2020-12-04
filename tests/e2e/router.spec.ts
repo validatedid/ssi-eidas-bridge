@@ -1,22 +1,22 @@
 import request from "supertest";
 import http from "http";
 import { decodeJwt } from "did-jwt";
-import { startEbsiService } from "../../../src/api/app";
-import { BRIDGE_SERVICE } from "../../../src/config";
-import { SignPayload } from "../../../src/dtos/secureEnclave";
-import { SignatureTypes } from "../../../src/libs/secureEnclave/jwt";
-import { EIDASSignatureOutput } from "../../../src/dtos/eidas";
+import { startEbsiService } from "../../src/api/app";
+import { BRIDGE_SERVICE } from "../../src/config";
+import { SignPayload } from "../../src/dtos/secureEnclave";
+import { SignatureTypes } from "../../src/libs/secureEnclave/jwt";
+import { EIDASSignatureOutput } from "../../src/dtos/eidas";
 import {
   DEFAULT_PROOF_PURPOSE,
   DEFAULT_EIDAS_VERIFICATION_METHOD,
-} from "../../../src/libs/eidas/constants";
-import { getEnterpriseAuthZToken } from "../../auxAPICalls";
+} from "../../src/libs/eidas/constants";
+import { getEnterpriseAuthZToken } from "../auxAPICalls";
 
 jest.setTimeout(100000);
 
 describe("eidas-bridge router API calls", () => {
   let server: http.Server;
-  const testPort: number = 9900;
+  const testPort = 9900;
 
   // eslint-disable-next-line jest/no-hooks
   beforeAll(async (done) => {

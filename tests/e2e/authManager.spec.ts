@@ -1,12 +1,12 @@
 import http from "http";
-import AuthManager from "../../../src/libs/authManager/authManager";
-import { API_PRIVATE_KEY, WALLET, BRIDGE_SERVICE } from "../../../src/config";
-import { startEbsiService } from "../../../src/api/app";
-import ComponentSecureEnclave from "../../../src/libs/secureEnclave/componentSecureEnclave";
+import AuthManager from "../../src/libs/authManager/authManager";
+import { API_PRIVATE_KEY, WALLET, BRIDGE_SERVICE } from "../../src/config";
+import { startEbsiService } from "../../src/api/app";
+import ComponentSecureEnclave from "../../src/libs/secureEnclave/componentSecureEnclave";
 
 describe("authManager tests", () => {
   let server: http.Server;
-  const testPort: number = 9900;
+  const testPort = 9900;
 
   // eslint-disable-next-line jest/no-hooks
   beforeAll(async (done) => {

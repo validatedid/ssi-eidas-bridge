@@ -23,9 +23,9 @@
     "lint:openapi": "openapi lint api/openapi.yaml",
     "full-lint": "tsc --noEmit && eslint 'src/**/*.{js,ts}' --quiet --fix && prettier --write 'src/**/*.{js,ts}'",
     "format": "prettier --write 'src/**/*.{js,ts}' 'tests/**/*.{js,ts}'",
-    "test:unit": "jest --clearCache && jest --runInBand --verbose false --testPathPattern=\"^.+\\.(spec|test)\\.ts$\"",
-    "test:e2e": "jest --clearCache && jest --config ./tests/jest-e2e.json --runInBand --verbose false",
-    "test": "jest --clearCache && jest --config ./jest-all.json --runInBand --verbose false",
+    "test": "jest --runInBand --verbose false",
+    "test:unit": "jest --clearCache && jest --runInBand --verbose false --testPathPattern=unit",
+    "test:e2e": "jest --clearCache && jest --runInBand --verbose false --testPathPattern=e2e",
     "clearCache": "jest --clearCache"
   },
   "devDependencies": {

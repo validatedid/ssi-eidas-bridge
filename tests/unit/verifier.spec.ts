@@ -1,7 +1,7 @@
 import { decodeJwt, ebsiVerifyJwt } from "@cef-ebsi/did-jwt";
-import { Verifier } from "../../../src/libs/secureEnclave";
-import { VerifiedJwt } from "../../../src/libs/secureEnclave/jwt";
-import { ApiErrorMessages, BadRequestError } from "../../../src/errors";
+import { Verifier } from "../../src/libs/secureEnclave";
+import { VerifiedJwt } from "../../src/libs/secureEnclave/jwt";
+import { ApiErrorMessages, BadRequestError } from "../../src/errors";
 
 jest.mock("@cef-ebsi/did-jwt", () => ({
   decodeJwt: jest.fn(),

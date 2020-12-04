@@ -1,10 +1,10 @@
-import { validateEIDASProofAttributes } from "../../../src/libs/eidas";
+import { validateEIDASProofAttributes } from "../../src/libs/eidas";
 import {
   DEFAULT_EIDAS_PROOF_TYPE,
   DEFAULT_PROOF_PURPOSE,
   DEFAULT_EIDAS_VERIFICATION_METHOD,
-} from "../../../src/libs/eidas/constants";
-import { compareCredentialKeys } from "../../../src/libs/eidas/eidas";
+} from "../../src/libs/eidas/constants";
+import { compareCredentialKeys } from "../../src/libs/eidas/eidas";
 
 const DID_ENTITY = "did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D";
 const VID_JWT =

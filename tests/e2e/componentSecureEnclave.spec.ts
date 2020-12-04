@@ -1,5 +1,5 @@
-import { ComponentSecureEnclave } from "../../../src/libs/secureEnclave";
-import { API_PRIVATE_KEY } from "../../../src/config";
+import { ComponentSecureEnclave } from "../../src/libs/secureEnclave";
+import { API_PRIVATE_KEY } from "../../src/config";
 
 describe("componentSecureEnclave test suite", () => {
   it("should throw InternalError with no encryptedKeystore", async () => {

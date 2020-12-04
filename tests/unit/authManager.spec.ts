@@ -1,6 +1,6 @@
-import AuthManager from "../../../src/libs/authManager/authManager";
-import { WALLET } from "../../../src/config";
-import { ComponentSecureEnclave } from "../../../src/libs/secureEnclave";
+import AuthManager from "../../src/libs/authManager/authManager";
+import { WALLET } from "../../src/config";
+import { ComponentSecureEnclave } from "../../src/libs/secureEnclave";
 
 describe("authManager tests", () => {
   it("should create an authorization token", async () => {

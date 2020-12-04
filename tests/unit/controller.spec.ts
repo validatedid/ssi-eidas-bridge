@@ -1,11 +1,11 @@
 import { decodeJwt } from "did-jwt";
-import Controller from "../../../src/api/eidas/controller";
-import { EnterpriseWallet, Verifier } from "../../../src/libs/secureEnclave";
-import { SignatureTypes } from "../../../src/libs/secureEnclave/jwt";
+import Controller from "../../src/api/eidas/controller";
+import { EnterpriseWallet, Verifier } from "../../src/libs/secureEnclave";
+import { SignatureTypes } from "../../src/libs/secureEnclave/jwt";
 import {
   DEFAULT_PROOF_PURPOSE,
   DEFAULT_EIDAS_VERIFICATION_METHOD,
-} from "../../../src/libs/eidas/constants";
+} from "../../src/libs/eidas/constants";
 
 jest.mock("did-jwt", () => ({
   decodeJwt: jest.fn(),
