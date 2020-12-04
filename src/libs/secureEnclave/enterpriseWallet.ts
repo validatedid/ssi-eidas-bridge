@@ -18,7 +18,7 @@ import {
 } from "../../dtos/cades";
 
 export default class EnterpriseWallet {
-  private issuerPemCert!: string;
+  private issuerPemCert!: string | string[];
 
   private issuerPemPrivateKey!: string;
 
@@ -26,7 +26,7 @@ export default class EnterpriseWallet {
 
   private issuerKeyCurve!: keys.Curves;
 
-  constructor(did: string) {
+  constructor(did: string, password: string) {
     const asyncConstructor = async (
       inputDid: string
     ): Promise<EidasKeysData> => {
@@ -38,7 +38,10 @@ export default class EnterpriseWallet {
     };
     asyncConstructor(did)
       .then((storedData) => {
-        const parsedData = parseP12File(storedData.p12);
+        const parsedData = parseP12File(
+          Buffer.from(storedData.p12).toString("binary"),
+          password
+        );
         this.issuerPemCert = parsedData.pemCert;
         this.issuerPemPrivateKey = parsedData.pemPrivateKey;
         this.issuerKeyType = storedData.keyType;
@@ -61,7 +64,9 @@ export default class EnterpriseWallet {
     const inputCades: CadesSignatureInput = {
       data: JSON.stringify(payload),
       hashAlg: HashAlg.SHA256,
-      pemCert: this.issuerPemCert,
+      pemCert: Array.isArray(this.issuerPemCert)
+        ? this.issuerPemCert[this.issuerPemCert.length - 1]
+        : this.issuerPemCert,
       pemPrivKey: this.issuerPemPrivateKey,
     };
     return signCadesRsa(inputCades);
