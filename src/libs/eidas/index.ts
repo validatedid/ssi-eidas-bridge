@@ -1,5 +1,6 @@
 import * as eidasConstants from "./constants";
 import * as eidasTypes from "./types";
-import { validateEIDASProofAttributes } from "./eidas";
+import * as eidas from "./eidas";
+import * as cades from "./cades";
 
-export { eidasTypes, eidasConstants, validateEIDASProofAttributes };
+export { eidasTypes, eidasConstants, eidas, cades };

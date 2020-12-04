@@ -16,7 +16,7 @@ import {
   VerifiedJwt,
 } from "../../libs/secureEnclave/jwt";
 
-import { validateEIDASProofAttributes } from "../../libs/eidas";
+import { eidas } from "../../libs/eidas";
 import * as config from "../../config";
 import { EidasKeysOptions } from "../../dtos/keys";
 import { signEidas } from "../../libs/eidas/eidas";
@@ -84,7 +84,7 @@ export default class Controller {
         detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
       });
 
-    validateEIDASProofAttributes(proof);
+    eidas.validateEIDASProofAttributes(proof);
     const options: JWTVerifyOptions = {
       resolver: new Resolver(
         VidDidResolver.getResolver({

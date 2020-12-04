@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import Wallet, { WalletOptions } from "./wallet";
 import { InternalError, ApiErrorMessages } from "../../errors";
 import getJWKfromHex from "./jwk";
-import util from "../../utils";
+import { util } from "../../utils";
 
 export default class ComponentWallet implements Wallet {
   static async componentWalletBuilder(

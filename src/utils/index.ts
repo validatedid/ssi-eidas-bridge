@@ -1,3 +1,4 @@
 import * as util from "./util";
+import parseP12File from "./crypto";
 
-export default util;
+export { util, parseP12File };

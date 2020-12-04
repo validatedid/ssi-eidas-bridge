@@ -17,6 +17,7 @@ export enum ApiErrorMessages {
   NO_PEM_CADES = "PEM CADES Signature not provided.",
   ERROR_RETRIEVING_REDIS_DATA = "Error retrieving data from Redis",
   ERROR_ENTERPRISE_WALLET_CONSTRUCTOR = "Error on EnterpriseWallet constructor",
+  KEY_TYPE_NOT_SUPPORTED = "Provided key type is not supported. Only RSA is supported",
 }
 
 export default { ApiErrorMessages };

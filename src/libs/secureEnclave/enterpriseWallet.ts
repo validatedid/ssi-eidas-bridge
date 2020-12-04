@@ -9,6 +9,13 @@ import getJWKfromHex from "./jwk";
 import { keys } from "../../dtos";
 import { EidasKeysData } from "../../dtos/redis";
 import { ApiErrorMessages, InternalError } from "../../errors";
+import { parseP12File } from "../../utils";
+import { signCadesRsa } from "../eidas/cades";
+import {
+  CadesSignatureInput,
+  CadesSignatureOutput,
+  HashAlg,
+} from "../../dtos/cades";
 
 export default class EnterpriseWallet {
   private issuerPemCert!: string;
@@ -31,7 +38,9 @@ export default class EnterpriseWallet {
     };
     asyncConstructor(did)
       .then((storedData) => {
-        const p12file = storedData.p12;
+        const parsedData = parseP12File(storedData.p12);
+        this.issuerPemCert = parsedData.pemCert;
+        this.issuerPemPrivateKey = parsedData.pemPrivateKey;
         this.issuerKeyType = storedData.keyType;
         if (storedData.keyCurve) this.issuerKeyCurve = storedData.keyCurve;
       })
@@ -41,6 +50,21 @@ export default class EnterpriseWallet {
             ${(e as Error).message}`
         );
       });
+  }
+
+  eSeal(payload: Record<string, unknown>): CadesSignatureOutput {
+    if (this.issuerKeyType !== "RSA")
+      throw new InternalError(InternalError.defaultTitle, {
+        detail: ApiErrorMessages.KEY_TYPE_NOT_SUPPORTED,
+      });
+    // !!! TODO: to canonalize the payload before sending it
+    const inputCades: CadesSignatureInput = {
+      data: JSON.stringify(payload),
+      hashAlg: HashAlg.SHA256,
+      pemCert: this.issuerPemCert,
+      pemPrivKey: this.issuerPemPrivateKey,
+    };
+    return signCadesRsa(inputCades);
   }
 
   static async signDidJwt(
@@ -72,8 +96,10 @@ export default class EnterpriseWallet {
     return jwt;
   }
 
-  static getJwkfromKeys(keys: string): JWK.ECKey {
-    const wallet: ethers.Wallet = new ethers.Wallet(util.prefixWith0x(keys));
+  static getJwkfromKeys(inputKeys: string): JWK.ECKey {
+    const wallet: ethers.Wallet = new ethers.Wallet(
+      util.prefixWith0x(inputKeys)
+    );
     const { privateKey } = new ethers.utils.SigningKey(wallet.privateKey);
     const { publicKey } = new ethers.utils.SigningKey(wallet.privateKey);
     return getJWKfromHex(publicKey, privateKey);
