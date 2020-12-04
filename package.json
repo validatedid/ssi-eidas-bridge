@@ -82,6 +82,7 @@
     "jose": "^2.0.3",
     "jsrsasign": "^10.1.4",
     "moment": "^2.25.3",
+    "node-forge": "^0.10.0",
     "swagger-ui-express": "^4.1.4",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.4.2",
