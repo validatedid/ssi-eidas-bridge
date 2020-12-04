@@ -91,7 +91,6 @@ const getIssuanceDate = (jwt: string): string => {
  */
 const b64nltohex = (s: string): string => {
   const b64 = s.replace(/[^0-9A-Za-z/+=]*/g, "");
-  // const hex = b64tohex(b64);
   const hex = toHex(b64);
   return hex;
 };

@@ -18,7 +18,7 @@ import {
 } from "../../dtos/cades";
 
 export default class EnterpriseWallet {
-  private issuerPemCert!: string | string[];
+  private issuerPemCert!: string[];
 
   private issuerPemPrivateKey!: string;
 
@@ -63,9 +63,7 @@ export default class EnterpriseWallet {
     // !!! TODO: to canonalize the payload before sending it
     const inputCades: CadesSignatureInput = {
       data: JSON.stringify(payload),
-      pemCert: Array.isArray(this.issuerPemCert)
-        ? this.issuerPemCert[this.issuerPemCert.length - 1]
-        : this.issuerPemCert,
+      pemCert: this.issuerPemCert[this.issuerPemCert.length - 1],
       pemPrivKey: this.issuerPemPrivateKey,
     };
     return signCadesRsa(inputCades);

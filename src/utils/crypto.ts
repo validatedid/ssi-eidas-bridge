@@ -44,7 +44,7 @@ function getCertificateFromP12(p12: any) {
 const parseP12File = (
   p12File: string,
   password: string
-): { pemCert: string | string[]; pemPrivateKey: string } => {
+): { pemCert: string[]; pemPrivateKey: string } => {
   const result = convertToPem(p12File, password);
   return { pemCert: result.pemCertificate, pemPrivateKey: result.pemKey };
 };
