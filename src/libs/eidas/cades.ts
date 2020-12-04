@@ -86,10 +86,9 @@ const verifyCadesSignature = (pemCades: string): CadesVerificationOutput => {
       detail: ApiErrorMessages.NO_PEM_CADES,
     });
   const hexSignedData = pemtohex(pemCades, "PKCS7");
-  const verifiedData = KJUR.asn1.cms.CMSUtil.verifySignedData({
+  return KJUR.asn1.cms.CMSUtil.verifySignedData({
     cms: hexSignedData,
-  });
-  return verifiedData;
+  }) as CadesVerificationOutput;
 };
 
 export { signCadesRsa, verifyCadesSignature };
