@@ -56,31 +56,6 @@ describe("cades tests should", () => {
     expect.assertions(1);
     const inputCades: CadesSignatureInput = {
       data: "jsrsasign",
-      hashAlg: HashAlg.SHA256,
-      pemCert: SZ4_CERPEM,
-      pemPrivKey: SZ4_PRVP8PPEM,
-    };
-    const cadesOuput = signCadesRsa(inputCades);
-    expect(cadesOuput.cades).toBeDefined();
-  });
-
-  it("CADES-BES SHA1withRSA sign a given data and output a PEM CMS", () => {
-    expect.assertions(1);
-    const inputCades: CadesSignatureInput = {
-      data: "jsrsasign",
-      hashAlg: HashAlg.SHA1,
-      pemCert: SZ4_CERPEM,
-      pemPrivKey: SZ4_PRVP8PPEM,
-    };
-    const cadesOuput = signCadesRsa(inputCades);
-    expect(cadesOuput.cades).toBeDefined();
-  });
-
-  it("CADES-BES SHA512withRSA sign a given data and output a PEM CMS", () => {
-    expect.assertions(1);
-    const inputCades: CadesSignatureInput = {
-      data: "jsrsasign",
-      hashAlg: HashAlg.SHA1,
       pemCert: SZ4_CERPEM,
       pemPrivKey: SZ4_PRVP8PPEM,
     };
@@ -93,7 +68,6 @@ describe("cades tests should", () => {
 
     const inputCades: CadesSignatureInput = {
       data: "jsrsasign",
-      hashAlg: HashAlg.SHA256,
       pemCert: SZ4_CERPEM,
       pemPrivKey: SZ4_PRVP8PPEM,
     };

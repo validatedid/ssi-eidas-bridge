@@ -15,22 +15,11 @@ import { ApiErrorMessages } from "../../errors";
 import { pemtohex } from "../../utils/util";
 
 const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
-  let sigalg: string;
-  if (
-    input.hashAlg !== HashAlg.SHA1 &&
-    input.hashAlg !== HashAlg.SHA256 &&
-    input.hashAlg !== HashAlg.SHA512
-  )
-    throw new BadRequestError(ApiErrorMessages.INVALID_HASH_ALG);
-  if (input.hashAlg === HashAlg.SHA1) sigalg = HashAlgKeyType.SHA1_RSA;
-  if (input.hashAlg === HashAlg.SHA256) sigalg = HashAlgKeyType.SHA256_RSA;
-  if (input.hashAlg === HashAlg.SHA512) sigalg = HashAlgKeyType.SHA512_RSA;
-
-  const dataDigest = KJUR.crypto.Util.hashString(input.data, input.hashAlg);
+  const dataDigest = KJUR.crypto.Util.hashString(input.data, HashAlg.SHA256);
 
   const param = {
     version: 1,
-    hashalgs: [HashAlg.SHA1, HashAlg.SHA256, HashAlg.SHA512],
+    hashalgs: [HashAlg.SHA256],
     econtent: {
       type: "data",
       content: { str: input.data },
@@ -40,7 +29,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
       {
         version: 1,
         id: { type: "isssn", cert: input.pemCert },
-        hashalg: input.hashAlg,
+        hashalg: HashAlg.SHA256,
         sattrs: {
           array: [
             {
@@ -61,7 +50,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
             },
           ],
         },
-        sigalg,
+        sigalg: HashAlgKeyType.SHA256_RSA,
         signkey: input.pemPrivKey,
       },
     ],

@@ -63,7 +63,6 @@ export default class EnterpriseWallet {
     // !!! TODO: to canonalize the payload before sending it
     const inputCades: CadesSignatureInput = {
       data: JSON.stringify(payload),
-      hashAlg: HashAlg.SHA256,
       pemCert: Array.isArray(this.issuerPemCert)
         ? this.issuerPemCert[this.issuerPemCert.length - 1]
         : this.issuerPemCert,

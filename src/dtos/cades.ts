@@ -18,7 +18,6 @@ export interface CadesSignatureOutput {
 export interface CadesSignatureInput {
   issuer?: string;
   data: string;
-  hashAlg: string;
   pemCert: string;
   pemPrivKey: string;
   oid?: string;
