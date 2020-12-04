@@ -46,7 +46,6 @@ const parseP12File = (
   password: string
 ): { pemCert: string | string[]; pemPrivateKey: string } => {
   const result = convertToPem(p12File, password);
-  console.warn(result);
   return { pemCert: result.pemCertificate, pemPrivateKey: result.pemKey };
 };
 
