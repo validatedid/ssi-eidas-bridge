@@ -89,7 +89,8 @@ describe("cades tests should", () => {
   });
 
   it("verify a PEM CADES signature", () => {
-    expect.assertions(3);
+    expect.assertions(2);
+
     const inputCades: CadesSignatureInput = {
       data: "jsrsasign",
       hashAlg: HashAlg.SHA256,
@@ -98,7 +99,6 @@ describe("cades tests should", () => {
     };
     const cadesOuput = signCadesRsa(inputCades);
     const verificationOut = verifyCadesSignature(cadesOuput.cades);
-    expect(verificationOut).toBeDefined();
     expect(verificationOut.isValid).toBe(true);
     expect(verificationOut.parse).toBeDefined();
   });

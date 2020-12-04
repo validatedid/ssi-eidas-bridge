@@ -81,7 +81,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
   const hexSignedData = signedData.getContentInfoEncodedHex();
   const pemSignedData = KJUR.asn1.ASN1Util.getPEMStringFromHex(
     hexSignedData,
-    "CMS"
+    "PKCS7"
   );
 
   const cadesOuput: CadesSignatureOutput = {
@@ -96,7 +96,7 @@ const verifyCadesSignature = (pemCades: string): CadesVerificationOutput => {
     throw new BadRequestError(BadRequestError.defaultTitle, {
       detail: ApiErrorMessages.NO_PEM_CADES,
     });
-  const hexSignedData = pemtohex(pemCades, "CMS");
+  const hexSignedData = pemtohex(pemCades, "PKCS7");
   const verifiedData = KJUR.asn1.cms.CMSUtil.verifySignedData({
     cms: hexSignedData,
   });
