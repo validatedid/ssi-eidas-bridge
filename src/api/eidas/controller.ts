@@ -14,7 +14,10 @@ import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
 import { JWTVerifyOptions, VerifiedJwt } from "../../dtos/jwt";
 
 import * as config from "../../config";
-import { signEidas, validateEIDASProofAttributes } from "../../libs/eidas/eidas";
+import {
+  signEidas,
+  validateEIDASProofAttributes,
+} from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
 import { KeyTypes, SignatureTypes } from "../../@types/constants";
 
