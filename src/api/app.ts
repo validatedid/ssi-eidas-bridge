@@ -47,7 +47,7 @@ class App {
   }
 
   public Start = async (port: number): Promise<http.Server> => {
-    const { did } = await ComponentSecureEnclave.Instance.init(API_PRIVATE_KEY);
+    const { did } = ComponentSecureEnclave.Instance.init(API_PRIVATE_KEY);
     if (!did)
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.ENCLAVE_DID_NULL,

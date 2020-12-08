@@ -5,9 +5,9 @@ jest.mock("../src/api/app");
 const mockStartEbsi = startEbsiService as jest.Mock;
 
 describe("start test", () => {
-  it("should start all designated services", () => {
+  it("should start all designated services", async () => {
     expect.hasAssertions();
-    startAll();
+    await startAll();
     expect(mockStartEbsi).toHaveBeenCalledTimes(1 + 1);
     mockStartEbsi.mockClear();
   });

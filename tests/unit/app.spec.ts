@@ -5,7 +5,7 @@ import App, { startEbsiService } from "../../src/api/app";
 import { ApiErrorMessages, ServiceUnavailableError } from "../../src/errors";
 
 describe("app test suite", () => {
-  const testPort: number = 9100;
+  const testPort = 9100;
   it("should throw an exception creating an APP with an unknown service", () => {
     expect.assertions(1);
     expect(() => {
@@ -19,7 +19,7 @@ describe("app test suite", () => {
   });
 
   test.each`
-    service                    | port
+    service                      | port
     ${BRIDGE_SERVICE.NAME.EIDAS} | ${testPort}
   `(
     "should start EBSI service $service at $port port",

@@ -1,16 +1,10 @@
 import request from "supertest";
 import http from "http";
-import { decodeJwt } from "did-jwt";
 import { startEbsiService } from "../../src/api/app";
 import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
-import { SignatureTypes } from "../../src/libs/secureEnclave/jwt";
 import { EIDASSignatureOutput } from "../../src/dtos/eidas";
-import {
-  DEFAULT_PROOF_PURPOSE,
-  DEFAULT_EIDAS_VERIFICATION_METHOD,
-} from "../../src/libs/eidas/constants";
-import { getEnterpriseAuthZToken } from "../auxAPICalls";
+import constants from "../../src/@types";
 
 jest.setTimeout(100000);
 
@@ -18,7 +12,7 @@ describe("eidas-bridge router API calls", () => {
   let server: http.Server;
   const testPort = 9900;
 
-  // eslint-disable-next-line jest/no-hooks
+  // eslint-disable-next-line jest/no-done-callback
   beforeAll(async (done) => {
     // launch Server to test its RESTful API
     server = await startEbsiService(
@@ -30,8 +24,7 @@ describe("eidas-bridge router API calls", () => {
     done();
   });
 
-  // eslint-disable-next-line jest/no-hooks
-  afterAll(async () => {
+  afterAll(() => {
     if (server) {
       server.close();
     }
@@ -44,15 +37,9 @@ describe("eidas-bridge router API calls", () => {
   });
 
   describe("secure enclave endpoints", () => {
-    let entityToken: string;
-    let entityDid: string;
-    // eslint-disable-next-line jest/no-hooks
-    beforeAll(async (done) => {
-      const { jwt, did } = await getEnterpriseAuthZToken();
-      entityToken = jwt;
-      entityDid = did;
-      done();
-    });
+    // !!! TODO: get the correct entityToken & entityDid
+    const entityToken = "";
+    const entityDid = "";
     it("returns a 400 without a body", async () => {
       expect.assertions(1);
       const res = await request(server)
@@ -67,15 +54,15 @@ describe("eidas-bridge router API calls", () => {
       const signPayload: SignPayload = {
         issuer: entityDid,
         payload: { data: "data to be signed" },
-        type: SignatureTypes.EidasSeal2019,
+        type: constants.SignatureTypes.EidasSeal2019,
       };
       const expectedResponse: EIDASSignatureOutput = {
         issuer: entityDid,
         proof: {
           type: signPayload.type,
           created: expect.any(String),
-          proofPurpose: DEFAULT_PROOF_PURPOSE,
-          verificationMethod: `${entityDid}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
+          proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
+          verificationMethod: `${entityDid}${constants.DEFAULT_EIDAS_VERIFICATION_METHOD}`,
           jws: expect.any(String),
         },
       };
@@ -102,7 +89,7 @@ describe("eidas-bridge router API calls", () => {
       const signPayload: SignPayload = {
         issuer: entityDid,
         payload: { data: "data to be signed" },
-        type: SignatureTypes.EidasSeal2019,
+        type: constants.SignatureTypes.EidasSeal2019,
       };
       const resSignature = await request(server)
         .post(

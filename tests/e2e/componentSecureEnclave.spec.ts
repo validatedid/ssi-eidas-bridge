@@ -7,7 +7,7 @@ describe("componentSecureEnclave test suite", () => {
     const se = ComponentSecureEnclave.Instance;
     se.enclaveDid = "";
 
-    await expect(se.init(undefined as any)).rejects.toThrow(
+    await expect(se.init(undefined as never)).rejects.toThrow(
       "Internal Server Error"
     );
   });
@@ -33,7 +33,7 @@ describe("componentSecureEnclave test suite", () => {
     const se = ComponentSecureEnclave.Instance;
     se.enclaveDid = "";
 
-    await expect(se.signJwt("", {} as any)).rejects.toThrow(
+    await expect(se.signJwt("", {} as never)).rejects.toThrow(
       "Internal Server Error"
     );
   });
@@ -43,7 +43,7 @@ describe("componentSecureEnclave test suite", () => {
     const se = ComponentSecureEnclave.Instance;
     se.enclaveDid = "";
 
-    expect(() => se.encrypt("" as any)).toThrow("Internal Server Error");
+    expect(() => se.encrypt("" as never)).toThrow("Internal Server Error");
   });
 
   it("should throw InternalError with no did: decrypt", () => {
@@ -51,50 +51,50 @@ describe("componentSecureEnclave test suite", () => {
     const se = ComponentSecureEnclave.Instance;
     se.enclaveDid = "";
 
-    expect(() => se.decrypt("" as any)).toThrow("Internal Server Error");
+    expect(() => se.decrypt("" as never)).toThrow("Internal Server Error");
   });
 
-  it("should create a wallet and save it to DB if it does not exist", async () => {
+  it("should create a wallet and save it to DB if it does not exist", () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;
 
-    const { did } = await se.init(API_PRIVATE_KEY);
+    const { did } = se.init(API_PRIVATE_KEY);
     expect(did).toContain("did:vid");
   });
 
-  it("should return public key", async () => {
+  it("should return public key", () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;
 
-    const { did } = await se.init(API_PRIVATE_KEY);
+    const { did } = se.init(API_PRIVATE_KEY);
     expect(se.getPublicKey(did)).toMatch(
       "0x042f28abb75ffd72766633057a57bdc71e687c38759c80d0547ff1383acf1c4f651ff91de55bd84288f9b7edff688c2aa87ab86819fa0c82234921184afab0d47d"
     );
   });
 
-  it("should export encryptedKey", async () => {
+  it("should export encryptedKey", () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;
 
-    const { did } = await se.init(API_PRIVATE_KEY);
+    const { did } = se.init(API_PRIVATE_KEY);
     expect(se.exportPrivateKey(did)).toBeDefined();
   });
 
-  it("should sign", async () => {
+  it("should sign", () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;
 
-    const { did } = await se.init(API_PRIVATE_KEY);
+    const { did } = se.init(API_PRIVATE_KEY);
     const data = Buffer.from(JSON.stringify({ data: "some test data" }));
-    const signature = await se.signJwt(did, data);
+    const signature = se.signJwt(did, data);
     expect(signature).toBeDefined();
   });
 
-  it("should decrypt what is encrypted", async () => {
+  it("should decrypt what is encrypted", () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;
 
-    await se.init(API_PRIVATE_KEY);
+    se.init(API_PRIVATE_KEY);
     const data = Buffer.from(JSON.stringify({ data: "some test data" }));
     expect(se.decrypt(se.encrypt(data))).toMatchObject(data);
   });

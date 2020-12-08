@@ -1,14 +1,14 @@
 import { JWK } from "jose";
 import { ethers } from "ethers";
-import { KeyType, Curves } from "../src/dtos/keys";
+import constants from "../src/@types";
 
 const prefixWith0x = (key: string): string => {
   return key.startsWith("0x") ? key : `0x${key}`;
 };
 
 const generateTestKeys = (
-  keyType: KeyType,
-  curveType: Curves
+  keyType: constants.KeyType,
+  curveType: constants.Curves
 ): {
   hexPrivateKey: string;
   did: string;
@@ -24,9 +24,7 @@ const generateTestKeys = (
       switch (curveType) {
         case "secp256k1":
           jwk = JWK.generateSync(keyType, curveType, { use: "sig" });
-          hexPrivateKey = Buffer.from(jwk.d as string, "base64").toString(
-            "hex"
-          );
+          hexPrivateKey = Buffer.from(jwk.d, "base64").toString("hex");
           wallet = new ethers.Wallet(prefixWith0x(hexPrivateKey));
           did = `did:vid:${wallet.address}`;
           return { hexPrivateKey, did, jwk };

@@ -1,10 +1,8 @@
-import { validateEIDASProofAttributes } from "../../src/libs/eidas";
+import constants from "../../src/@types";
 import {
-  DEFAULT_EIDAS_PROOF_TYPE,
-  DEFAULT_PROOF_PURPOSE,
-  DEFAULT_EIDAS_VERIFICATION_METHOD,
-} from "../../src/libs/eidas/constants";
-import { compareCredentialKeys } from "../../src/libs/eidas/eidas";
+  compareCredentialKeys,
+  validateEIDASProofAttributes,
+} from "../../src/libs/eidas/eidas";
 
 const DID_ENTITY = "did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D";
 const VID_JWT =
@@ -16,10 +14,11 @@ describe("eidas test suite", () => {
       expect.assertions(1);
 
       const proof = {
-        type: DEFAULT_EIDAS_PROOF_TYPE,
+        type: constants.DEFAULT_EIDAS_PROOF_TYPE,
         created: new Date().toISOString(),
-        proofPurpose: DEFAULT_PROOF_PURPOSE,
-        verificationMethod: DID_ENTITY + DEFAULT_EIDAS_VERIFICATION_METHOD,
+        proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
+        verificationMethod:
+          DID_ENTITY + constants.DEFAULT_EIDAS_VERIFICATION_METHOD,
         jws: VID_JWT,
       };
 
@@ -32,13 +31,14 @@ describe("eidas test suite", () => {
       const proof = {
         type: "",
         created: new Date().toISOString(),
-        proofPurpose: DEFAULT_PROOF_PURPOSE,
-        verificationMethod: DID_ENTITY + DEFAULT_EIDAS_VERIFICATION_METHOD,
+        proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
+        verificationMethod:
+          DID_ENTITY + constants.DEFAULT_EIDAS_VERIFICATION_METHOD,
         jws: VID_JWT,
       };
 
-      expect(() => validateEIDASProofAttributes(proof as any)).toThrow(
-        `Proof type is missing '${DEFAULT_EIDAS_PROOF_TYPE}'`
+      expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
+        `Proof type is missing '${constants.DEFAULT_EIDAS_PROOF_TYPE}'`
       );
     });
 
@@ -48,13 +48,14 @@ describe("eidas test suite", () => {
       const proof = {
         type: "test type",
         created: new Date().toISOString(),
-        proofPurpose: DEFAULT_PROOF_PURPOSE,
-        verificationMethod: DID_ENTITY + DEFAULT_EIDAS_VERIFICATION_METHOD,
+        proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
+        verificationMethod:
+          DID_ENTITY + constants.DEFAULT_EIDAS_VERIFICATION_METHOD,
         jws: VID_JWT,
       };
 
-      expect(() => validateEIDASProofAttributes(proof as any)).toThrow(
-        `Proof type is missing '${DEFAULT_EIDAS_PROOF_TYPE}'`
+      expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
+        `Proof type is missing '${constants.DEFAULT_EIDAS_PROOF_TYPE}'`
       );
     });
 
@@ -62,15 +63,16 @@ describe("eidas test suite", () => {
       expect.assertions(1);
 
       const proof = {
-        type: DEFAULT_EIDAS_PROOF_TYPE,
+        type: constants.DEFAULT_EIDAS_PROOF_TYPE,
         created: new Date().toISOString(),
         proofPurpose: "",
-        verificationMethod: DID_ENTITY + DEFAULT_EIDAS_VERIFICATION_METHOD,
+        verificationMethod:
+          DID_ENTITY + constants.DEFAULT_EIDAS_VERIFICATION_METHOD,
         jws: VID_JWT,
       };
 
-      expect(() => validateEIDASProofAttributes(proof as any)).toThrow(
-        `Proof Purpose is missing '${DEFAULT_PROOF_PURPOSE}'`
+      expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
+        `Proof Purpose is missing '${constants.DEFAULT_PROOF_PURPOSE}'`
       );
     });
 
@@ -78,15 +80,16 @@ describe("eidas test suite", () => {
       expect.assertions(1);
 
       const proof = {
-        type: DEFAULT_EIDAS_PROOF_TYPE,
+        type: constants.DEFAULT_EIDAS_PROOF_TYPE,
         created: new Date().toISOString(),
         proofPurpose: "test proof",
-        verificationMethod: DID_ENTITY + DEFAULT_EIDAS_VERIFICATION_METHOD,
+        verificationMethod:
+          DID_ENTITY + constants.DEFAULT_EIDAS_VERIFICATION_METHOD,
         jws: VID_JWT,
       };
 
-      expect(() => validateEIDASProofAttributes(proof as any)).toThrow(
-        `Proof Purpose is missing '${DEFAULT_PROOF_PURPOSE}'`
+      expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
+        `Proof Purpose is missing '${constants.DEFAULT_PROOF_PURPOSE}'`
       );
     });
 
@@ -94,15 +97,15 @@ describe("eidas test suite", () => {
       expect.assertions(1);
 
       const proof = {
-        type: DEFAULT_EIDAS_PROOF_TYPE,
+        type: constants.DEFAULT_EIDAS_PROOF_TYPE,
         created: new Date().toISOString(),
-        proofPurpose: DEFAULT_PROOF_PURPOSE,
+        proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
         verificationMethod: "",
         jws: VID_JWT,
       };
 
-      expect(() => validateEIDASProofAttributes(proof as any)).toThrow(
-        `EIDAS Verification Method key is missing '${DEFAULT_EIDAS_VERIFICATION_METHOD}'`
+      expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
+        `EIDAS Verification Method key is missing '${constants.DEFAULT_EIDAS_VERIFICATION_METHOD}'`
       );
     });
 
@@ -110,15 +113,15 @@ describe("eidas test suite", () => {
       expect.assertions(1);
 
       const proof = {
-        type: DEFAULT_EIDAS_PROOF_TYPE,
+        type: constants.DEFAULT_EIDAS_PROOF_TYPE,
         created: new Date().toISOString(),
-        proofPurpose: DEFAULT_PROOF_PURPOSE,
+        proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
         verificationMethod: `${DID_ENTITY}#a verif test`,
         jws: VID_JWT,
       };
 
-      expect(() => validateEIDASProofAttributes(proof as any)).toThrow(
-        `EIDAS Verification Method key is missing '${DEFAULT_EIDAS_VERIFICATION_METHOD}'`
+      expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
+        `EIDAS Verification Method key is missing '${constants.DEFAULT_EIDAS_VERIFICATION_METHOD}'`
       );
     });
 
@@ -126,13 +129,14 @@ describe("eidas test suite", () => {
       expect.assertions(1);
 
       const proof = {
-        type: DEFAULT_EIDAS_PROOF_TYPE,
+        type: constants.DEFAULT_EIDAS_PROOF_TYPE,
         created: new Date().toISOString(),
-        proofPurpose: DEFAULT_PROOF_PURPOSE,
-        verificationMethod: DID_ENTITY + DEFAULT_EIDAS_VERIFICATION_METHOD,
+        proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
+        verificationMethod:
+          DID_ENTITY + constants.DEFAULT_EIDAS_VERIFICATION_METHOD,
       };
 
-      expect(() => validateEIDASProofAttributes(proof as any)).toThrow(
+      expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
         "Proof must have the minimum required attributes"
       );
     });
@@ -142,13 +146,13 @@ describe("eidas test suite", () => {
     it("should return false with first array undefined", () => {
       expect.assertions(1);
       const arr2: string[] = [""];
-      expect(compareCredentialKeys(undefined as any, arr2)).toBe(false);
+      expect(compareCredentialKeys(undefined as never, arr2)).toBe(false);
     });
 
     it("should return false with second array undefined", () => {
       expect.assertions(1);
       const arr1: string[] = [""];
-      expect(compareCredentialKeys(arr1, undefined as any)).toBe(false);
+      expect(compareCredentialKeys(arr1, undefined as never)).toBe(false);
     });
 
     it("should return false with different array lenghts", () => {

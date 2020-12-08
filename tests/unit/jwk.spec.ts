@@ -1,5 +1,5 @@
 import { JWK } from "jose";
-import getJWKfromHex from "../../../src/libs/secureEnclave/jwk";
+import getJWKfromHex from "../../src/utils/jwk";
 
 describe("jWK test", () => {
   it("should generate a JWK from hex public and private", async () => {
