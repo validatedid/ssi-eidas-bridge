@@ -2,9 +2,11 @@ import { JWK } from "jose";
 import * as util from "util";
 import { AxiosError, AxiosResponse } from "axios";
 import { decodeJWT } from "did-jwt";
+import bs58 from "bs58";
 import LOGGER from "../logger";
 import { ENVIRONMENT } from "../config";
 import { BadRequestError, ProblemDetailsError } from "../errors";
+import constants from "../@types";
 
 const toHex = (data: string): string =>
   Buffer.from(data, "base64").toString("hex");
@@ -50,8 +52,8 @@ const PRINT_ERROR = (error: Error, operation?: string): void => {
     LOGGER.error(error.name, "error", operation);
     if (error.stack) LOGGER.error(error.stack, "error", operation);
   }
-  if ((error as AxiosError).response as AxiosResponse) {
-    const response = (error as AxiosError).response as AxiosResponse;
+  if ((error as AxiosError).response) {
+    const { response } = error as AxiosError;
     LOGGER.error(util.inspect(response.data));
   }
 };
@@ -140,6 +142,13 @@ const pemtohex = (s: string, sHead: string): string => {
   return b64nltohex(inputData);
 };
 
+const getDidFromPemPubKey = (pemPubKey: string): string => {
+  const pubKeyb58 = bs58.encode(
+    Buffer.from(pemtohex(pemPubKey, "PUBLIC KEY"), "hex")
+  );
+  return `did:key:${constants.DEFAULT_DID_KEY_RSA_INIT}${pubKeyb58}`;
+};
+
 export {
   toHex,
   pemtohex,
@@ -150,4 +159,5 @@ export {
   generateKeys,
   prefixWith0x,
   getIssuanceDate,
+  getDidFromPemPubKey,
 };

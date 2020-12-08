@@ -47,3 +47,4 @@ export const DEFAULT_EIDAS_PROOF_TYPE = SignatureTypes.CAdESRSASignature2020;
 export const DEFAULT_PROOF_PURPOSE = "assertionMethod";
 export const DEFAULT_EIDAS_VERIFICATION_METHOD = "#eidasKey";
 export const DEFAULT_CMS_HEADER = "PKCS7";
+export const DEFAULT_DID_KEY_RSA_INIT = "zUepp";
