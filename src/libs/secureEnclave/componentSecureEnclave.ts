@@ -1,5 +1,5 @@
 import { JWKECKey } from "jose";
-import Wallet, { WalletOptions } from "./wallet";
+import Wallet, { WalletOptions } from "../../dtos/wallet";
 import ComponentWallet from "./componentWallet";
 import { ApiErrorMessages, InternalError } from "../../errors";
 import { PRINT_DEBUG } from "../../utils/util";
@@ -53,10 +53,7 @@ export default class ComponentSecureEnclave {
    *
    * @param encryptedKeystore, Optionally, keystore can be provided as input parameter.
    */
-  async init(
-    hexEncodedPrivateKey: string,
-    privateKey?: boolean
-  ): Promise<InitComponent> {
+  init(hexEncodedPrivateKey: string, privateKey?: boolean): InitComponent {
     // If Did exists, return it.
     if (this.enclaveDid !== "") {
       const outKey = (this.getWallet(this.enclaveDid) as ComponentWallet).toJWK(
@@ -69,7 +66,7 @@ export default class ComponentSecureEnclave {
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.ERROR_ON_COMPONENT_WALLET_INIT,
       });
-    const did = await this.restoreWallet({
+    const did = this.restoreWallet({
       privateKey: hexEncodedPrivateKey,
     });
     this.enclaveDid = did;
@@ -81,8 +78,8 @@ export default class ComponentSecureEnclave {
    * Adds a new wallet to the Enclave
    * @param options
    */
-  async addNewWallet(options?: WalletOptions): Promise<string> {
-    const wallet = await ComponentWallet.componentWalletBuilder(options);
+  addNewWallet(options?: WalletOptions): string {
+    const wallet = ComponentWallet.componentWalletBuilder(options);
     this.wallets.set(wallet.getDid(), wallet);
     return wallet.getDid();
   }
@@ -91,7 +88,7 @@ export default class ComponentSecureEnclave {
    * Restores a wallet from a JSON encrypted file
    * @param options
    */
-  async restoreWallet(options?: WalletOptions): Promise<string> {
+  restoreWallet(options?: WalletOptions): string {
     return this.addNewWallet(options);
   }
 
@@ -115,15 +112,14 @@ export default class ComponentSecureEnclave {
     return wallet.exportPrivateKey();
   }
 
-  async signJwt(did: string, data: Buffer): Promise<any> {
+  signJwt(did: string, data: Buffer): string {
     const wallet = this.wallets.get(did);
     if (!wallet)
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.WALLET_NOT_FOUND,
       });
 
-    const response = await wallet.signJwt(data);
-    return response;
+    return wallet.signJwt(data);
   }
 
   // encrypt data using Component public key

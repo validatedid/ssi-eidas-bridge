@@ -1,4 +1,4 @@
-import * as keys from "./keys";
+import constants from "../@types";
 
 export interface RedisInsertion {
   eidasKey: string;
@@ -7,6 +7,6 @@ export interface RedisInsertion {
 
 export interface EidasKeysData {
   p12: Buffer;
-  keyType: keys.KeyType;
-  keyCurve?: keys.Curves;
+  keyType: constants.KeyType;
+  keyCurve?: constants.Curves;
 }

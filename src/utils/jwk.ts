@@ -1,7 +1,7 @@
 import { JWK, JWKECKey } from "jose";
 import base64url from "base64url";
 import { Buffer } from "buffer";
-import { API_NAME } from "../../config";
+import { API_NAME } from "../config";
 
 interface IJwk {
   crv: string;

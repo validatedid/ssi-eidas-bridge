@@ -59,7 +59,7 @@ class App {
         .listen(port, () => {
           resolve(this.connection);
         })
-        .on("error", (err: any) => {
+        .on("error", (err) => {
           reject(err);
         });
     });

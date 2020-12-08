@@ -1,15 +1,13 @@
 import { JWT, JWK, JWKECKey } from "jose";
 import { encrypt, decrypt } from "eciesjs";
 import { ethers } from "ethers";
-import Wallet, { WalletOptions } from "./wallet";
+import { WalletOptions } from "../../dtos/wallet";
 import { InternalError, ApiErrorMessages } from "../../errors";
-import getJWKfromHex from "./jwk";
+import getJWKfromHex from "../../utils/jwk";
 import { util } from "../../utils";
 
-export default class ComponentWallet implements Wallet {
-  static async componentWalletBuilder(
-    options?: WalletOptions
-  ): Promise<ComponentWallet> {
+export default class ComponentWallet {
+  static componentWalletBuilder(options?: WalletOptions): ComponentWallet {
     if (!options)
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.WALLET_OPTIONS_NOT_PROVIDED,
@@ -21,30 +19,28 @@ export default class ComponentWallet implements Wallet {
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.COMPONENT_WALLET_KEY_NOT_PROVIDED,
       });
-    await wallet.loadFromPrivateKey(options.privateKey);
+    wallet.loadFromPrivateKey(options.privateKey);
 
     return wallet;
   }
 
-  ethAddress: any;
+  ethAddress: string;
 
   protected jwk!: JWK.ECKey;
 
   protected wallet!: ethers.Wallet;
 
-  async init(): Promise<void> {
+  init(): void {
     this.jwk = util.generateKeys();
-    await this.initFromECKeys(this.jwk);
+    this.initFromECKeys(this.jwk);
   }
 
-  async initFromECKeys(jwk: JWK.ECKey): Promise<void> {
-    this.wallet = new ethers.Wallet(
-      util.prefixWith0x(util.toHex(<string>jwk.d))
-    );
+  initFromECKeys(jwk: JWK.ECKey): void {
+    this.wallet = new ethers.Wallet(util.prefixWith0x(util.toHex(jwk.d)));
     this.ethAddress = this.wallet.address;
   }
 
-  async loadFromPrivateKey(hexEncodedPrivKey: string): Promise<ethers.Wallet> {
+  loadFromPrivateKey(hexEncodedPrivKey: string): ethers.Wallet {
     const wallet: ethers.Wallet = new ethers.Wallet(
       util.prefixWith0x(hexEncodedPrivKey)
     );

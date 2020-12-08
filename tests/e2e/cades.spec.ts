@@ -1,5 +1,8 @@
-import { CadesSignatureInput, HashAlg } from "../../src/dtos/cades";
-import { signCadesRsa, verifyCadesSignature } from "../../src/libs/eidas/cades";
+import { CadesSignatureInput } from "../../src/dtos/cades";
+import {
+  signCadesRsa,
+  verifyCadesSignature,
+} from "../../src/libs/secureEnclave/cades";
 
 // _test/z4.* RSA 2048bit
 const SZ4_PRVP8PPEM = `-----BEGIN PRIVATE KEY-----

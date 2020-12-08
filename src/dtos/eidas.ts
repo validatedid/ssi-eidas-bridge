@@ -1,4 +1,16 @@
-import { Proof } from "../libs/eidas/types";
+import { Curves, KeyType } from "../@types/constants";
+
+export interface Proof {
+  type: string;
+  created: string;
+  proofPurpose: string;
+  verificationMethod: string;
+  jws?: string;
+}
+export interface EidasProof extends Proof {
+  cades?: string;
+  [x: string]: unknown;
+}
 
 export interface EIDASSignatureOutput {
   issuer: string;
@@ -27,4 +39,11 @@ export interface Credential extends InputCredential {
 }
 export interface VerifiableCredential extends Credential {
   proof: Proof | Proof[];
+}
+
+export interface EidasKeysOptions {
+  did: string;
+  eidasKey: string; // hexPrivateKey for secp256k1 or PEM RSA key
+  keyType: KeyType;
+  curveType?: Curves;
 }

@@ -2,20 +2,19 @@ import { SignPayload } from "../../dtos/secureEnclave";
 import { InternalError, ApiErrorMessages, BadRequestError } from "../../errors";
 import { getIssuanceDate } from "../../utils/util";
 import { EnterpriseWallet } from "../secureEnclave";
-import { SignatureTypes } from "../secureEnclave/jwt";
 import {
   DEFAULT_EIDAS_PROOF_TYPE,
   DEFAULT_PROOF_PURPOSE,
   DEFAULT_EIDAS_VERIFICATION_METHOD,
-} from "./constants";
-import { EidasProof, Proof } from "./types";
+  SignatureTypes,
+} from "../../@types/constants";
+import { EidasProof, Proof } from "../../dtos/eidas";
 
 const PROOF_REQUIRED_KEYS = [
   "type",
   "created",
   "proofPurpose",
   "verificationMethod",
-  "jws",
 ];
 
 export const compareCredentialKeys = (

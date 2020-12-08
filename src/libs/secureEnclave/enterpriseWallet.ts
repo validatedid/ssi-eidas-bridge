@@ -2,29 +2,28 @@ import { createJwt, SimpleSigner } from "@cef-ebsi/did-jwt";
 import { JWK } from "jose";
 import { ethers } from "ethers";
 import * as util from "../../utils/util";
-import { JWTHeader } from "./jwt";
-import { DEFAULT_EIDAS_VERIFICATION_METHOD, JWT_ALG } from "../eidas/constants";
+import { JWTHeader } from "../../dtos/jwt";
+import {
+  DEFAULT_EIDAS_VERIFICATION_METHOD,
+  JWT_ALG,
+} from "../../@types/constants";
 import redis from "../storage/redis";
-import getJWKfromHex from "./jwk";
-import { keys } from "../../dtos";
+import getJWKfromHex from "../../utils/jwk";
 import { EidasKeysData } from "../../dtos/redis";
 import { ApiErrorMessages, InternalError } from "../../errors";
 import { parseP12File } from "../../utils";
-import { signCadesRsa } from "../eidas/cades";
-import {
-  CadesSignatureInput,
-  CadesSignatureOutput,
-  HashAlg,
-} from "../../dtos/cades";
+import { signCadesRsa } from "./cades";
+import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
+import constants from "../../@types";
 
 export default class EnterpriseWallet {
   private issuerPemCert!: string[];
 
   private issuerPemPrivateKey!: string;
 
-  private issuerKeyType!: keys.KeyType;
+  private issuerKeyType!: constants.KeyType;
 
-  private issuerKeyCurve!: keys.Curves;
+  private issuerKeyCurve!: constants.Curves;
 
   constructor(did: string, password: string) {
     const asyncConstructor = async (
@@ -36,6 +35,7 @@ export default class EnterpriseWallet {
       }
       return JSON.parse(data) as EidasKeysData;
     };
+
     asyncConstructor(did)
       .then((storedData) => {
         const parsedData = parseP12File(
@@ -56,7 +56,7 @@ export default class EnterpriseWallet {
   }
 
   eSeal(payload: Record<string, unknown>): CadesSignatureOutput {
-    if (this.issuerKeyType !== "RSA")
+    if (this.issuerKeyType !== constants.KeyTypes.RSA)
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.KEY_TYPE_NOT_SUPPORTED,
       });
@@ -78,7 +78,7 @@ export default class EnterpriseWallet {
     const jwk = storedKeys
       ? this.getJwkfromKeys(storedKeys)
       : util.generateKeys();
-    const signer = SimpleSigner(util.toHex(<string>jwk.d).replace("0x", "")); // Removing 0x from wallet private key as input of SimpleSigner
+    const signer = SimpleSigner(util.toHex(jwk.d).replace("0x", "")); // Removing 0x from wallet private key as input of SimpleSigner
     const header: JWTHeader = {
       alg: JWT_ALG,
       typ: "JWT",
@@ -108,9 +108,7 @@ export default class EnterpriseWallet {
   }
 
   static getDid(jwk: JWK.ECKey): string {
-    const wallet = new ethers.Wallet(
-      util.prefixWith0x(util.toHex(<string>jwk.d))
-    );
+    const wallet = new ethers.Wallet(util.prefixWith0x(util.toHex(jwk.d)));
     return `did:vid:${wallet.address}`;
   }
 }

@@ -107,9 +107,3 @@ export interface AccessTokenResponseBody {
   expiresIn: number; // 15 minutes
   issuedAt: number;
 }
-
-export enum SignatureTypes {
-  EcdsaSecp256k1Signature2019 = "EcdsaSecp256k1Signature2019",
-  EidasSeal2019 = "EidasSeal2019",
-  CAdESRSASignature2020 = "CAdESRSASignature2020",
-}

@@ -4,22 +4,24 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { BadRequestError } from "@cef-ebsi/problem-details-errors";
 import { KJUR } from "jsrsasign";
+import constants from "../../@types";
 import {
   CadesSignatureInput,
   CadesSignatureOutput,
   CadesVerificationOutput,
-  HashAlg,
-  HashAlgKeyType,
 } from "../../dtos/cades";
 import { ApiErrorMessages } from "../../errors";
 import { pemtohex } from "../../utils/util";
 
 const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
-  const dataDigest = KJUR.crypto.Util.hashString(input.data, HashAlg.SHA256);
+  const dataDigest = KJUR.crypto.Util.hashString(
+    input.data,
+    constants.HashAlg.SHA256
+  );
 
   const param = {
     version: 1,
-    hashalgs: [HashAlg.SHA256],
+    hashalgs: [constants.HashAlg.SHA256],
     econtent: {
       type: "data",
       content: { str: input.data },
@@ -29,7 +31,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
       {
         version: 1,
         id: { type: "isssn", cert: input.pemCert },
-        hashalg: HashAlg.SHA256,
+        hashalg: constants.HashAlg.SHA256,
         sattrs: {
           array: [
             {
@@ -50,7 +52,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
             },
           ],
         },
-        sigalg: HashAlgKeyType.SHA256_RSA,
+        sigalg: constants.HashAlgKeyType.SHA256_RSA,
         signkey: input.pemPrivKey,
       },
     ],
@@ -85,7 +87,7 @@ const verifyCadesSignature = (pemCades: string): CadesVerificationOutput => {
     throw new BadRequestError(BadRequestError.defaultTitle, {
       detail: ApiErrorMessages.NO_PEM_CADES,
     });
-  const hexSignedData = pemtohex(pemCades, "PKCS7");
+  const hexSignedData = pemtohex(pemCades, constants.DEFAULT_CMS_HEADER);
   return KJUR.asn1.cms.CMSUtil.verifySignedData({
     cms: hexSignedData,
   }) as CadesVerificationOutput;

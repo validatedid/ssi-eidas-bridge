@@ -4,23 +4,19 @@ import { Resolver } from "did-resolver";
 import { SignPayload } from "../../dtos/secureEnclave";
 import {
   Credential,
+  EidasKeysOptions,
   EIDASSignatureOutput,
+  Proof,
   VerifiableCredential,
 } from "../../dtos/eidas";
 import { RedisInsertion } from "../../dtos/redis";
 import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
-import { Proof } from "../../libs/eidas/types";
-import {
-  JWTVerifyOptions,
-  SignatureTypes,
-  VerifiedJwt,
-} from "../../libs/secureEnclave/jwt";
+import { JWTVerifyOptions, VerifiedJwt } from "../../dtos/jwt";
 
-import { eidas } from "../../libs/eidas";
 import * as config from "../../config";
-import { EidasKeysOptions } from "../../dtos/keys";
-import { signEidas } from "../../libs/eidas/eidas";
+import { signEidas, validateEIDASProofAttributes } from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
+import { KeyTypes, SignatureTypes } from "../../@types/constants";
 
 export default class Controller {
   /**
@@ -84,7 +80,7 @@ export default class Controller {
         detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
       });
 
-    eidas.validateEIDASProofAttributes(proof);
+    validateEIDASProofAttributes(proof);
     const options: JWTVerifyOptions = {
       resolver: new Resolver(
         VidDidResolver.getResolver({
@@ -114,8 +110,8 @@ export default class Controller {
       !opts.did ||
       !opts.eidasKey ||
       !opts.keyType ||
-      !["RSA", "EC", "OKP"].includes(opts.keyType) ||
-      (opts.keyType === ("EC" || "OKP") && !opts.curveType)
+      ![KeyTypes.RSA, KeyTypes.EC, KeyTypes.OKP].includes(opts.keyType) ||
+      (opts.keyType === (KeyTypes.EC || KeyTypes.OKP) && !opts.curveType)
     )
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,

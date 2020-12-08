@@ -11,11 +11,7 @@ export default interface Wallet {
    * Sign the data and creates a JWS with the current key
    * @param data Data to be signed with the current key. Should be a VC JSON object
    */
-  signJwt(
-    data: Buffer,
-    password?: string,
-    expiresIn?: number
-  ): Promise<any> | any;
+  signJwt(data: Buffer, password?: string, expiresIn?: number): string;
 
   getDid(): string;
 
