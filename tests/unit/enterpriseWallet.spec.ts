@@ -1,4 +1,3 @@
-import { JWK } from "jose";
 import Redis from "ioredis";
 import fs from "fs";
 import path from "path";
@@ -7,26 +6,12 @@ import constants from "../../src/@types";
 
 jest.mock("ioredis");
 
-describe("enterprise wallet suite", () => {
-  it("should return an did", () => {
-    expect.assertions(1);
-    const key = JWK.generateSync("EC", "secp256k1", { use: "sig" });
-    expect(EnterpriseWallet.getDid(key)).toContain("did:vid");
-  });
-
-  it("should sign", async () => {
-    expect.assertions(1);
-    const payload = { data: "test sample data" };
-    const buff = Buffer.from(JSON.stringify(payload));
-    const token = await EnterpriseWallet.signDidJwt("did:vid:0x00", buff);
-    expect(token).toBeDefined();
-  });
-});
-
 describe("eidas enterprise wallet tests should", () => {
   const testFilePathWithCa = "../data/test2/";
   const testFilePathSelfSigned = "../data/test1/";
   const p12File = "keyStore.p12";
+  const password = "vidchain";
+  const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
 
   it("create a new enterpriseWallet", () => {
     expect.assertions(1);
@@ -39,7 +24,7 @@ describe("eidas enterprise wallet tests should", () => {
         keyType: constants.KeyTypes.RSA,
       });
     });
-    const wallet = new EnterpriseWallet("did:key:zUepp", "vidchain");
+    const wallet = new EnterpriseWallet(mockDid, password);
     expect(wallet).toBeDefined();
     jest.restoreAllMocks();
   });
