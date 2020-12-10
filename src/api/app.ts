@@ -38,7 +38,7 @@ class App {
         detail: ApiErrorMessages.NO_BRIDGE_SERVICE_AVAILABLE,
       });
 
-    this.router = new EidasRouter(this.httpServer, YAML.load(yamlFilePath));
+    this.router = new EidasRouter(this.httpServer);
     this.httpServer.use(
       BRIDGE_SERVICE.SWAGGER.EIDAS,
       swaggerUi.serve,

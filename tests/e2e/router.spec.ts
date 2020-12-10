@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import request from "supertest";
 import http from "http";
+import { decodeJWT } from "did-jwt";
 import { startEbsiService } from "../../src/api/app";
 import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
-import { EIDASSignatureOutput } from "../../src/dtos/eidas";
+import { VerifiableCredential } from "../../src/dtos/eidas";
 import constants from "../../src/@types";
 
 jest.setTimeout(100000);
@@ -53,18 +56,20 @@ describe("eidas-bridge router API calls", () => {
       expect.assertions(3);
       const signPayload: SignPayload = {
         issuer: entityDid,
-        payload: { data: "data to be signed" },
+        payload: ({
+          data: "data to be signed",
+        } as unknown) as VerifiableCredential,
         type: constants.SignatureTypes.EidasSeal2019,
       };
-      const expectedResponse: EIDASSignatureOutput = {
+      const expectedResponse = {
         issuer: entityDid,
-        proof: {
+        proof: ({
           type: signPayload.type,
           created: expect.any(String),
           proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
           verificationMethod: `${entityDid}${constants.DEFAULT_EIDAS_VERIFICATION_METHOD}`,
           jws: expect.any(String),
-        },
+        } as unknown) as VerifiableCredential,
       };
       const res = await request(server)
         .post(
@@ -74,7 +79,7 @@ describe("eidas-bridge router API calls", () => {
         .send(signPayload);
       expect(res.status).toStrictEqual(201);
       expect(res.body).toMatchObject(expectedResponse);
-      const { payload } = decodeJwt(res.body.proof.jws);
+      const { payload } = decodeJWT(res.body.proof.jws);
       const expectedSignature = {
         iat: expect.any(Number),
         iss: expect.stringContaining(`did:vid:`), // signer is another did from temporaly generated keys
@@ -88,7 +93,9 @@ describe("eidas-bridge router API calls", () => {
 
       const signPayload: SignPayload = {
         issuer: entityDid,
-        payload: { data: "data to be signed" },
+        payload: ({
+          data: "data to be signed",
+        } as unknown) as VerifiableCredential,
         type: constants.SignatureTypes.EidasSeal2019,
       };
       const resSignature = await request(server)

@@ -5,11 +5,8 @@ import { BRIDGE_SERVICE } from "../../config";
 import { BadRequestError, ApiErrorMessages } from "../../errors";
 
 class Router {
-  constructor(server: express.Express, swaggerDoc: any) {
+  constructor(server: express.Express) {
     const router = express.Router();
-    router.get("/openapi.json", (req: express.Request, res: express.Response) =>
-      res.send(swaggerDoc)
-    );
 
     // sessions call managed by auth middleware
     router.post(BRIDGE_SERVICE.CALL.BRIDGE_LOGIN);
@@ -32,10 +29,12 @@ class Router {
       cors(),
       async (req: express.Request, res: express.Response, next) => {
         try {
-          if (!req.body.proof)
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          if (!req.body || !req.body.proof)
             throw new BadRequestError(BadRequestError.defaultTitle, {
               detail: ApiErrorMessages.BAD_CREDENTIAL_PARAMETERS,
             });
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const { proof } = req.body;
           await Controller.EIDASvalidateSignature(proof);
           res.sendStatus(204);

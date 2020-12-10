@@ -1,8 +1,5 @@
-import {
-  generateDid,
-  getKidFromDidAndPemCertificate,
-  resolveDid,
-} from "../../src/utils/ssi";
+import { getKidFromDidAndPemCertificate } from "../../src/utils/ssi";
+import { generateDid, resolveDid } from "../utils";
 
 describe("ssi util tests should", () => {
   it("build a kid", () => {

@@ -2,7 +2,7 @@ import { JWK } from "jose";
 import getJWKfromHex from "../../src/utils/jwk";
 
 describe("jWK test", () => {
-  it("should generate a JWK from hex public and private", async () => {
+  it("should generate a JWK from hex public and private", () => {
     expect.assertions(3);
     const expectedJWK = JWK.asKey({
       crv: "secp256k1",

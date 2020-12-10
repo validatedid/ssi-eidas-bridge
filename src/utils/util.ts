@@ -2,11 +2,9 @@ import { JWK } from "jose";
 import * as util from "util";
 import { AxiosError } from "axios";
 import { decodeJWT } from "did-jwt";
-import bs58 from "bs58";
 import LOGGER from "../logger";
 import { ENVIRONMENT } from "../config";
 import { BadRequestError, ProblemDetailsError } from "../errors";
-import constants from "../@types";
 
 const toHex = (data: string): string =>
   Buffer.from(data, "base64").toString("hex");
@@ -142,13 +140,6 @@ const pemtohex = (s: string, sHead: string): string => {
   return b64nltohex(inputData);
 };
 
-const getDidFromPemPubKey = (pemPubKey: string): string => {
-  const pubKeyb58 = bs58.encode(
-    Buffer.from(pemtohex(pemPubKey, "PUBLIC KEY"), "hex")
-  );
-  return `did:key:${constants.DEFAULT_DID_KEY_RSA_INIT}${pubKeyb58}`;
-};
-
 const replaceNewLines = (str: string): string =>
   str.replace(/[^0-9A-Za-z/+=]*/g, "");
 
@@ -178,7 +169,6 @@ export {
   prefixWith0x,
   replaceNewLines,
   getIssuanceDate,
-  getDidFromPemPubKey,
   replacePemNewLines,
   replacePemHeaderAndNewLines,
 };

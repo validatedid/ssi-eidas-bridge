@@ -1,7 +1,6 @@
-import { KeyTypes } from "../../src/@types/constants";
 import Controller from "../../src/api/eidas/controller";
 import { EidasKeysOptions } from "../../src/dtos/eidas";
-import generateTestKeys from "../utils";
+import { generateTestKeys } from "../utils";
 import constants from "../../src/@types";
 
 describe("eidas keys tests should", () => {

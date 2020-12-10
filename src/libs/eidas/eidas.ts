@@ -111,6 +111,7 @@ const signEidas = async (signPayload: SignPayload): Promise<EidasProof> => {
     return proof;
   }
   // At this point, signPayload.type is SignatureTypes.CAdESRSASignature2020
+  return proof;
 };
 
 export { validateEIDASProofAttributes, signEidas };
