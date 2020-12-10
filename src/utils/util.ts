@@ -1,6 +1,6 @@
 import { JWK } from "jose";
 import * as util from "util";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { decodeJWT } from "did-jwt";
 import bs58 from "bs58";
 import LOGGER from "../logger";
@@ -149,6 +149,24 @@ const getDidFromPemPubKey = (pemPubKey: string): string => {
   return `did:key:${constants.DEFAULT_DID_KEY_RSA_INIT}${pubKeyb58}`;
 };
 
+const replaceNewLines = (str: string): string =>
+  str.replace(/[^0-9A-Za-z/+=]*/g, "");
+
+const replacePemNewLines = (pem: string, sHead: string): string => {
+  const header = `-----BEGIN ${sHead}-----`;
+  const footer = `-----END ${sHead}-----`;
+  const strippedData = replaceNewLines(
+    pem.replace(header, "").replace(footer, "")
+  );
+  return `${header}${strippedData}${footer}`;
+};
+
+const replacePemHeaderAndNewLines = (pem: string, sHead: string): string => {
+  const header = `-----BEGIN ${sHead}-----`;
+  const footer = `-----END ${sHead}-----`;
+  return replaceNewLines(pem.replace(header, "").replace(footer, ""));
+};
+
 export {
   toHex,
   pemtohex,
@@ -158,6 +176,9 @@ export {
   PRINT_SILLY,
   generateKeys,
   prefixWith0x,
+  replaceNewLines,
   getIssuanceDate,
   getDidFromPemPubKey,
+  replacePemNewLines,
+  replacePemHeaderAndNewLines,
 };

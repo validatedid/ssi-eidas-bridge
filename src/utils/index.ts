@@ -1,5 +1,5 @@
 import * as util from "./util";
-import parseP12File from "./crypto";
+import * as eidasCrypto from "./crypto";
 import * as jwk from "./jwk";
 
-export { util, parseP12File, jwk };
+export { util, eidasCrypto, jwk };

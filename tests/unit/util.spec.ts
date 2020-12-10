@@ -157,7 +157,7 @@ describe("pemtohex tests should", () => {
 });
 
 describe("did key tests should", () => {
-  it.only("code a base58 from a PEM public key", () => {
+  it("code a base58 from a PEM public key", () => {
     expect.assertions(1);
     const pemPubKey = `-----BEGIN PUBLIC KEY-----
     MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAozBgrSHFrezwbDULQCFP
