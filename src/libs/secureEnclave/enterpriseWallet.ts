@@ -11,7 +11,7 @@ import redis from "../storage/redis";
 import getJWKfromHex from "../../utils/jwk";
 import { EidasKeysData } from "../../dtos/redis";
 import { ApiErrorMessages, InternalError } from "../../errors";
-import { parseP12File } from "../../utils";
+import { eidasCrypto } from "../../utils";
 import { signCadesRsa } from "./cades";
 import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
 import constants from "../../@types";
@@ -38,7 +38,7 @@ export default class EnterpriseWallet {
 
     asyncConstructor(did)
       .then((storedData) => {
-        const parsedData = parseP12File(
+        const parsedData = eidasCrypto.parseP12File(
           Buffer.from(storedData.p12).toString("binary"),
           password
         );

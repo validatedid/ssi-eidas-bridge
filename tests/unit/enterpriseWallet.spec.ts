@@ -27,16 +27,6 @@ describe("eidas enterprise wallet tests should", () => {
   const testFilePathWithCa = "../data/test2/";
   const testFilePathSelfSigned = "../data/test1/";
   const p12File = "keyStore.p12";
-  it("throw an error when no data can be retrieved from redis", () => {
-    expect.assertions(1);
-    jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
-      return undefined;
-    });
-    expect(new EnterpriseWallet("did:key:zUepp", "password")).toThrow(
-      "Internal Server Error"
-    );
-    jest.restoreAllMocks();
-  });
 
   it("create a new enterpriseWallet", () => {
     expect.assertions(1);
