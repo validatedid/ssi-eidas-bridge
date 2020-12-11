@@ -72,9 +72,10 @@ export default class EnterpriseWallet {
         detail: ApiErrorMessages.KEY_TYPE_NOT_SUPPORTED,
       });
 
+    // TODO: sign with all certificate list
     const inputCades: CadesSignatureInput = {
       data: await canonizeCredential(payload),
-      pemCert: this.issuerPemCert[this.issuerPemCert.length - 1],
+      pemCert: this.issuerPemCert[0],
       pemPrivKey: this.issuerPemPrivateKey,
     };
     return signCadesRsa(inputCades);

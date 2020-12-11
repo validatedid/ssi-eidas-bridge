@@ -6,6 +6,7 @@ import constants from "../../src/@types";
 import { ApiErrorMessages, InternalError } from "../../src/errors";
 import { eidasCrypto } from "../../src/utils";
 import * as mockedData from "../data/credentials";
+import { verifyCadesSignature } from "../../src/libs/secureEnclave/cades";
 
 jest.mock("ioredis");
 
@@ -221,6 +222,54 @@ describe("eidas enterprise wallet tests should", () => {
 
     const signature = await wallet.eSeal(mockedData.mockVC);
     expect(signature).toBeDefined();
+    jest.restoreAllMocks();
+  }, 40000);
+
+  it("verifies a seal with a given payload with a certificate with CA", async () => {
+    expect.assertions(2);
+    const fileData = fs.readFileSync(
+      path.join(__dirname, `${testFilePathWithCa}${p12File}`)
+    );
+    jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
+      return JSON.stringify({
+        p12: fileData,
+        keyType: constants.KeyTypes.RSA,
+      });
+    });
+
+    const wallet = await EnterpriseWallet.createInstance({
+      did: mockDid,
+      password,
+    });
+
+    const cadesOuput = await wallet.eSeal(mockedData.mockVC);
+    const verificationOut = verifyCadesSignature(cadesOuput.cades);
+    expect(verificationOut.isValid).toBe(true);
+    expect(verificationOut.parse).toBeDefined();
+    jest.restoreAllMocks();
+  }, 40000);
+
+  it("verifies a seal with a given payload with a selfsigned certificate", async () => {
+    expect.assertions(2);
+    const fileData = fs.readFileSync(
+      path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+    );
+    jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
+      return JSON.stringify({
+        p12: fileData,
+        keyType: constants.KeyTypes.RSA,
+      });
+    });
+
+    const wallet = await EnterpriseWallet.createInstance({
+      did: mockDid,
+      password,
+    });
+
+    const cadesOuput = await wallet.eSeal(mockedData.mockVC);
+    const verificationOut = verifyCadesSignature(cadesOuput.cades);
+    expect(verificationOut.isValid).toBe(true);
+    expect(verificationOut.parse).toBeDefined();
     jest.restoreAllMocks();
   }, 40000);
 });
