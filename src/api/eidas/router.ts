@@ -2,7 +2,6 @@ import * as express from "express";
 import cors from "cors";
 import Controller from "./controller";
 import { BRIDGE_SERVICE } from "../../config";
-import { BadRequestError, ApiErrorMessages } from "../../errors";
 
 class Router {
   constructor(server: express.Express) {
@@ -29,14 +28,7 @@ class Router {
       cors(),
       async (req: express.Request, res: express.Response, next) => {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          if (!req.body || !req.body.proof)
-            throw new BadRequestError(BadRequestError.defaultTitle, {
-              detail: ApiErrorMessages.BAD_CREDENTIAL_PARAMETERS,
-            });
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const { proof } = req.body;
-          await Controller.EIDASvalidateSignature(proof);
+          await Controller.EIDASvalidateSignature(req.body);
           res.sendStatus(204);
         } catch (error) {
           next(error);

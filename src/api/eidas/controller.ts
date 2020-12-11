@@ -58,7 +58,7 @@ export default class Controller {
 
   /**
    *
-   * @param proof
+   * @param verifiableCredential
    */
   static async EIDASvalidateSignature(
     verifiableCredential: VerifiableCredential

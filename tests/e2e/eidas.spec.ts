@@ -42,5 +42,6 @@ describe("eidas tests", () => {
     const verificationOut = verifyCadesSignature(proof.cades);
     expect(verificationOut.isValid).toBe(true);
     expect(verificationOut.parse).toBeDefined();
+    jest.restoreAllMocks();
   }, 30000);
 });
