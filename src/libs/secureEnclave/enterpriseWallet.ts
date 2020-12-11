@@ -16,6 +16,7 @@ import { signCadesRsa } from "./cades";
 import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
 import constants from "../../@types";
 import { WalletBuilderOptions } from "../../dtos/wallet";
+import { canonizeCredential } from "../../utils/ssi";
 
 export default class EnterpriseWallet {
   private constructor(
@@ -65,14 +66,14 @@ export default class EnterpriseWallet {
     );
   }
 
-  eSeal(payload: Record<string, unknown>): CadesSignatureOutput {
+  async eSeal(payload: Record<string, unknown>): Promise<CadesSignatureOutput> {
     if (this.issuerKeyType !== constants.KeyTypes.RSA)
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.KEY_TYPE_NOT_SUPPORTED,
       });
-    // !!! TODO: to canonalize the payload before sending it
+
     const inputCades: CadesSignatureInput = {
-      data: JSON.stringify(payload),
+      data: await canonizeCredential(payload),
       pemCert: this.issuerPemCert[this.issuerPemCert.length - 1],
       pemPrivKey: this.issuerPemPrivateKey,
     };

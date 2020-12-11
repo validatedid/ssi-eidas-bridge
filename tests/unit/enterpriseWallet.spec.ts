@@ -5,6 +5,7 @@ import { EnterpriseWallet } from "../../src/libs/secureEnclave";
 import constants from "../../src/@types";
 import { ApiErrorMessages, InternalError } from "../../src/errors";
 import { eidasCrypto } from "../../src/utils";
+import * as mockedData from "../data/credentials";
 
 jest.mock("ioredis");
 
@@ -176,7 +177,7 @@ describe("eidas enterprise wallet tests should", () => {
     jest.restoreAllMocks();
   });
 
-  it("seals a given payload with a certificate with CA", async () => {
+  it("throws a BadRequestError when seals a given payload not a credential", async () => {
     expect.assertions(1);
     const fileData = fs.readFileSync(
       path.join(__dirname, `${testFilePathWithCa}${p12File}`)
@@ -195,8 +196,31 @@ describe("eidas enterprise wallet tests should", () => {
       password,
     });
 
-    const signature = wallet.eSeal(dataToSign);
-    expect(signature).toBeDefined();
+    await expect(wallet.eSeal(dataToSign)).rejects.toThrow(
+      ApiErrorMessages.CANONIZE_BAD_PARAMS
+    );
     jest.restoreAllMocks();
   });
+
+  it("seals a given payload with a certificate with CA", async () => {
+    expect.assertions(1);
+    const fileData = fs.readFileSync(
+      path.join(__dirname, `${testFilePathWithCa}${p12File}`)
+    );
+    jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
+      return JSON.stringify({
+        p12: fileData,
+        keyType: constants.KeyTypes.RSA,
+      });
+    });
+
+    const wallet = await EnterpriseWallet.createInstance({
+      did: mockDid,
+      password,
+    });
+
+    const signature = await wallet.eSeal(mockedData.mockVC);
+    expect(signature).toBeDefined();
+    jest.restoreAllMocks();
+  }, 40000);
 });

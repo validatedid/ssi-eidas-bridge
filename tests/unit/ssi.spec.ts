@@ -1,6 +1,6 @@
-import * as jsonld from "jsonld";
+import { ApiErrorMessages } from "../../src/errors";
 import {
-  canonizeVerifiableCredential,
+  canonizeCredential,
   getKidFromDidAndPemCertificate,
 } from "../../src/utils/ssi";
 import * as mockedData from "../data/credentials";
@@ -124,7 +124,7 @@ describe("ssi util tests should", () => {
 
   it("canonize a given verifiable credential with context", async () => {
     expect.assertions(1);
-    const canonized = await canonizeVerifiableCredential(mockedData.mockVC);
+    const canonized = await canonizeCredential(mockedData.mockVC);
     expect(canonized).toMatchInlineSnapshot(`
       "<did:example:ebfeb1f712ebc6f1c276e12ec21> <https://example.org/examples#degree> _:c14n0 .
       <http://example.gov/credentials/3732> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/examples#UniversityDegreeCredential> .
@@ -143,4 +143,10 @@ describe("ssi util tests should", () => {
       "
     `);
   }, 30000);
+  it("throw BadRequestError when canonize a non Credential", async () => {
+    expect.assertions(1);
+    await expect(canonizeCredential({ data: "some data" })).rejects.toThrow(
+      ApiErrorMessages.CANONIZE_BAD_PARAMS
+    );
+  });
 });

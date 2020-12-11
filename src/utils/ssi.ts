@@ -1,5 +1,5 @@
-import * as jsonld from "jsonld";
-import { JsonLdObj } from "jsonld/jsonld-spec";
+import { Options, normalize } from "jsonld";
+import { ApiErrorMessages, BadRequestError } from "../errors";
 import { getPemPublicKeyfromPemCert } from "./crypto";
 import { replacePemHeaderAndNewLines } from "./util";
 
@@ -15,21 +15,28 @@ const getKidFromDidAndPemCertificate = (input: KidInput): string => {
   )}`;
 };
 
-const canonizeVerifiableCredential = async (
+const isCredential = (object: Record<string, unknown>): boolean => {
+  return (
+    "@context" in object &&
+    "id" in object &&
+    "type" in object &&
+    "credentialSubject" in object &&
+    "issuer" in object &&
+    "issuanceDate" in object
+  );
+};
+
+const canonizeCredential = async (
   payload: Record<string, unknown>
 ): Promise<string> => {
-  const doc = payload as JsonLdObj;
-  const options: jsonld.Options.Normalize = {
+  if (!isCredential(payload))
+    throw new BadRequestError(ApiErrorMessages.CANONIZE_BAD_PARAMS);
+  const options: Options.Normalize = {
     algorithm: "URDNA2015",
     format: "application/n-quads",
   };
 
-  const canonized = await jsonld.normalize(doc, options);
-  return canonized;
+  return normalize(payload, options);
 };
 
-export {
-  getKidFromDidAndPemCertificate,
-  KidInput,
-  canonizeVerifiableCredential,
-};
+export { getKidFromDidAndPemCertificate, KidInput, canonizeCredential };

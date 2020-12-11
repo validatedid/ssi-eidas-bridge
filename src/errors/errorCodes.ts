@@ -21,6 +21,7 @@ export enum ApiErrorMessages {
   KEY_CURVE_NOT_SET = "Key Curve is not set",
   WALLET_BUILDER_BAD_PARAMS = "Wallet creation requires a DID and a password.",
   ERROR_PARSING_P12_DATA = "Error parsing P12 data",
+  CANONIZE_BAD_PARAMS = "Data to canonize is not a Credential",
 }
 
 export default { ApiErrorMessages };
