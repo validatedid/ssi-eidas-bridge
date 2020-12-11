@@ -1,14 +1,13 @@
 import { SignPayload } from "../../dtos/secureEnclave";
-import { InternalError, ApiErrorMessages, BadRequestError } from "../../errors";
-import { getIssuanceDate } from "../../utils/util";
+import { ApiErrorMessages, BadRequestError } from "../../errors";
 import { EnterpriseWallet } from "../secureEnclave";
 import {
   DEFAULT_EIDAS_PROOF_TYPE,
   DEFAULT_PROOF_PURPOSE,
   DEFAULT_EIDAS_VERIFICATION_METHOD,
-  SignatureTypes,
 } from "../../@types/constants";
 import { EidasProof, Proof } from "../../dtos/eidas";
+import { getKidFromDidAndPemCertificate } from "../../utils/ssi";
 
 const PROOF_REQUIRED_KEYS = [
   "type",
@@ -71,47 +70,36 @@ const validateEIDASProofAttributes = (proof: Proof): void => {
 };
 
 const signEidas = async (signPayload: SignPayload): Promise<EidasProof> => {
+  if (
+    !signPayload ||
+    !signPayload.issuer ||
+    !signPayload.payload ||
+    !signPayload.type ||
+    !signPayload.password
+  )
+    throw new BadRequestError(ApiErrorMessages.SIGN_EIDAS_BAD_PARAMETERS);
+
   let payloadToSign = signPayload.payload;
   if (signPayload.payload.proof) {
     // removing proof
     payloadToSign = (({ proof, ...o }) => o)(signPayload.payload);
   }
-  let jws: string;
-  let proof: EidasProof;
-  if (
-    signPayload.type !== SignatureTypes.EidasSeal2019 &&
-    signPayload.type !== SignatureTypes.EcdsaSecp256k1Signature2019 &&
-    signPayload.type !== SignatureTypes.CAdESRSASignature2020
-  )
-    throw new BadRequestError(BadRequestError.defaultTitle, {
-      detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
-    });
+  const wallet = await EnterpriseWallet.createInstance({
+    did: signPayload.issuer,
+    password: signPayload.password,
+  });
 
-  if (
-    signPayload.type === SignatureTypes.EidasSeal2019 ||
-    signPayload.type === SignatureTypes.EcdsaSecp256k1Signature2019
-  ) {
-    jws = await EnterpriseWallet.signDidJwt(
-      signPayload.issuer,
-      Buffer.from(JSON.stringify(payloadToSign)),
-      signPayload.expiresIn
-    );
-    if (!jws)
-      throw new InternalError(InternalError.defaultTitle, {
-        detail: ApiErrorMessages.ERROR_SIGNATURE_CREATION,
-      });
-
-    proof = {
-      type: signPayload.type,
-      created: getIssuanceDate(jws),
-      proofPurpose: DEFAULT_PROOF_PURPOSE,
-      verificationMethod: `${signPayload.issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
-      jws,
-    };
-    return proof;
-  }
-  // At this point, signPayload.type is SignatureTypes.CAdESRSASignature2020
-  return proof;
+  const cadesOuput = await wallet.eSeal(payloadToSign);
+  return {
+    type: signPayload.type,
+    created: cadesOuput.signingTime,
+    proofPurpose: DEFAULT_PROOF_PURPOSE,
+    verificationMethod: getKidFromDidAndPemCertificate({
+      did: signPayload.issuer,
+      pemCertificate: cadesOuput.verificationMethod,
+    }),
+    cades: cadesOuput.cades,
+  };
 };
 
 export { validateEIDASProofAttributes, signEidas };

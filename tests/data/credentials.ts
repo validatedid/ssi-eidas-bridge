@@ -6,9 +6,8 @@ export const mockVerifiableCredential = {
   id: "http://example.edu/credentials/58473",
   type: ["VerifiableCredential", "AlumniCredential"],
   credentialSubject: {
-    id: "did:example:ebfeb1f712ebc6f1c276e12ec21",
+    id: "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp",
     alumniOf: {
-      id: "did:example:c276e12ec21ebfeb1f712ebc6f1",
       name: [
         {
           value: "Example University",
@@ -20,13 +19,6 @@ export const mockVerifiableCredential = {
         },
       ],
     },
-  },
-  proof: {
-    type: "RsaSignature2018",
-    created: "2018-06-18T21:19:10Z",
-    proofPurpose: "assertionMethod",
-    verificationMethod: "https://example.com/jdoe/keys/1",
-    jws: "",
   },
 };
 

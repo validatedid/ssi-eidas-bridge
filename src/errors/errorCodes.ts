@@ -22,6 +22,7 @@ export enum ApiErrorMessages {
   WALLET_BUILDER_BAD_PARAMS = "Wallet creation requires a DID and a password.",
   ERROR_PARSING_P12_DATA = "Error parsing P12 data",
   CANONIZE_BAD_PARAMS = "Data to canonize is not a Credential",
+  SIGN_EIDAS_BAD_PARAMETERS = "Sign Eidas requires a SignPayload with issuer, payload, type and password",
 }
 
 export default { ApiErrorMessages };

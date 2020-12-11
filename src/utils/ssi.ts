@@ -39,4 +39,36 @@ const canonizeCredential = async (
   return normalize(payload, options);
 };
 
-export { getKidFromDidAndPemCertificate, KidInput, canonizeCredential };
+function pad(number: number) {
+  if (number < 10) {
+    return `0${number}`;
+  }
+  return number;
+}
+
+const toISOStringSeconds = (input: Date): string => {
+  return `${input.getUTCFullYear()}-${pad(input.getUTCMonth() + 1)}-${pad(
+    input.getUTCDate()
+  )}T${pad(input.getUTCHours())}:${pad(input.getUTCMinutes())}:${pad(
+    input.getUTCSeconds()
+  )}Z`;
+};
+
+const parseSigningTime = (inputTime: string): string => {
+  const year = Number(`20${inputTime.substr(0, 2)}`);
+  const month = Number(inputTime.substr(2, 2)) - 1; // 0-11
+  const day = Number(inputTime.substr(4, 2));
+  const hour = Number(inputTime.substr(6, 2));
+  const minutes = Number(inputTime.substr(8, 2));
+  const seconds = Number(inputTime.substr(10, 2));
+  return toISOStringSeconds(
+    new Date(Date.UTC(year, month, day, hour, minutes, seconds, 0))
+  );
+};
+
+export {
+  getKidFromDidAndPemCertificate,
+  KidInput,
+  canonizeCredential,
+  parseSigningTime,
+};
