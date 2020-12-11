@@ -82,7 +82,7 @@ describe("eidas router API calls (mocking redis)", () => {
     });
 
     it("returns a 204 with a valid signature", async () => {
-      expect.assertions(3);
+      expect.assertions(2);
       const fileData = fs.readFileSync(
         path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
       );

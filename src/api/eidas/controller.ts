@@ -79,9 +79,10 @@ export default class Controller {
       );
       if (eidasProofs.length <= 0)
         throw new BadRequestError(ApiErrorMessages.NO_EIDAS_PROOF);
-      eidasProofs.map(async (eidasProof) =>
+      const resolves = eidasProofs.map(async (eidasProof) =>
         verifyEidas(credential, eidasProof as EidasProof)
       );
+      await Promise.all(resolves);
     }
   }
 

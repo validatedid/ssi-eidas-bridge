@@ -4,7 +4,6 @@ import { EnterpriseWallet } from "../secureEnclave";
 import {
   DEFAULT_EIDAS_PROOF_TYPE,
   DEFAULT_PROOF_PURPOSE,
-  DEFAULT_EIDAS_VERIFICATION_METHOD,
 } from "../../@types/constants";
 import { EidasProof, Proof, Credential } from "../../dtos/eidas";
 import {
@@ -18,6 +17,7 @@ const PROOF_REQUIRED_KEYS = [
   "created",
   "proofPurpose",
   "verificationMethod",
+  "cades",
 ];
 
 export const compareCredentialKeys = (
@@ -48,14 +48,6 @@ const validateProofPurpose = (value: string): void => {
   }
 };
 
-const validateEIDASVerificationMethod = (value: string): void => {
-  if (value.length < 1 || !value.includes(DEFAULT_EIDAS_VERIFICATION_METHOD)) {
-    throw new TypeError(
-      `EIDAS Verification Method key is missing '${DEFAULT_EIDAS_VERIFICATION_METHOD}'`
-    );
-  }
-};
-
 const validateProofKeys = (value: Proof): void => {
   if (Object.keys(value).length === 0)
     throw new TypeError("Proof must not be empty");
@@ -66,10 +58,9 @@ const validateProofKeys = (value: Proof): void => {
   }
 };
 
-const validateEIDASProofAttributes = (proof: Proof): void => {
+const validateEIDASProofAttributes = (proof: EidasProof): void => {
   validateEIDASProofType(proof.type);
   validateProofPurpose(proof.proofPurpose);
-  validateEIDASVerificationMethod(proof.verificationMethod);
   validateProofKeys(proof);
 };
 
