@@ -23,6 +23,8 @@ export enum ApiErrorMessages {
   ERROR_PARSING_P12_DATA = "Error parsing P12 data",
   CANONIZE_BAD_PARAMS = "Data to canonize is not a Credential",
   SIGN_EIDAS_BAD_PARAMETERS = "Sign Eidas requires a SignPayload with issuer, payload, type and password",
+  NO_EIDAS_PROOF = "Verification Credential does not contain an Eidas Proof",
+  CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA = "Verification Credential payload does not match signed data",
 }
 
 export default { ApiErrorMessages };

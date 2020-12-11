@@ -1,25 +1,19 @@
-import { decodeJWT, verifyJWT } from "did-jwt";
-import VidDidResolver from "@validatedid/vid-did-resolver";
-import { Resolver } from "did-resolver";
 import { SignPayload } from "../../dtos/secureEnclave";
 import {
   Credential,
   EidasKeysOptions,
+  EidasProof,
   EIDASSignatureOutput,
   Proof,
   VerifiableCredential,
 } from "../../dtos/eidas";
 import { RedisInsertion } from "../../dtos/redis";
-import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
-import { JWTVerifyOptions, VerifiedJwt } from "../../dtos/jwt";
+import { BadRequestError, ApiErrorMessages } from "../../errors";
 
-import * as config from "../../config";
-import {
-  signEidas,
-  validateEIDASProofAttributes,
-} from "../../libs/eidas/eidas";
+import { isEidasProof, signEidas, verifyEidas } from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
-import { KeyTypes, SignatureTypes } from "../../@types/constants";
+import { KeyTypes } from "../../@types/constants";
+import { isVerifiableCredential } from "../../utils/ssi";
 
 export default class Controller {
   /**
@@ -66,45 +60,29 @@ export default class Controller {
    *
    * @param proof
    */
-  static async EIDASvalidateSignature(proof: Proof): Promise<VerifiedJwt> {
-    if (
-      !proof ||
-      !proof.type ||
-      !proof.created ||
-      !proof.proofPurpose ||
-      !proof.verificationMethod ||
-      !proof.jws
-    )
+  static async EIDASvalidateSignature(
+    verifiableCredential: VerifiableCredential
+  ): Promise<void> {
+    if (!isVerifiableCredential(verifiableCredential))
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,
       });
-    if (proof.type !== SignatureTypes.EidasSeal2019)
-      throw new BadRequestError(BadRequestError.defaultTitle, {
-        detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
-      });
-
-    validateEIDASProofAttributes(proof);
-    const options: JWTVerifyOptions = {
-      resolver: new Resolver(
-        VidDidResolver.getResolver({
-          rpcUrl: config.LEDGER.provider,
-          registry: config.LEDGER.didRegistry,
-        })
-      ),
-    };
-    const result = await verifyJWT(proof.jws, options);
-    if (!result)
-      throw new InternalError(InternalError.defaultTitle, {
-        detail: ApiErrorMessages.ERROR_VERIFYING_SIGNATURE,
-      });
-    return result;
-  }
-
-  static getIssuanceDate(jwt: string): string {
-    const { payload } = decodeJWT(jwt);
-    const iat = payload.iat ? payload.iat : new Date();
-    const issuanceDate = new Date(iat).toISOString();
-    return issuanceDate;
+    const credential = (({ proof, ...o }) => o)(verifiableCredential);
+    if (!Array.isArray(verifiableCredential.proof)) {
+      if (!isEidasProof(verifiableCredential.proof))
+        throw new BadRequestError(ApiErrorMessages.NO_EIDAS_PROOF);
+      await verifyEidas(credential, verifiableCredential.proof as EidasProof);
+    }
+    if (Array.isArray(verifiableCredential.proof)) {
+      const eidasProofs = verifiableCredential.proof.filter((proof) =>
+        isEidasProof(proof)
+      );
+      if (eidasProofs.length <= 0)
+        throw new BadRequestError(ApiErrorMessages.NO_EIDAS_PROOF);
+      eidasProofs.map(async (eidasProof) =>
+        verifyEidas(credential, eidasProof as EidasProof)
+      );
+    }
   }
 
   static async putEidasKeys(opts: EidasKeysOptions): Promise<RedisInsertion> {

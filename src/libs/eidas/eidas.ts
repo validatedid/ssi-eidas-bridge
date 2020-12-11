@@ -6,8 +6,12 @@ import {
   DEFAULT_PROOF_PURPOSE,
   DEFAULT_EIDAS_VERIFICATION_METHOD,
 } from "../../@types/constants";
-import { EidasProof, Proof } from "../../dtos/eidas";
-import { getKidFromDidAndPemCertificate } from "../../utils/ssi";
+import { EidasProof, Proof, Credential } from "../../dtos/eidas";
+import {
+  canonizeCredential,
+  getKidFromDidAndPemCertificate,
+} from "../../utils/ssi";
+import { verifyCadesSignature } from "../secureEnclave/cades";
 
 const PROOF_REQUIRED_KEYS = [
   "type",
@@ -102,4 +106,28 @@ const signEidas = async (signPayload: SignPayload): Promise<EidasProof> => {
   };
 };
 
-export { validateEIDASProofAttributes, signEidas };
+const isEidasProof = (proof: Proof | EidasProof): boolean => {
+  return "cades" in proof;
+};
+
+const verifyEidas = async (
+  credential: Credential,
+  eidasProof: EidasProof
+): Promise<void> => {
+  validateEIDASProofAttributes(eidasProof);
+  const verificationOut = verifyCadesSignature(eidasProof.cades);
+  if (!verificationOut || !verificationOut.isValid)
+    throw new BadRequestError(ApiErrorMessages.ERROR_VERIFYING_SIGNATURE);
+  // check that the data signed is the same as the Verifiable Credential payload
+  const canonizedCredential = await canonizeCredential(credential);
+  const signedData = Buffer.from(
+    verificationOut.parse.econtent,
+    "hex"
+  ).toString("utf-8");
+  if (canonizedCredential !== signedData)
+    throw new BadRequestError(
+      ApiErrorMessages.CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA
+    );
+};
+
+export { validateEIDASProofAttributes, signEidas, verifyEidas, isEidasProof };

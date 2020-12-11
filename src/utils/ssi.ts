@@ -26,6 +26,10 @@ const isCredential = (object: Record<string, unknown>): boolean => {
   );
 };
 
+const isVerifiableCredential = (object: Record<string, unknown>): boolean => {
+  return isCredential(object) && "proof" in object;
+};
+
 const canonizeCredential = async (
   payload: Record<string, unknown>
 ): Promise<string> => {
@@ -71,4 +75,5 @@ export {
   KidInput,
   canonizeCredential,
   parseSigningTime,
+  isVerifiableCredential,
 };
