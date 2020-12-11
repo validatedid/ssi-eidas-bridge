@@ -3,6 +3,11 @@ export interface WalletOptions {
   did?: string;
 }
 
+export interface WalletBuilderOptions {
+  did: string;
+  password: string;
+}
+
 export default interface Wallet {
   publicKey: string;
   ethAddress?: string;

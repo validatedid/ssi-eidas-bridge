@@ -1,8 +1,8 @@
 import { JWK } from "jose";
 import { ethers } from "ethers";
+import { DID } from "dids";
 import { Ed25519Provider } from "key-did-provider-ed25519";
 import KeyResolver from "@ceramicnetwork/key-did-resolver";
-import { DID } from "dids";
 import crypto from "crypto";
 import { resolver } from "@transmute/did-key.js";
 import { DIDDocument } from "did-resolver";
@@ -46,9 +46,12 @@ const generateDid = async (inputSeed?: Uint8Array): Promise<string> => {
   let seed = inputSeed;
   if (!inputSeed) seed = crypto.randomBytes(32);
   const provider = new Ed25519Provider(seed);
+
   const did = new DID({ provider, resolver: KeyResolver.getResolver() });
   await did.authenticate();
   return did.id;
+
+  return "did:key:test";
 };
 
 const resolveDid = async (did: string): Promise<DIDDocument> => {

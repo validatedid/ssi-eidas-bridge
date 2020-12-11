@@ -16,8 +16,11 @@ export enum ApiErrorMessages {
   INVALID_HASH_ALG = "Hash algorithm not supported. Only supported algorithms are SHA1, SHA256 and SHA512.",
   NO_PEM_CADES = "PEM CADES Signature not provided.",
   ERROR_RETRIEVING_REDIS_DATA = "Error retrieving data from Redis",
-  ERROR_ENTERPRISE_WALLET_CONSTRUCTOR = "Error on EnterpriseWallet constructor",
   KEY_TYPE_NOT_SUPPORTED = "Provided key type is not supported. Only RSA is supported",
+  DATA_NOT_LOADED = "Certificate, private and key types are not loaded",
+  KEY_CURVE_NOT_SET = "Key Curve is not set",
+  WALLET_BUILDER_BAD_PARAMS = "Wallet creation requires a DID and a password.",
+  ERROR_PARSING_P12_DATA = "Error parsing P12 data",
 }
 
 export default { ApiErrorMessages };

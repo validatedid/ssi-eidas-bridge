@@ -10,49 +10,59 @@ import {
 import redis from "../storage/redis";
 import getJWKfromHex from "../../utils/jwk";
 import { EidasKeysData } from "../../dtos/redis";
-import { ApiErrorMessages, InternalError } from "../../errors";
+import { ApiErrorMessages, BadRequestError, InternalError } from "../../errors";
 import { eidasCrypto } from "../../utils";
 import { signCadesRsa } from "./cades";
 import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
 import constants from "../../@types";
+import { WalletBuilderOptions } from "../../dtos/wallet";
 
 export default class EnterpriseWallet {
-  private issuerPemCert!: string[];
+  private constructor(
+    private issuerPemCert: string[],
+    private issuerPemPrivateKey: string,
+    private issuerKeyType: constants.KeyType,
+    private issuerKeyCurve?: constants.Curves
+  ) {}
 
-  private issuerPemPrivateKey!: string;
+  static async createInstance(
+    options: WalletBuilderOptions
+  ): Promise<EnterpriseWallet> {
+    if (!options || !options.did || !options.password)
+      throw new BadRequestError(ApiErrorMessages.WALLET_BUILDER_BAD_PARAMS);
 
-  private issuerKeyType!: constants.KeyType;
+    let storedData: EidasKeysData;
+    try {
+      const data = await redis.get(options.did);
+      storedData = JSON.parse(data) as EidasKeysData;
+    } catch (error) {
+      throw new InternalError(
+        `${ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA} : ${
+          (error as Error).message
+        }`
+      );
+    }
 
-  private issuerKeyCurve!: constants.Curves;
+    if (
+      !storedData.p12 ||
+      !storedData.keyType ||
+      (storedData.keyType === constants.KeyTypes.EC && !storedData.keyCurve) ||
+      (storedData.keyType === constants.KeyTypes.OKP && !storedData.keyCurve)
+    )
+      throw new InternalError(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
 
-  constructor(did: string, password: string) {
-    const asyncConstructor = async (
-      inputDid: string
-    ): Promise<EidasKeysData> => {
-      const data = await redis.get(inputDid);
-      if (!data) {
-        throw new InternalError(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
-      }
-      return JSON.parse(data) as EidasKeysData;
-    };
-
-    asyncConstructor(did)
-      .then((storedData) => {
-        const parsedData = eidasCrypto.parseP12File(
-          Buffer.from(storedData.p12).toString("binary"),
-          password
-        );
-        this.issuerPemCert = parsedData.pemCert;
-        this.issuerPemPrivateKey = parsedData.pemPrivateKey;
-        this.issuerKeyType = storedData.keyType;
-        if (storedData.keyCurve) this.issuerKeyCurve = storedData.keyCurve;
-      })
-      .catch((e) => {
-        throw new InternalError(
-          `${ApiErrorMessages.ERROR_ENTERPRISE_WALLET_CONSTRUCTOR} : 
-            ${(e as Error).message}`
-        );
-      });
+    const parsedData = eidasCrypto.parseP12File(
+      Buffer.from(storedData.p12).toString("binary"),
+      options.password
+    );
+    if (!parsedData || !parsedData.pemCert || !parsedData.pemPrivateKey)
+      throw new InternalError(ApiErrorMessages.ERROR_PARSING_P12_DATA);
+    return new this(
+      parsedData.pemCert,
+      parsedData.pemPrivateKey,
+      storedData.keyType,
+      storedData.keyCurve
+    );
   }
 
   eSeal(payload: Record<string, unknown>): CadesSignatureOutput {

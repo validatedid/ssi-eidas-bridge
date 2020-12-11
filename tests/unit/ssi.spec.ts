@@ -1,4 +1,9 @@
-import { getKidFromDidAndPemCertificate } from "../../src/utils/ssi";
+import * as jsonld from "jsonld";
+import {
+  canonizeVerifiableCredential,
+  getKidFromDidAndPemCertificate,
+} from "../../src/utils/ssi";
+import * as mockedData from "../data/credentials";
 import { generateDid, resolveDid } from "../utils";
 
 describe("ssi util tests should", () => {
@@ -116,4 +121,26 @@ describe("ssi util tests should", () => {
     const result = await resolveDid(did);
     expect(result).toMatchObject(expectedDidDoc);
   });
+
+  it("canonize a given verifiable credential with context", async () => {
+    expect.assertions(1);
+    const canonized = await canonizeVerifiableCredential(mockedData.mockVC);
+    expect(canonized).toMatchInlineSnapshot(`
+      "<did:example:ebfeb1f712ebc6f1c276e12ec21> <https://example.org/examples#degree> _:c14n0 .
+      <http://example.gov/credentials/3732> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/examples#UniversityDegreeCredential> .
+      <http://example.gov/credentials/3732> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.w3.org/2018/credentials#VerifiableCredential> .
+      <http://example.gov/credentials/3732> <https://w3id.org/security#proof> _:c14n1 .
+      <http://example.gov/credentials/3732> <https://www.w3.org/2018/credentials#credentialSubject> <did:example:ebfeb1f712ebc6f1c276e12ec21> .
+      <http://example.gov/credentials/3732> <https://www.w3.org/2018/credentials#issuanceDate> \\"2010-01-01T19:73:24Z\\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+      <http://example.gov/credentials/3732> <https://www.w3.org/2018/credentials#issuer> <https://example.edu> .
+      _:c14n0 <http://schema.org/name> \\"Bachelor of Science and Arts\\"^^<http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML> .
+      _:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/examples#BachelorDegree> .
+      _:c14n2 <http://purl.org/dc/terms/created> \\"2018-06-18T21:19:10Z\\"^^<http://www.w3.org/2001/XMLSchema#dateTime> _:c14n1 .
+      _:c14n2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#RsaSignature2018> _:c14n1 .
+      _:c14n2 <sec:jws> \\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..DJBMvvFAIC00nSGB6Tn0XKbbF9XrsaJZREWvR2aONYTQQxnyXirtXnlewJMBBn2h9hfcGZrvnC1b6PgWmukzFJ1IiH1dWgnDIS81BH-IxXnPkbuYDeySorc4QU9MJxdVkY5EL4HYbcIfwKj6X4LBQ2_ZHZIu1jdqLcRZqHcsDF5KKylKc1THn5VRWy5WhYg_gBnyWny8E6Qkrze53MR7OuAmmNJ1m1nN8SxDrG6a08L78J0-Fbas5OjAQz3c17GY8mVuDPOBIOVjMEghBlgl3nOi1ysxbRGhHLEK4s0KKbeRogZdgt1DkQxDFxxn41QWDw_mmMCjs9qxg0zcZzqEJw\\" _:c14n1 .
+      _:c14n2 <sec:proofPurpose> <https://w3id.org/security#assertionMethod> _:c14n1 .
+      _:c14n2 <sec:verificationMethod> <https://example.com/jdoe/keys/1> _:c14n1 .
+      "
+    `);
+  }, 30000);
 });
