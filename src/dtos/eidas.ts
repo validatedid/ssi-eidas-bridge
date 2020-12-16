@@ -40,10 +40,3 @@ export interface Credential extends InputCredential {
 export interface VerifiableCredential extends Credential {
   proof: Proof | Proof[];
 }
-
-export interface EidasKeysOptions {
-  did: string;
-  eidasKey: string; // hexPrivateKey for secp256k1 or PEM RSA key
-  keyType: KeyType;
-  curveType?: Curves;
-}

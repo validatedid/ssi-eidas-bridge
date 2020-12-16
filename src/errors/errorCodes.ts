@@ -12,7 +12,7 @@ export enum ApiErrorMessages {
   SIGNATURE_BAD_TYPE = "Signature type  not supported.",
   NO_AUDIENCE = "No audience provided",
   INVALID_AUDIENCE = "Invalid audience. Should be a string",
-  BAD_INPUT_EIDAS_KEYS_PARAMS = "Eidas keys call requires an EidasKeysOptions filled with the correct attributes",
+  BAD_INPUT_EIDAS_KEYS_PARAMS = "Eidas keys call requires an EidasKeysData filled with the correct attributes",
   INVALID_HASH_ALG = "Hash algorithm not supported. Only supported algorithms are SHA1, SHA256 and SHA512.",
   NO_PEM_CADES = "PEM CADES Signature not provided.",
   ERROR_RETRIEVING_REDIS_DATA = "Error retrieving data from Redis",

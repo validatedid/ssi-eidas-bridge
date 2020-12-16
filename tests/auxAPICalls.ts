@@ -6,7 +6,7 @@ import { API_PRIVATE_KEY, API_NAME } from "../src/config";
 import { PRINT_DEBUG } from "../src/utils/util";
 import { InternalError, ApiErrorMessages } from "../src/errors";
 import { util } from "../src/utils";
-import { IEnterpriseAuthZToken, LegalEntityAuthNToken } from "../src/dtos/jwt";
+import { LegalEntityAuthNToken } from "../src/dtos/jwt";
 
 const mockedEnterpriseUser = {
   name: "Test Legal Entity",

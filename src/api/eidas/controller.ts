@@ -1,13 +1,12 @@
 import { SignPayload } from "../../dtos/secureEnclave";
 import {
   Credential,
-  EidasKeysOptions,
   EidasProof,
   EIDASSignatureOutput,
   Proof,
   VerifiableCredential,
 } from "../../dtos/eidas";
-import { RedisInsertion } from "../../dtos/redis";
+import { EidasKeysData, RedisInsertion } from "../../dtos/redis";
 import { BadRequestError, ApiErrorMessages } from "../../errors";
 
 import { isEidasProof, signEidas, verifyEidas } from "../../libs/eidas/eidas";
@@ -33,7 +32,6 @@ export default class Controller {
         detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,
       });
     const { issuer, payload } = signPayload;
-
     // sign with another keypair
     const eidasProof = await signEidas(signPayload);
 
@@ -86,22 +84,21 @@ export default class Controller {
     }
   }
 
-  static async putEidasKeys(opts: EidasKeysOptions): Promise<RedisInsertion> {
+  static async putEidasKeys(opts: EidasKeysData): Promise<RedisInsertion> {
     if (
       !opts ||
-      !opts.did ||
-      !opts.eidasKey ||
+      !opts.p12 ||
       !opts.keyType ||
       ![KeyTypes.RSA, KeyTypes.EC, KeyTypes.OKP].includes(opts.keyType) ||
-      (opts.keyType === (KeyTypes.EC || KeyTypes.OKP) && !opts.curveType)
+      (opts.keyType === (KeyTypes.EC || KeyTypes.OKP) && !opts.keyCurve)
     )
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
     const previousKeys = await redis.get(opts.did);
-    await redis.set(opts.did, opts.eidasKey);
+    await redis.set(opts.did, JSON.stringify(opts));
     return {
-      eidasKey: opts.eidasKey,
+      eidasKeysData: opts,
       firstInsertion: !previousKeys,
     };
   }
