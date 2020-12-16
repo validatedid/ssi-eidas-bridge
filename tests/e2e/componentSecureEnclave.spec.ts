@@ -2,14 +2,12 @@ import { ComponentSecureEnclave } from "../../src/libs/secureEnclave";
 import { API_PRIVATE_KEY } from "../../src/config";
 
 describe("componentSecureEnclave test suite", () => {
-  it("should throw InternalError with no encryptedKeystore", async () => {
+  it("should throw InternalError with no encryptedKeystore", () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;
     se.enclaveDid = "";
 
-    await expect(se.init(undefined as never)).rejects.toThrow(
-      "Internal Server Error"
-    );
+    expect(() => se.init(undefined as never)).toThrow("Internal Server Error");
   });
 
   it("should throw InternalError with no did: getPublicKey", () => {
@@ -28,14 +26,12 @@ describe("componentSecureEnclave test suite", () => {
     expect(() => se.exportPrivateKey("")).toThrow("Internal Server Error");
   });
 
-  it("should throw InternalError with no did: signJwt", async () => {
+  it("should throw InternalError with no did: signJwt", () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;
     se.enclaveDid = "";
 
-    await expect(se.signJwt("", {} as never)).rejects.toThrow(
-      "Internal Server Error"
-    );
+    expect(() => se.signJwt("", {} as never)).toThrow("Internal Server Error");
   });
 
   it("should throw InternalError with no did: encrypt", () => {
