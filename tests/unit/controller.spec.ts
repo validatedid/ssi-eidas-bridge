@@ -1,8 +1,10 @@
-import { decodeJWT } from "did-jwt";
 import { SignatureTypes } from "../../src/@types/constants";
 import Controller from "../../src/api/eidas/controller";
-import { EnterpriseWallet } from "../../src/libs/secureEnclave";
 import constants from "../../src/@types";
+import * as mockedData from "../data/credentials";
+import { SignPayload } from "../../src/dtos/secureEnclave";
+import * as eidas from "../../src/libs/eidas/eidas";
+import { EidasProof } from "../../src/dtos/eidas";
 
 jest.mock("did-jwt", () => ({
   decodeJWT: jest.fn(),
@@ -10,14 +12,14 @@ jest.mock("did-jwt", () => ({
 
 describe("controller suite tests", () => {
   describe("eidas signature calls", () => {
-    it("should throw an error without signPayload", async () => {
+    it("should throw an error when undefined signPayload", async () => {
       expect.assertions(1);
       await expect(
         Controller.EIDASsignature(undefined as never)
       ).rejects.toThrow("Bad Request");
     });
 
-    it("should throw an error without signPayload issuer", async () => {
+    it("should throw an error when empty signPayload", async () => {
       expect.assertions(1);
       const signPayload = {};
       await expect(
@@ -25,98 +27,86 @@ describe("controller suite tests", () => {
       ).rejects.toThrow("Bad Request");
     });
 
-    it("should throw an error without signPayload payload", async () => {
-      expect.assertions(1);
-      const signPayload = {
+    it("should throw an error when signPayload missing attributes", async () => {
+      expect.assertions(3);
+      const signPayloadIss = {
         issuer: "did:vid",
       };
       await expect(
-        Controller.EIDASsignature(signPayload as never)
+        Controller.EIDASsignature(signPayloadIss as never)
       ).rejects.toThrow("Bad Request");
-    });
-
-    it("should throw an error without signPayload type", async () => {
-      expect.assertions(1);
-      const signPayload = {
+      const signPayloadIssPayload = {
         issuer: "did:vid",
         payload: {},
       };
       await expect(
-        Controller.EIDASsignature(signPayload as never)
+        Controller.EIDASsignature(signPayloadIssPayload as never)
+      ).rejects.toThrow("Bad Request");
+      const signPayloadIssType = {
+        issuer: "did:vid",
+        type: "test",
+      };
+      await expect(
+        Controller.EIDASsignature(signPayloadIssType as never)
       ).rejects.toThrow("Bad Request");
     });
 
-    it("should throw an error without signPayload correct type", async () => {
+    it("should throw an error when signPayload signEidas no password", async () => {
       expect.assertions(1);
       const signPayload = {
         issuer: "did:vid",
         payload: {},
-        type: "a type",
+        type: "test",
       };
       await expect(
         Controller.EIDASsignature(signPayload as never)
-      ).rejects.toThrow("Bad Request");
-    });
-
-    it("should throw an error when signdidjwt does not return a value", async () => {
-      expect.assertions(1);
-      const signPayload = {
-        issuer: "did:vid",
-        payload: {},
-        type: SignatureTypes.EidasSeal2019,
-      };
-      jest
-        .spyOn(EnterpriseWallet, "signDidJwt")
-        .mockResolvedValue(undefined as never);
-      await expect(
-        Controller.EIDASsignature(signPayload as never)
-      ).rejects.toThrow("Internal Server Error");
+      ).rejects.toThrow(
+        "Sign Eidas requires a SignPayload with issuer, payload, type and password"
+      );
     });
 
     it("should return a value", async () => {
       expect.assertions(1);
-      const signPayload = {
-        issuer: "did:vid",
-        payload: {},
-        type: SignatureTypes.EidasSeal2019,
+      const did = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
+      const password = "vidchain";
+      const signPayload: SignPayload = {
+        issuer: did,
+        payload: mockedData.mockCredential,
+        type: constants.SignatureTypes.CAdESRSASignature2020,
+        password,
       };
-      jest
-        .spyOn(EnterpriseWallet, "signDidJwt")
-        .mockResolvedValue("token-string");
-      jest
-        .spyOn(Controller, "getIssuanceDate")
-        .mockReturnValue(new Date().toISOString());
+      jest.spyOn(eidas, "signEidas").mockResolvedValue({} as EidasProof);
       const response = await Controller.EIDASsignature(signPayload);
       const expectedResponse = {
         issuer: signPayload.issuer,
-        proof: {
-          type: SignatureTypes.EidasSeal2019,
-          created: expect.any(String) as string,
-          proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
-          verificationMethod: `${signPayload.issuer}${constants.DEFAULT_EIDAS_VERIFICATION_METHOD}`,
-          jws: "token-string",
+        vc: {
+          ...mockedData.mockCredential,
+          proof: {},
         },
       };
       expect(response).toMatchObject(expectedResponse);
+      jest.resetAllMocks();
     });
   });
   describe("eidas verification calls", () => {
-    it("should throw an error without proof", async () => {
+    it("should throw an error when undefined vc", async () => {
       expect.assertions(1);
       await expect(
         Controller.EIDASvalidateSignature(undefined as never)
-      ).rejects.toThrow("Bad Request");
+      ).rejects.toThrow(
+        "Cannot use 'in' operator to search for '@context' in undefined"
+      );
     });
 
-    it("should throw an error without proof type", async () => {
+    it("should throw an error when empty vc", async () => {
       expect.assertions(1);
-      const proof = {};
+      const vc = {};
       await expect(
-        Controller.EIDASvalidateSignature(proof as never)
+        Controller.EIDASvalidateSignature(vc as never)
       ).rejects.toThrow("Bad Request");
     });
 
-    it("should throw an error without proof created", async () => {
+    it("should throw an error when is not a vc", async () => {
       expect.assertions(1);
       const proof = {
         type: SignatureTypes.EidasSeal2019,
@@ -126,72 +116,13 @@ describe("controller suite tests", () => {
       ).rejects.toThrow("Bad Request");
     });
 
-    it("should throw an error without proof purpose", async () => {
+    it("should throw an error when vc proof is not valid eidasProof", async () => {
       expect.assertions(1);
-      const proof = {
-        type: SignatureTypes.EidasSeal2019,
-        created: new Date().toISOString(),
-      };
       await expect(
-        Controller.EIDASvalidateSignature(proof as never)
-      ).rejects.toThrow("Bad Request");
-    });
-
-    it("should throw an error without proof verificationMethod", async () => {
-      expect.assertions(1);
-      const proof = {
-        type: SignatureTypes.EidasSeal2019,
-        created: new Date().toISOString(),
-        proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
-      };
-      await expect(
-        Controller.EIDASvalidateSignature(proof as never)
-      ).rejects.toThrow("Bad Request");
-    });
-
-    it("should throw an error without proof jws", async () => {
-      expect.assertions(1);
-      const proof = {
-        type: SignatureTypes.EidasSeal2019,
-        created: new Date().toISOString(),
-        proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
-        verificationMethod: `did:vid:0x00${constants.DEFAULT_EIDAS_VERIFICATION_METHOD}`,
-      };
-      await expect(
-        Controller.EIDASvalidateSignature(proof as never)
-      ).rejects.toThrow("Bad Request");
-    });
-
-    it("should throw an error without correct proof type", async () => {
-      expect.assertions(1);
-      const proof = {
-        type: "another type",
-        created: new Date().toISOString(),
-        proofPurpose: constants.DEFAULT_PROOF_PURPOSE,
-        verificationMethod: `did:vid:0x00${constants.DEFAULT_EIDAS_VERIFICATION_METHOD}`,
-        jws: "a jws signature",
-      };
-      await expect(
-        Controller.EIDASvalidateSignature(proof as never)
-      ).rejects.toThrow("Bad Request");
-    });
-  });
-
-  describe("getIssuanceDate call tests", () => {
-    it("should return the issuance date", () => {
-      expect.assertions(1);
-      (decodeJWT as jest.Mock).mockReturnValue({
-        payload: { iat: new Date(1998, 11) },
-      });
-      expect(Controller.getIssuanceDate("a token")).toBeDefined();
-      jest.clearAllMocks();
-    });
-
-    it("should return the issuance date when no iat is passed", () => {
-      expect.assertions(1);
-      (decodeJWT as jest.Mock).mockReturnValue({ payload: {} });
-      expect(Controller.getIssuanceDate("a token")).toBeDefined();
-      jest.clearAllMocks();
+        Controller.EIDASvalidateSignature(mockedData.mockVC as never)
+      ).rejects.toThrow(
+        "Verification Credential does not contain an Eidas Proof"
+      );
     });
   });
 });

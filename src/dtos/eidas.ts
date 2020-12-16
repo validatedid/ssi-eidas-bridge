@@ -1,5 +1,3 @@
-import { Curves, KeyType } from "../@types/constants";
-
 export interface Proof {
   type: string;
   created: string;
