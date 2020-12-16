@@ -1,7 +1,7 @@
 import http from "http";
 import net from "net";
 import { BRIDGE_SERVICE } from "../../src/config";
-import App, { startEbsiService } from "../../src/api/app";
+import App, { startService } from "../../src/api/app";
 import { ApiErrorMessages, ServiceUnavailableError } from "../../src/errors";
 
 describe("app test suite", () => {
@@ -35,10 +35,10 @@ describe("app test suite", () => {
     }
   );
 
-  it("should call startEbsiService", async () => {
+  it("should call startService", async () => {
     expect.hasAssertions();
 
-    const server = await startEbsiService(
+    const server = await startService(
       BRIDGE_SERVICE.NAME.EIDAS,
       testPort + 3,
       BRIDGE_SERVICE.SWAGGER_INTERNAL_URL.EIDAS

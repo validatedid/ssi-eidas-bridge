@@ -3,7 +3,7 @@ import http from "http";
 import Redis from "ioredis";
 import fs from "fs";
 import path from "path";
-import { startEbsiService } from "../../src/api/app";
+import { startService } from "../../src/api/app";
 import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
 import constants from "../../src/@types";
@@ -20,7 +20,7 @@ describe("eidas router API calls (mocking redis)", () => {
   // eslint-disable-next-line jest/no-done-callback
   beforeAll(async (done) => {
     // launch Server to test its RESTful API
-    server = await startEbsiService(
+    server = await startService(
       BRIDGE_SERVICE.NAME.EIDAS,
       testPort,
       BRIDGE_SERVICE.SWAGGER_INTERNAL_URL.EIDAS

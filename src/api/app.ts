@@ -66,7 +66,7 @@ class App {
   };
 }
 
-export const startEbsiService = async (
+export const startService = async (
   service: string,
   port: number,
   swaggerUrl: string
