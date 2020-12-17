@@ -12,7 +12,7 @@
   "scripts": {
     "audit": "audit-ci --moderate",
     "start": "node dist/start.js",
-    "start:dev": "nodemon --watch src --exec 'ts-node' src/start.ts",
+    "start:dev": "nodemon --watch src --watch api -e ts,yaml --exec 'ts-node' src/start.ts",
     "start:openapi": "openapi preview-docs api/openapi.yaml",
     "build": "yarn clean && tsc -p tsconfig-build.json",
     "clean": "rm -rf ./dist ./coverage ./log ./build",
