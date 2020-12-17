@@ -85,13 +85,7 @@ export default class Controller {
   }
 
   static async putEidasKeys(opts: EidasKeysData): Promise<RedisInsertion> {
-    if (
-      !opts ||
-      !opts.p12 ||
-      !opts.keyType ||
-      ![KeyTypes.RSA, KeyTypes.EC, KeyTypes.OKP].includes(opts.keyType) ||
-      (opts.keyType === (KeyTypes.EC || KeyTypes.OKP) && !opts.keyCurve)
-    )
+    if (!opts || !opts.p12 || !opts.keyType)
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
