@@ -1,14 +1,20 @@
 import { JWK } from "jose";
 import { ethers } from "ethers";
-import { KeyType, Curves } from "../src/dtos/keys";
+import { DID } from "dids";
+import { Ed25519Provider } from "key-did-provider-ed25519";
+import KeyResolver from "@ceramicnetwork/key-did-resolver";
+import crypto from "crypto";
+import { resolver } from "@transmute/did-key.js";
+import { DIDDocument } from "did-resolver";
+import constants from "../src/@types";
 
 const prefixWith0x = (key: string): string => {
   return key.startsWith("0x") ? key : `0x${key}`;
 };
 
 const generateTestKeys = (
-  keyType: KeyType,
-  curveType: Curves
+  keyType: constants.KeyType,
+  curveType: constants.Curves
 ): {
   hexPrivateKey: string;
   did: string;
@@ -24,9 +30,7 @@ const generateTestKeys = (
       switch (curveType) {
         case "secp256k1":
           jwk = JWK.generateSync(keyType, curveType, { use: "sig" });
-          hexPrivateKey = Buffer.from(jwk.d as string, "base64").toString(
-            "hex"
-          );
+          hexPrivateKey = Buffer.from(jwk.d, "base64").toString("hex");
           wallet = new ethers.Wallet(prefixWith0x(hexPrivateKey));
           did = `did:vid:${wallet.address}`;
           return { hexPrivateKey, did, jwk };
@@ -38,4 +42,20 @@ const generateTestKeys = (
   }
 };
 
-export default generateTestKeys;
+const generateDid = async (inputSeed?: Uint8Array): Promise<string> => {
+  let seed = inputSeed;
+  if (!inputSeed) seed = crypto.randomBytes(32);
+  const provider = new Ed25519Provider(seed);
+
+  const did = new DID({ provider, resolver: KeyResolver.getResolver() });
+  await did.authenticate();
+  return did.id;
+
+  return "did:key:test";
+};
+
+const resolveDid = async (did: string): Promise<DIDDocument> => {
+  return (await resolver.resolve(did)) as DIDDocument;
+};
+
+export { generateTestKeys, generateDid, resolveDid };

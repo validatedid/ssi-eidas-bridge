@@ -1,39 +1,45 @@
+import fs from "fs";
+import path from "path";
 import Controller from "../../src/api/eidas/controller";
-import { EidasKeysOptions } from "../../src/dtos/keys";
-import generateTestKeys from "../utils";
+import { generateDid } from "../utils";
+import constants from "../../src/@types";
+import { EidasKeysData } from "../../src/dtos/redis";
 
 describe("eidas keys tests should", () => {
-  let sameDid: string;
+  let sameDid = "";
+  const testFilePathSelfSigned = "../data/test1/";
+  const p12File = "keyStore.p12";
+  const fileData = fs.readFileSync(
+    path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+  );
+
   it("store a given key for the first time", async () => {
-    expect.assertions(2);
-    const { hexPrivateKey, did } = generateTestKeys("EC", "secp256k1");
-    const opts: EidasKeysOptions = {
-      did,
-      eidasKey: hexPrivateKey,
-      keyType: "EC",
-      curveType: "secp256k1",
-    };
+    const did = await generateDid();
     sameDid = did;
+    const opts: EidasKeysData = {
+      did,
+      p12: fileData,
+      keyType: constants.KeyTypes.RSA,
+    };
+    expect.assertions(2);
     const response = await Controller.putEidasKeys(opts);
     expect(response).toBeDefined();
     expect(response).toStrictEqual({
-      eidasKey: hexPrivateKey,
+      eidasKeysData: opts,
       firstInsertion: true,
     });
   });
   it("update key for same did", async () => {
-    expect.assertions(2);
-    const { hexPrivateKey } = generateTestKeys("EC", "secp256k1");
-    const opts: EidasKeysOptions = {
+    const opts: EidasKeysData = {
       did: sameDid,
-      eidasKey: hexPrivateKey,
-      keyType: "EC",
-      curveType: "secp256k1",
+      p12: fileData,
+      keyType: constants.KeyTypes.RSA,
     };
+    expect.assertions(2);
     const response = await Controller.putEidasKeys(opts);
     expect(response).toBeDefined();
     expect(response).toStrictEqual({
-      eidasKey: hexPrivateKey,
+      eidasKeysData: opts,
       firstInsertion: false,
     });
   });

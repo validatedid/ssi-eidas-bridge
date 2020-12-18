@@ -7,21 +7,24 @@ import {
   NotFoundError,
   ProblemDetailsError,
 } from "@cef-ebsi/problem-details-errors";
+import { AxiosError } from "axios";
 import InvalidTokenError from "./InvalidTokenError";
 import { ApiErrorMessages } from "./errorCodes";
 import LOGGER from "../logger";
 
-const handleError = errorHandler((normalizedError: any, originalError: any) => {
-  if (originalError) {
-    // Axios error
-    if (originalError.response)
-      LOGGER.error(JSON.stringify(originalError.response.data));
-    LOGGER.error(originalError.stack);
+const handleError = errorHandler(
+  (normalizedError: ProblemDetailsError, originalError: AxiosError) => {
+    if (originalError) {
+      // Axios error
+      if (originalError.response)
+        LOGGER.error(JSON.stringify(originalError.response.data));
+      LOGGER.error(originalError.stack);
+    }
+    LOGGER.info(
+      `Error ${normalizedError.status} ${normalizedError.title}: ${normalizedError.detail}`
+    );
   }
-  LOGGER.info(
-    `Error ${normalizedError.status} ${normalizedError.title}: ${normalizedError.detail}`
-  );
-});
+);
 
 export {
   handleError,

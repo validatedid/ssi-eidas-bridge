@@ -1,3 +1,5 @@
 import * as util from "./util";
+import * as eidasCrypto from "./crypto";
+import * as jwk from "./jwk";
 
-export default util;
+export { util, eidasCrypto, jwk };
