@@ -92,6 +92,10 @@ export default class Controller {
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
+    if (!id)
+      throw new BadRequestError(BadRequestError.defaultTitle, {
+        detail: ApiErrorMessages.MISSING_PUT_ID_PARAMS,
+      });
     const previousKeys = await redis.get(id);
     await redis.set(id, JSON.stringify(opts));
     return {
