@@ -37,10 +37,12 @@ class Router {
     );
 
     router.put(
-      `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`,
+      `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}/:id`,
       cors(),
       async (req: express.Request, res: express.Response) => {
+        const { id } = req.params;
         const { eidasKeysData, firstInsertion } = await Controller.putEidasKeys(
+          id,
           req.body
         );
         res.status(firstInsertion ? 201 : 200).json(eidasKeysData);

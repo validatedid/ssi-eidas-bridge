@@ -84,13 +84,16 @@ export default class Controller {
     }
   }
 
-  static async putEidasKeys(opts: EidasKeysData): Promise<RedisInsertion> {
+  static async putEidasKeys(
+    id: string,
+    opts: EidasKeysData
+  ): Promise<RedisInsertion> {
     if (!opts || !opts.p12 || !opts.keyType || opts.keyType !== KeyTypes.RSA)
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
-    const previousKeys = await redis.get(opts.did);
-    await redis.set(opts.did, JSON.stringify(opts));
+    const previousKeys = await redis.get(id);
+    await redis.set(id, JSON.stringify(opts));
     return {
       eidasKeysData: opts,
       firstInsertion: !previousKeys,

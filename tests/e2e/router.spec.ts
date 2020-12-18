@@ -63,7 +63,7 @@ describe("eidas router API calls", () => {
       expect.assertions(1);
       const res = await request(server)
         .put(
-          `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`
+          `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}/${randomOpts.did}`
         )
         .send(randomOpts);
       expect(res.status).toStrictEqual(201);
@@ -72,12 +72,12 @@ describe("eidas router API calls", () => {
       expect.assertions(1);
       await request(server)
         .put(
-          `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`
+          `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}/${did}`
         )
         .send(opts);
       const res = await request(server)
         .put(
-          `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`
+          `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}/${did}`
         )
         .send(opts);
       expect(res.status).toStrictEqual(200);
