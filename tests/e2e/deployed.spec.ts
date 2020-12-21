@@ -31,7 +31,7 @@ describe("eidas e2e flow towards vidchain", () => {
       keyType: constants.KeyTypes.RSA,
     };
     const storeKeysResponse = await axios.put(
-      `${server}${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`,
+      `${server}${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}/${did}`,
       opts
     );
     expect(storeKeysResponse.status).toStrictEqual(201);
