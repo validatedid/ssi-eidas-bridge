@@ -1,16 +1,23 @@
+import { SignPayload } from "../../dtos/secureEnclave";
+import { ApiErrorMessages, BadRequestError } from "../../errors";
+import { EnterpriseWallet } from "../secureEnclave";
 import {
   DEFAULT_EIDAS_PROOF_TYPE,
   DEFAULT_PROOF_PURPOSE,
-  DEFAULT_EIDAS_VERIFICATION_METHOD,
-} from "./constants";
-import { Proof } from "./types";
+} from "../../@types/constants";
+import { EidasProof, Proof, Credential } from "../../dtos/eidas";
+import {
+  canonizeCredential,
+  getKidFromDidAndPemCertificate,
+} from "../../utils/ssi";
+import { verifyCadesSignature } from "../secureEnclave/cades";
 
 const PROOF_REQUIRED_KEYS = [
   "type",
   "created",
   "proofPurpose",
   "verificationMethod",
-  "jws",
+  "cades",
 ];
 
 export const compareCredentialKeys = (
@@ -41,14 +48,6 @@ const validateProofPurpose = (value: string): void => {
   }
 };
 
-const validateEIDASVerificationMethod = (value: string): void => {
-  if (value.length < 1 || !value.includes(DEFAULT_EIDAS_VERIFICATION_METHOD)) {
-    throw new TypeError(
-      `EIDAS Verification Method key is missing '${DEFAULT_EIDAS_VERIFICATION_METHOD}'`
-    );
-  }
-};
-
 const validateProofKeys = (value: Proof): void => {
   if (Object.keys(value).length === 0)
     throw new TypeError("Proof must not be empty");
@@ -59,11 +58,67 @@ const validateProofKeys = (value: Proof): void => {
   }
 };
 
-const validateEIDASProofAttributes = (proof: Proof): void => {
+const validateEIDASProofAttributes = (proof: EidasProof): void => {
   validateEIDASProofType(proof.type);
   validateProofPurpose(proof.proofPurpose);
-  validateEIDASVerificationMethod(proof.verificationMethod);
   validateProofKeys(proof);
 };
 
-export default validateEIDASProofAttributes;
+const signEidas = async (signPayload: SignPayload): Promise<EidasProof> => {
+  if (
+    !signPayload ||
+    !signPayload.issuer ||
+    !signPayload.payload ||
+    !signPayload.type ||
+    !signPayload.password
+  )
+    throw new BadRequestError(ApiErrorMessages.SIGN_EIDAS_BAD_PARAMETERS);
+
+  let payloadToSign = signPayload.payload;
+  if (signPayload.payload.proof) {
+    // removing proof
+    payloadToSign = (({ proof, ...o }) => o)(signPayload.payload);
+  }
+  const wallet = await EnterpriseWallet.createInstance({
+    did: signPayload.issuer,
+    password: signPayload.password,
+  });
+
+  const cadesOuput = await wallet.eSeal(payloadToSign);
+  return {
+    type: signPayload.type,
+    created: cadesOuput.signingTime,
+    proofPurpose: DEFAULT_PROOF_PURPOSE,
+    verificationMethod: getKidFromDidAndPemCertificate({
+      did: signPayload.issuer,
+      pemCertificate: cadesOuput.verificationMethod,
+    }),
+    cades: cadesOuput.cades,
+  };
+};
+
+const isEidasProof = (proof: Proof | EidasProof): boolean => {
+  return "cades" in proof;
+};
+
+const verifyEidas = async (
+  credential: Credential,
+  eidasProof: EidasProof
+): Promise<void> => {
+  validateEIDASProofAttributes(eidasProof);
+  const verificationOut = verifyCadesSignature(eidasProof.cades);
+  if (!verificationOut || !verificationOut.isValid)
+    throw new BadRequestError(ApiErrorMessages.ERROR_VERIFYING_SIGNATURE);
+  // check that the data signed is the same as the Verifiable Credential payload
+  const canonizedCredential = await canonizeCredential(credential);
+  const signedData = Buffer.from(
+    verificationOut.parse.econtent,
+    "hex"
+  ).toString("utf-8");
+  if (canonizedCredential !== signedData)
+    throw new BadRequestError(
+      ApiErrorMessages.CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA
+    );
+};
+
+export { validateEIDASProofAttributes, signEidas, verifyEidas, isEidasProof };

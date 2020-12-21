@@ -2,14 +2,10 @@ import * as express from "express";
 import cors from "cors";
 import Controller from "./controller";
 import { BRIDGE_SERVICE } from "../../config";
-import { BadRequestError, ApiErrorMessages } from "../../errors";
 
 class Router {
-  constructor(server: express.Express, swaggerDoc: any) {
+  constructor(server: express.Express) {
     const router = express.Router();
-    router.get("/openapi.json", (req: express.Request, res: express.Response) =>
-      res.send(swaggerDoc)
-    );
 
     // sessions call managed by auth middleware
     router.post(BRIDGE_SERVICE.CALL.BRIDGE_LOGIN);
@@ -32,12 +28,7 @@ class Router {
       cors(),
       async (req: express.Request, res: express.Response, next) => {
         try {
-          if (!req.body.proof)
-            throw new BadRequestError(BadRequestError.defaultTitle, {
-              detail: ApiErrorMessages.BAD_CREDENTIAL_PARAMETERS,
-            });
-          const { proof } = req.body;
-          await Controller.EIDASvalidateSignature(proof);
+          await Controller.EIDASvalidateSignature(req.body);
           res.sendStatus(204);
         } catch (error) {
           next(error);
@@ -46,13 +37,15 @@ class Router {
     );
 
     router.put(
-      `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`,
+      `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}/:id`,
       cors(),
       async (req: express.Request, res: express.Response) => {
-        const { eidasKey, firstInsertion } = await Controller.putEidasKeys(
+        const { id } = req.params;
+        const { eidasKeysData, firstInsertion } = await Controller.putEidasKeys(
+          id,
           req.body
         );
-        res.status(firstInsertion ? 201 : 200).json(eidasKey);
+        res.status(firstInsertion ? 201 : 200).json(eidasKeysData);
       }
     );
     router.options("*", cors());

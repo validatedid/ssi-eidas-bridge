@@ -1,29 +1,18 @@
-import { decodeJWT, verifyJWT } from "did-jwt";
-import VidDidResolver from "@validatedid/vid-did-resolver";
-import { Resolver } from "did-resolver";
 import { SignPayload } from "../../dtos/secureEnclave";
 import {
   Credential,
+  EidasProof,
   EIDASSignatureOutput,
+  Proof,
   VerifiableCredential,
 } from "../../dtos/eidas";
-import { RedisInsertion } from "../../dtos/redis";
-import { BadRequestError, InternalError, ApiErrorMessages } from "../../errors";
-import { Proof } from "../../libs/eidas/types";
-import {
-  JWTVerifyOptions,
-  SignatureTypes,
-  VerifiedJwt,
-} from "../../libs/secureEnclave/jwt";
-import {
-  DEFAULT_PROOF_PURPOSE,
-  DEFAULT_EIDAS_VERIFICATION_METHOD,
-} from "../../libs/eidas/constants";
-import { validateEIDASProofAttributes } from "../../libs/eidas";
-import { EnterpriseWallet } from "../../libs/secureEnclave";
-import * as config from "../../config";
-import { EidasKeysOptions } from "../../dtos/keys";
+import { EidasKeysData, RedisInsertion } from "../../dtos/redis";
+import { BadRequestError, ApiErrorMessages } from "../../errors";
+
+import { isEidasProof, signEidas, verifyEidas } from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
+import { KeyTypes } from "../../@types/constants";
+import { isVerifiableCredential } from "../../utils/ssi";
 
 export default class Controller {
   /**
@@ -42,45 +31,22 @@ export default class Controller {
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,
       });
-    const { issuer, payload, type, expiresIn } = signPayload;
-    let payloadToSign = payload;
-    if (type !== SignatureTypes.EidasSeal2019)
-      throw new BadRequestError(BadRequestError.defaultTitle, {
-        detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
-      });
-    if (payload.proof) {
-      // removing proof
-      payloadToSign = (({ proof, ...o }) => o)(payload);
-    }
+    const { issuer, payload } = signPayload;
     // sign with another keypair
-    const jws: string = await EnterpriseWallet.signDidJwt(
-      issuer,
-      Buffer.from(JSON.stringify(payloadToSign)),
-      expiresIn
-    );
-    if (!jws)
-      throw new InternalError(InternalError.defaultTitle, {
-        detail: ApiErrorMessages.ERROR_SIGNATURE_CREATION,
-      });
-    const proof: Proof = {
-      type,
-      created: Controller.getIssuanceDate(jws),
-      proofPurpose: DEFAULT_PROOF_PURPOSE,
-      verificationMethod: `${issuer}${DEFAULT_EIDAS_VERIFICATION_METHOD}`,
-      jws,
-    };
+    const eidasProof = await signEidas(signPayload);
+
     let proofs: Proof[] = [];
     if (Array.isArray(payload.proof)) {
       proofs = payload.proof as Proof[];
-      proofs.push(proof);
+      proofs.push(eidasProof);
     }
     if (payload.proof && !Array.isArray(payload.proof)) {
       proofs.push(payload.proof as Proof);
-      proofs.push(proof);
+      proofs.push(eidasProof);
     }
     const vc: VerifiableCredential = {
       ...(payload as Credential),
-      proof: proofs && proofs.length > 0 ? proofs : proof,
+      proof: proofs && proofs.length > 0 ? proofs : eidasProof,
     };
     return {
       issuer,
@@ -90,65 +56,50 @@ export default class Controller {
 
   /**
    *
-   * @param proof
+   * @param verifiableCredential
    */
-  static async EIDASvalidateSignature(proof: Proof): Promise<VerifiedJwt> {
-    if (
-      !proof ||
-      !proof.type ||
-      !proof.created ||
-      !proof.proofPurpose ||
-      !proof.verificationMethod ||
-      !proof.jws
-    )
+  static async EIDASvalidateSignature(
+    verifiableCredential: VerifiableCredential
+  ): Promise<void> {
+    if (!isVerifiableCredential(verifiableCredential))
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,
       });
-    if (proof.type !== SignatureTypes.EidasSeal2019)
-      throw new BadRequestError(BadRequestError.defaultTitle, {
-        detail: ApiErrorMessages.SIGNATURE_BAD_TYPE,
-      });
-
-    validateEIDASProofAttributes(proof);
-    const options: JWTVerifyOptions = {
-      resolver: new Resolver(
-        VidDidResolver.getResolver({
-          rpcUrl: config.LEDGER.provider,
-          registry: config.LEDGER.didRegistry,
-        })
-      ),
-    };
-    const result = await verifyJWT(proof.jws, options);
-    if (!result)
-      throw new InternalError(InternalError.defaultTitle, {
-        detail: ApiErrorMessages.ERROR_VERIFYING_SIGNATURE,
-      });
-    return result;
+    const credential = (({ proof, ...o }) => o)(verifiableCredential);
+    if (!Array.isArray(verifiableCredential.proof)) {
+      if (!isEidasProof(verifiableCredential.proof))
+        throw new BadRequestError(ApiErrorMessages.NO_EIDAS_PROOF);
+      await verifyEidas(credential, verifiableCredential.proof as EidasProof);
+    }
+    if (Array.isArray(verifiableCredential.proof)) {
+      const eidasProofs = verifiableCredential.proof.filter((proof) =>
+        isEidasProof(proof)
+      );
+      if (eidasProofs.length <= 0)
+        throw new BadRequestError(ApiErrorMessages.NO_EIDAS_PROOF);
+      const resolves = eidasProofs.map(async (eidasProof) =>
+        verifyEidas(credential, eidasProof as EidasProof)
+      );
+      await Promise.all(resolves);
+    }
   }
 
-  static getIssuanceDate(jwt: string): string {
-    const { payload } = decodeJWT(jwt);
-    const iat = payload.iat ? payload.iat : new Date();
-    const issuanceDate = new Date(iat).toISOString();
-    return issuanceDate;
-  }
-
-  static async putEidasKeys(opts: EidasKeysOptions): Promise<RedisInsertion> {
-    if (
-      !opts ||
-      !opts.did ||
-      !opts.eidasKey ||
-      !opts.keyType ||
-      !["RSA", "EC", "OKP"].includes(opts.keyType) ||
-      (opts.keyType === ("EC" || "OKP") && !opts.curveType)
-    )
+  static async putEidasKeys(
+    id: string,
+    opts: EidasKeysData
+  ): Promise<RedisInsertion> {
+    if (!opts || !opts.p12 || !opts.keyType || opts.keyType !== KeyTypes.RSA)
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
-    const previousKeys = await redis.get(opts.did);
-    await redis.set(opts.did, opts.eidasKey);
+    if (!id)
+      throw new BadRequestError(BadRequestError.defaultTitle, {
+        detail: ApiErrorMessages.MISSING_PUT_ID_PARAMS,
+      });
+    const previousKeys = await redis.get(id);
+    await redis.set(id, JSON.stringify(opts));
     return {
-      eidasKey: opts.eidasKey,
+      eidasKeysData: opts,
       firstInsertion: !previousKeys,
     };
   }

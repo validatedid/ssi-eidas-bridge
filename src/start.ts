@@ -1,8 +1,8 @@
-import { startEbsiService } from "./api/app";
+import { startService } from "./api/app";
 import { BRIDGE_SERVICE, ENVIRONMENT } from "./config";
 
 const startAll = async (): Promise<void> => {
-  await startEbsiService(
+  await startService(
     BRIDGE_SERVICE.NAME.EIDAS,
     BRIDGE_SERVICE.PORT.EIDAS,
     ENVIRONMENT === "local" || ENVIRONMENT === "test"

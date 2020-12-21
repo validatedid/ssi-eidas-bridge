@@ -38,7 +38,7 @@ class App {
         detail: ApiErrorMessages.NO_BRIDGE_SERVICE_AVAILABLE,
       });
 
-    this.router = new EidasRouter(this.httpServer, YAML.load(yamlFilePath));
+    this.router = new EidasRouter(this.httpServer);
     this.httpServer.use(
       BRIDGE_SERVICE.SWAGGER.EIDAS,
       swaggerUi.serve,
@@ -47,7 +47,7 @@ class App {
   }
 
   public Start = async (port: number): Promise<http.Server> => {
-    const { did } = await ComponentSecureEnclave.Instance.init(API_PRIVATE_KEY);
+    const { did } = ComponentSecureEnclave.Instance.init(API_PRIVATE_KEY);
     if (!did)
       throw new InternalError(InternalError.defaultTitle, {
         detail: ApiErrorMessages.ENCLAVE_DID_NULL,
@@ -59,14 +59,14 @@ class App {
         .listen(port, () => {
           resolve(this.connection);
         })
-        .on("error", (err: any) => {
+        .on("error", (err) => {
           reject(err);
         });
     });
   };
 }
 
-export const startEbsiService = async (
+export const startService = async (
   service: string,
   port: number,
   swaggerUrl: string

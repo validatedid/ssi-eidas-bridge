@@ -1,15 +1,7 @@
 import ComponentSecureEnclave from "./componentSecureEnclave";
 import ComponentWallet from "./componentWallet";
 import EnterpriseWallet from "./enterpriseWallet";
-import * as jwk from "./jwk";
-import * as jwt from "./jwt";
-import Wallet from "./wallet";
+import * as jwk from "../../utils/jwk";
+import * as jwt from "../../dtos/jwt";
 
-export {
-  jwk,
-  jwt,
-  Wallet,
-  ComponentSecureEnclave,
-  EnterpriseWallet,
-  ComponentWallet,
-};
+export { jwk, jwt, ComponentSecureEnclave, EnterpriseWallet, ComponentWallet };

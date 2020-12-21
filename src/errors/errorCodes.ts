@@ -12,7 +12,20 @@ export enum ApiErrorMessages {
   SIGNATURE_BAD_TYPE = "Signature type  not supported.",
   NO_AUDIENCE = "No audience provided",
   INVALID_AUDIENCE = "Invalid audience. Should be a string",
-  BAD_INPUT_EIDAS_KEYS_PARAMS = "Eidas keys call requires an EidasKeysOptions filled with the correct attributes",
+  BAD_INPUT_EIDAS_KEYS_PARAMS = "Eidas keys call requires an EidasKeysData filled with the correct attributes",
+  MISSING_PUT_ID_PARAMS = "Missing store key id parameter",
+  INVALID_HASH_ALG = "Hash algorithm not supported. Only supported algorithms are SHA1, SHA256 and SHA512.",
+  NO_PEM_CADES = "PEM CADES Signature not provided.",
+  ERROR_RETRIEVING_REDIS_DATA = "Error retrieving data from Redis",
+  KEY_TYPE_NOT_SUPPORTED = "Provided key type is not supported. Only RSA is supported",
+  DATA_NOT_LOADED = "Certificate, private and key types are not loaded",
+  KEY_CURVE_NOT_SET = "Key Curve is not set",
+  WALLET_BUILDER_BAD_PARAMS = "Wallet creation requires a DID and a password.",
+  ERROR_PARSING_P12_DATA = "Error parsing P12 data",
+  CANONIZE_BAD_PARAMS = "Data to canonize is not a Credential",
+  SIGN_EIDAS_BAD_PARAMETERS = "Sign Eidas requires a SignPayload with issuer, payload, type and password",
+  NO_EIDAS_PROOF = "Verification Credential does not contain an Eidas Proof",
+  CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA = "Verification Credential payload does not match signed data",
 }
 
 export default { ApiErrorMessages };
