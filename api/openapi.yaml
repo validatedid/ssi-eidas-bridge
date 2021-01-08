@@ -398,16 +398,16 @@ paths:
                   issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
                   issuanceDate: "2019-12-31T23:59:60Z"
                   credentialSubject: 
-                      id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-                      firstName: "Eva"
-                      lastName: "Monroe"
-                      gender: "Female"
-                      dateOfBirth: "12/11/1970"
-                      placeOfBirth: "Madrid"
-                      currentAddress: "Arago 179 4a"
-                      city: "Barcelona"
-                      state: "Catalunya"
-                      zip: "08011"
+                    id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                    firstName: "Eva"
+                    lastName: "Monroe"
+                    gender: "Female"
+                    dateOfBirth: "12/11/1970"
+                    placeOfBirth: "Madrid"
+                    currentAddress: "Arago 179 4a"
+                    city: "Barcelona"
+                    state: "Catalunya"
+                    zip: "08011"
                   proof:
                     type: "CAdESRSASignature2020"
                     created: "2021-01-08T11:17:16Z"
