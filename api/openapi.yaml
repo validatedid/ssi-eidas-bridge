@@ -231,7 +231,7 @@ paths:
                           - value: "Exemple d'Université"
                             lang: fr
                   type: CAdESRSASignature2020
-                  password: kzNjDWIlDvIufumc
+                  password: vidchain
               eSeal a Verifiable Credential Payload:
                 value:
                   issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
@@ -261,7 +261,7 @@ paths:
                       verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
                       jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
                   type: CAdESRSASignature2020
-                  password: kzNjDWIlDvIufumc
+                  password: vidchain
         required: true
       responses:
         "201":
