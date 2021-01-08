@@ -210,7 +210,7 @@ paths:
             examples:
               eSeal a Credential Payload:
                 value:
-                  issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                  issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
                   payload:
                     "@context":
                       - "https://www.w3.org/2018/credentials/v1"
@@ -218,23 +218,25 @@ paths:
                     id: "http://example.edu/credentials/1872"
                     type:
                       - VerifiableCredential
-                      - AlumniCredential
-                    issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                      - VerifiableID
+                    issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
                     issuanceDate: "2019-12-31T23:59:60Z"
                     credentialSubject:
                       id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-                      alumniOf:
-                        id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
-                        name:
-                          - value: Example University
-                            lang: en
-                          - value: "Exemple d'Université"
-                            lang: fr
+                      firstName: "Eva"
+                      lastName: "Monroe"
+                      gender: "Female"
+                      dateOfBirth: "12/11/1970"
+                      placeOfBirth: "Madrid"
+                      currentAddress: "Arago 179 4a"
+                      city: "Barcelona"
+                      state: "Catalunya"
+                      zip: "08011"
                   type: CAdESRSASignature2020
-                  password: kzNjDWIlDvIufumc
+                  password: vidchain
               eSeal a Verifiable Credential Payload:
                 value:
-                  issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                  issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
                   payload:
                     "@context":
                       - "https://www.w3.org/2018/credentials/v1"
@@ -242,18 +244,20 @@ paths:
                     id: "http://example.edu/credentials/1872"
                     type:
                       - VerifiableCredential
-                      - AlumniCredential
-                    issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                      - VerifiableID
+                    issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
                     issuanceDate: "2019-12-31T23:59:60Z"
                     credentialSubject:
                       id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-                      alumniOf:
-                        id: did:key:zQ3shZc2QzApp2oymGvQbzP8eKheVshBHbU4ZYjeXqwSKEn6N
-                        name:
-                          - value: Example University
-                            lang: en
-                          - value: "Exemple d'Université"
-                            lang: fr
+                      firstName: "Eva"
+                      lastName: "Monroe"
+                      gender: "Female"
+                      dateOfBirth: "12/11/1970"
+                      placeOfBirth: "Madrid"
+                      currentAddress: "Arago 179 4a"
+                      city: "Barcelona"
+                      state: "Catalunya"
+                      zip: "08011"
                     proof:
                       type: EcdsaSecp256k1Signature2019
                       created: "2019-06-18T21:19:10Z"
@@ -261,7 +265,7 @@ paths:
                       verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
                       jws: eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2Us...
                   type: CAdESRSASignature2020
-                  password: kzNjDWIlDvIufumc
+                  password: vidchain
         required: true
       responses:
         "201":
@@ -273,14 +277,14 @@ paths:
               examples:
                 One Proof EIDAS Signature:
                   value:
-                    issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                    issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
                     vc:
                       "@context":
                         - "https://www.w3.org/2018/credentials/v1"
                         - "https://api.vidchain.net/credentials/verifiableId/v1"
                       id: http://example.vid/credentials/1872
                       type: ['VerifiableCredential','VerifiableID']
-                      issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                      issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
                       issuanceDate: "2019-06-22T14:11:44Z"
                       expirationDate: "2019-06-22T14:11:44Z"
                       credentialSubject: 
@@ -302,14 +306,14 @@ paths:
                         cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
                 Mutiple Proofs EIDAS Signature:
                   value:
-                    issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                    issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
                     vc:
                       "@context":
                         - "https://www.w3.org/2018/credentials/v1"
                         - "https://api.vidchain.net/credentials/verifiableId/v1"
                       id: http://example.vid/credentials/1872
                       type: ['VerifiableCredential','VerifiableID']
-                      issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
+                      issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
                       issuanceDate: "2019-06-22T14:11:44Z"
                       expirationDate: "2019-06-22T14:11:44Z"
                       credentialSubject: 
@@ -388,41 +392,13 @@ paths:
                 value:
                   "@context":
                     - "https://www.w3.org/2018/credentials/v1"
-                    - "https://api.vidchain.net/credentials/verifiableId/v1"
-                  id: http://example.vid/credentials/1872
+                    - "https://www.w3.org/2018/credentials/examples/v1"
+                  id: "http://example.edu/credentials/1872"
                   type: ['VerifiableCredential','VerifiableID']
-                  issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
-                  issuanceDate: "2019-06-22T14:11:44Z"
-                  expirationDate: "2019-06-22T14:11:44Z"
+                  issuer: "did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2"
+                  issuanceDate: "2019-12-31T23:59:60Z"
                   credentialSubject: 
-                      id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-                      firstName: "Eva"
-                      lastName: "Monroe"
-                      gender: "Female"
-                      dateOfBirth: "12/11/1970"
-                      placeOfBirth: "Madrid"
-                      currentAddress: "Arago 179 4a"
-                      city: "Barcelona"
-                      state: "Catalunya"
-                      zip: "08011"
-                  proof:
-                    type: "CAdESRSASignature2020"
-                    created: "2020-06-22T14:11:44Z"
-                    proofPurpose: "assertionMethod"
-                    verificationMethod: did:key:z6MkfGYwYV8xQgoNtyFgxdHLuBC6vzSCoHUKpeUg5uBvkXLE#MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvcPOS736aX2tfwEj+mMCJ3kw6KBCDHLRNqtkDseXNTuhdIs5Uj7wPcOETexT1DnGDfPZ3HYBsc8x8jWKFtO/E5oqFzXDyq60G8Qmlt509JKQJLP0YxrXwjZcLD/uM9Qf8lCjjiVJjDYnztE88p5jkQ2V9HCf3NK3ASL3m2q4M5QRHNGiTTvCvcRG2qRocVIp3EB8fwIpgqWxi6uI242yE7E1J4fVDXlD4hYpocDH0HOzazQXrNubHz6EGkOt5nAKeEzToqE9ow++h6TRHhfmdWJFb2HQ7FvoAMUYopQJaKpk/V5FpmXTDyMPNt2uj9UBS/EML7Z3vXzXUUJq/pTbdtJIpZaZk0SOCdt3iWk8CCNIHAHdN0uy+SWC+AH0hv56urQqR0Zaz33fGguhbuUYKzXt1CTQgCTkEhcwT9Sml4m1WGMl3fbFMFkacPGRwSMs5ZXKjDCRdz+N8/pFExOuobCqIMUPGC98TVsV3drrsSe716CSHS3BWuaum/W3ve5w1Z11nGbRih9X5AuYg5t/gwFDsg05iQa76ymzWSaZEEL5btHvCXNsmsyDU1n/KJw4S8nnXj+qt+xLNENNWsijcP7VnE1bkXvEQ0rg/PewmPWKVLIHZf5s8RJTmAdCFE0IJT1WiXufwT9QUa6BfyE1mOpnk4LpwkhcmM0jNADHvp8CAwEAAQ==
-                    cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
-              Mutiple Proofs EIDAS Signature:
-                value:
-                  "@context":
-                    - "https://www.w3.org/2018/credentials/v1"
-                    - "https://api.vidchain.net/credentials/verifiableId/v1"
-                  id: http://example.vid/credentials/1872
-                  type: ['VerifiableCredential','VerifiableID']
-                  issuer: did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme
-                  issuanceDate: "2019-06-22T14:11:44Z"
-                  expirationDate: "2019-06-22T14:11:44Z"
-                  credentialSubject: 
-                    id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+                    id: "did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2"
                     firstName: "Eva"
                     lastName: "Monroe"
                     gender: "Female"
@@ -433,16 +409,42 @@ paths:
                     state: "Catalunya"
                     zip: "08011"
                   proof:
-                    - type: "EcdsaSecp256k1Signature2019"
+                    type: "CAdESRSASignature2020"
+                    created: "2021-01-08T11:17:16Z"
+                    proofPurpose: "assertionMethod"
+                    verificationMethod: "did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE#MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvcPOS736aX2tfwEj+mMCJ3kw6KBCDHLRNqtkDseXNTuhdIs5Uj7wPcOETexT1DnGDfPZ3HYBsc8x8jWKFtO/E5oqFzXDyq60G8Qmlt509JKQJLP0YxrXwjZcLD/uM9Qf8lCjjiVJjDYnztE88p5jkQ2V9HCf3NK3ASL3m2q4M5QRHNGiTTvCvcRG2qRocVIp3EB8fwIpgqWxi6uI242yE7E1J4fVDXlD4hYpocDH0HOzazQXrNubHz6EGkOt5nAKeEzToqE9ow++h6TRHhfmdWJFb2HQ7FvoAMUYopQJaKpk/V5FpmXTDyMPNt2uj9UBS/EML7Z3vXzXUUJq/pTbdtJIpZaZk0SOCdt3iWk8CCNIHAHdN0uy+SWC+AH0hv56urQqR0Zaz33fGguhbuUYKzXt1CTQgCTkEhcwT9Sml4m1WGMl3fbFMFkacPGRwSMs5ZXKjDCRdz+N8/pFExOuobCqIMUPGC98TVsV3drrsSe716CSHS3BWuaum/W3ve5w1Z11nGbRih9X5AuYg5t/gwFDsg05iQa76ymzWSaZEEL5btHvCXNsmsyDU1n/KJw4S8nnXj+qt+xLNENNWsijcP7VnE1bkXvEQ0rg/PewmPWKVLIHZf5s8RJTmAdCFE0IJT1WiXufwT9QUa6BfyE1mOpnk4LpwkhcmM0jNADHvp8CAwEAAQ=="
+                    cades: "-----BEGIN PKCS7-----MIINPQYJKoZIhvcNAQcCoIINLjCCDSoCAQExDzANBglghkgBZQMEAgEFADCCAnQGCSqGSIb3DQEHAaCCAmUEggJhPGh0dHA6Ly9leGFtcGxlLmVkdS9jcmVkZW50aWFscy8xODcyPiA8aHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zI3R5cGU+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNWZXJpZmlhYmxlQ3JlZGVudGlhbD4gLgo8aHR0cDovL2V4YW1wbGUuZWR1L2NyZWRlbnRpYWxzLzE4NzI+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNjcmVkZW50aWFsU3ViamVjdD4gPGRpZDprZXk6elEzc2h0eFYxRnJKZmhxRTFkdnhZUmNDa25XTmpIYzNjNVgxeTNaU29QRGkyYXVyMj4gLgo8aHR0cDovL2V4YW1wbGUuZWR1L2NyZWRlbnRpYWxzLzE4NzI+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNpc3N1YW5jZURhdGU+ICIyMDE5LTEyLTMxVDIzOjU5OjYwWiJeXjxodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSNkYXRlVGltZT4gLgo8aHR0cDovL2V4YW1wbGUuZWR1L2NyZWRlbnRpYWxzLzE4NzI+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNpc3N1ZXI+IDxkaWQ6a2V5OnpRM3NodHhWMUZySmZocUUxZHZ4WVJjQ2tuV05qSGMzYzVYMXkzWlNvUERpMmF1cjI+IC4KoIIGNTCCBjEwggQZoAMCAQICFBy9lOj/nTeUD8ZU3bmkkskrgkPsMA0GCSqGSIb3DQEBCwUAMIGnMQswCQYDVQQGEwJFUzESMBAGA1UECAwJQ2F0YWxvbmlhMRIwEAYDVQQHDAlCYXJjZWxvbmExGDAWBgNVBAoMD1ZhbGlkYXRlZCBJZCBzbDERMA8GA1UECwwIVklEY2hhaW4xFTATBgNVBAMMDFZhbGlkYXRlZCBJZDEsMCoGCSqGSIb3DQEJARYddmlkY2hhaW4rdGVzdEB2YWxpZGF0ZWRpZC5jb20w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-----END PKCS7-----"
+              Multiple Proofs EIDAS Signature:
+                value:
+                  "@context":
+                    - "https://www.w3.org/2018/credentials/v1"
+                    - "https://www.w3.org/2018/credentials/examples/v1"
+                  id: "http://example.edu/credentials/1872"
+                  type: ['VerifiableCredential','VerifiableID']
+                  issuer: "did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2"
+                  issuanceDate: "2019-12-31T23:59:60Z"
+                  credentialSubject: 
+                    id: "did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2"
+                    firstName: "Eva"
+                    lastName: "Monroe"
+                    gender: "Female"
+                    dateOfBirth: "12/11/1970"
+                    placeOfBirth: "Madrid"
+                    currentAddress: "Arago 179 4a"
+                    city: "Barcelona"
+                    state: "Catalunya"
+                    zip: "08011"
+                  proof:
+                    - type: "EidasSeal2019"
                       created: "2019-06-22T14:11:44Z"
                       proofPurpose: "assertionMethod"
-                      verificationMethod: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1
-                      jws: "eyJhbGciOiJFU...pKTV3co3wXAE"
+                      verificationMethod: "did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2#keys-1"
+                      jws: "eyJhbGciOiJFUzI1NkstUiIsInR5cCI6IkpXVCIsImtpZCI6ImRpZDp2aWQ6MHhCNTUxYjcwZDY1MDg5MmQyM2RFM0JlMjAxQTk1YzFGY0JlYTk4QTNEI2VpZGFzS2V5In0.eyJpYXQiOjE2MDUzODY5NDYsIkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly9hcGkudmlkY2hhaW4ubmV0L2NyZWRlbnRpYWxzL3ZlcmlmaWFibGVJZC92MSJdLCJpZCI6InZpZDp0eXBlLXZlcnNpb24tb2YtdGhlLWNyZWRlbnRpYWwiLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiVmVyaWZpYWJsZUlEIl0sImlzc3VlciI6ImRpZDp2aWQ6MHg1MjA4NDMxQzZFQzJlYzQwOTdhZUE3MTgyYkI5MmQwMTg3NjY0OThjIiwiaXNzdWFuY2VEYXRlIjoiMjAxOS0wNi0yMlQxNDoxMTo0NFoiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMTktMDYtMjJUMTQ6MTE6NDRaIiwiY3JlZGVudGlhbFN1YmplY3QiOnsiaWQiOiJkaWQ6dmlkOjB4ODcwN0NDYTgzNUM5NjEzMzREM0Y2NDUwQzZhNjFhMEFENjU5MjQ2MCIsImZpcnN0TmFtZSI6IkV2YSIsImxhc3ROYW1lIjoiTW9ucm9lIiwiZ2VuZGVyIjoiRmVtYWxlIiwiZGF0ZU9mQmlydGgiOiIxMi8xMS8xOTcwIiwicGxhY2VPZkJpcnRoIjoiTWFkcmlkIiwiY3VycmVudEFkZHJlc3MiOiJBcmFnbyAxNzkgNGEiLCJjaXR5IjoiQmFyY2Vsb25hIiwic3RhdGUiOiJDYXRhbHVueWEiLCJ6aXAiOiIwODAxMSJ9LCJpc3MiOiJkaWQ6dmlkOjB4QTUxMzVhYTA3ODg2MzVFZTQ5NTJERWFCRmEzZGE5OGJGNTk5OUJFMSJ9.CcIAc7C1Z1BsvjLO7y5XpSNqhvrcVXxSxpkRY0-o2mfSCebKhMK4f4g2lP-4Yf_fVzL_SmWKO05jeLAJnE6BBwA"
                     - type: "CAdESRSASignature2020"
-                      created: "2020-06-22T14:11:44Z"
+                      created: "2021-01-08T11:17:16Z"
                       proofPurpose: "assertionMethod"
-                      verificationMethod: did:key:z6MkfGYwYV8xQgoNtyFgxdHLuBC6vzSCoHUKpeUg5uBvkXLE#MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvcPOS736aX2tfwEj+mMCJ3kw6KBCDHLRNqtkDseXNTuhdIs5Uj7wPcOETexT1DnGDfPZ3HYBsc8x8jWKFtO/E5oqFzXDyq60G8Qmlt509JKQJLP0YxrXwjZcLD/uM9Qf8lCjjiVJjDYnztE88p5jkQ2V9HCf3NK3ASL3m2q4M5QRHNGiTTvCvcRG2qRocVIp3EB8fwIpgqWxi6uI242yE7E1J4fVDXlD4hYpocDH0HOzazQXrNubHz6EGkOt5nAKeEzToqE9ow++h6TRHhfmdWJFb2HQ7FvoAMUYopQJaKpk/V5FpmXTDyMPNt2uj9UBS/EML7Z3vXzXUUJq/pTbdtJIpZaZk0SOCdt3iWk8CCNIHAHdN0uy+SWC+AH0hv56urQqR0Zaz33fGguhbuUYKzXt1CTQgCTkEhcwT9Sml4m1WGMl3fbFMFkacPGRwSMs5ZXKjDCRdz+N8/pFExOuobCqIMUPGC98TVsV3drrsSe716CSHS3BWuaum/W3ve5w1Z11nGbRih9X5AuYg5t/gwFDsg05iQa76ymzWSaZEEL5btHvCXNsmsyDU1n/KJw4S8nnXj+qt+xLNENNWsijcP7VnE1bkXvEQ0rg/PewmPWKVLIHZf5s8RJTmAdCFE0IJT1WiXufwT9QUa6BfyE1mOpnk4LpwkhcmM0jNADHvp8CAwEAAQ==
-                      cades: 308204c906092a864886f70d010702...266ad9fee3375d8095
+                      verificationMethod: "did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE#MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvcPOS736aX2tfwEj+mMCJ3kw6KBCDHLRNqtkDseXNTuhdIs5Uj7wPcOETexT1DnGDfPZ3HYBsc8x8jWKFtO/E5oqFzXDyq60G8Qmlt509JKQJLP0YxrXwjZcLD/uM9Qf8lCjjiVJjDYnztE88p5jkQ2V9HCf3NK3ASL3m2q4M5QRHNGiTTvCvcRG2qRocVIp3EB8fwIpgqWxi6uI242yE7E1J4fVDXlD4hYpocDH0HOzazQXrNubHz6EGkOt5nAKeEzToqE9ow++h6TRHhfmdWJFb2HQ7FvoAMUYopQJaKpk/V5FpmXTDyMPNt2uj9UBS/EML7Z3vXzXUUJq/pTbdtJIpZaZk0SOCdt3iWk8CCNIHAHdN0uy+SWC+AH0hv56urQqR0Zaz33fGguhbuUYKzXt1CTQgCTkEhcwT9Sml4m1WGMl3fbFMFkacPGRwSMs5ZXKjDCRdz+N8/pFExOuobCqIMUPGC98TVsV3drrsSe716CSHS3BWuaum/W3ve5w1Z11nGbRih9X5AuYg5t/gwFDsg05iQa76ymzWSaZEEL5btHvCXNsmsyDU1n/KJw4S8nnXj+qt+xLNENNWsijcP7VnE1bkXvEQ0rg/PewmPWKVLIHZf5s8RJTmAdCFE0IJT1WiXufwT9QUa6BfyE1mOpnk4LpwkhcmM0jNADHvp8CAwEAAQ=="
+                      cades: "-----BEGIN PKCS7-----MIINPQYJKoZIhvcNAQcCoIINLjCCDSoCAQExDzANBglghkgBZQMEAgEFADCCAnQGCSqGSIb3DQEHAaCCAmUEggJhPGh0dHA6Ly9leGFtcGxlLmVkdS9jcmVkZW50aWFscy8xODcyPiA8aHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zI3R5cGU+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNWZXJpZmlhYmxlQ3JlZGVudGlhbD4gLgo8aHR0cDovL2V4YW1wbGUuZWR1L2NyZWRlbnRpYWxzLzE4NzI+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNjcmVkZW50aWFsU3ViamVjdD4gPGRpZDprZXk6elEzc2h0eFYxRnJKZmhxRTFkdnhZUmNDa25XTmpIYzNjNVgxeTNaU29QRGkyYXVyMj4gLgo8aHR0cDovL2V4YW1wbGUuZWR1L2NyZWRlbnRpYWxzLzE4NzI+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNpc3N1YW5jZURhdGU+ICIyMDE5LTEyLTMxVDIzOjU5OjYwWiJeXjxodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSNkYXRlVGltZT4gLgo8aHR0cDovL2V4YW1wbGUuZWR1L2NyZWRlbnRpYWxzLzE4NzI+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNpc3N1ZXI+IDxkaWQ6a2V5OnpRM3NodHhWMUZySmZocUUxZHZ4WVJjQ2tuV05qSGMzYzVYMXkzWlNvUERpMmF1cjI+IC4KoIIGNTCCBjEwggQZoAMCAQICFBy9lOj/nTeUD8ZU3bmkkskrgkPsMA0GCSqGSIb3DQEBCwUAMIGnMQswCQYDVQQGEwJFUzESMBAGA1UECAwJQ2F0YWxvbmlhMRIwEAYDVQQHDAlCYXJjZWxvbmExGDAWBgNVBAoMD1ZhbGlkYXRlZCBJZCBzbDERMA8GA1UECwwIVklEY2hhaW4xFTATBgNVBAMMDFZhbGlkYXRlZCBJZDEsMCoGCSqGSIb3DQEJARYddmlkY2hhaW4rdGVzdEB2YWxpZGF0ZWRpZC5jb20w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-----END PKCS7-----"
         required: true
       responses:
         "204":
