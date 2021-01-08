@@ -392,7 +392,7 @@ paths:
                 value:
                   "@context":
                     - "https://www.w3.org/2018/credentials/v1"
-                    - "https://api.vidchain.net/credentials/verifiableId/v1"
+                    - "https://www.w3.org/2018/credentials/examples/v1"
                   id: http://example.vid/credentials/1872
                   type: ['VerifiableCredential','VerifiableID']
                   issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
@@ -418,7 +418,7 @@ paths:
                 value:
                   "@context":
                     - "https://www.w3.org/2018/credentials/v1"
-                    - "https://api.vidchain.net/credentials/verifiableId/v1"
+                    - "https://www.w3.org/2018/credentials/examples/v1"
                   id: http://example.vid/credentials/1872
                   type: ['VerifiableCredential','VerifiableID']
                   issuer: zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
