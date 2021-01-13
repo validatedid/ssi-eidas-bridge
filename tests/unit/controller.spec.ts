@@ -5,12 +5,16 @@ import * as mockedData from "../data/credentials";
 import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as eidas from "../../src/libs/eidas/eidas";
 import { EidasProof } from "../../src/dtos/eidas";
+import redis from "../../src/libs/storage/redis";
 
 jest.mock("did-jwt", () => ({
   decodeJWT: jest.fn(),
 }));
 
 describe("controller suite tests", () => {
+  afterAll(async () => {
+    await redis.quit();
+  });
   describe("eidas signature calls", () => {
     it("should throw an error when undefined signPayload", async () => {
       expect.assertions(1);

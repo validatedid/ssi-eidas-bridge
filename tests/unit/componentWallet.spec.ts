@@ -3,11 +3,15 @@ import { WalletOptions } from "../../src/dtos/wallet";
 import { ComponentWallet } from "../../src/libs/secureEnclave";
 import { util } from "../../src/utils";
 import getJWKfromHex from "../../src/utils/jwk";
+import redis from "../../src/libs/storage/redis";
 
 const key = util.generateKeys();
 const ethWallet = new ethers.Wallet(util.prefixWith0x(util.toHex(key.d)));
 
 describe("component wallet test suite", () => {
+  afterAll(async () => {
+    await redis.quit();
+  });
   describe("wallet builder test suite", () => {
     it("should return a wallet", () => {
       expect.assertions(1);

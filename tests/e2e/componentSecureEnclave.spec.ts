@@ -1,7 +1,11 @@
 import { ComponentSecureEnclave } from "../../src/libs/secureEnclave";
 import { API_PRIVATE_KEY } from "../../src/config";
+import redis from "../../src/libs/storage/redis";
 
 describe("componentSecureEnclave test suite", () => {
+  afterAll(async () => {
+    await redis.quit();
+  });
   it("should throw InternalError with no encryptedKeystore", () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;

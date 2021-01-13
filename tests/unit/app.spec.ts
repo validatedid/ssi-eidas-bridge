@@ -3,8 +3,13 @@ import net from "net";
 import { BRIDGE_SERVICE } from "../../src/config";
 import App, { startService } from "../../src/api/app";
 import { ApiErrorMessages, ServiceUnavailableError } from "../../src/errors";
+import redis from "../../src/libs/storage/redis";
 
 describe("app test suite", () => {
+  afterAll(async () => {
+    await redis.quit();
+  });
+
   const testPort = 9100;
   it("should throw an exception creating an APP with an unknown service", () => {
     expect.assertions(1);

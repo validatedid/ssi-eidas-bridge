@@ -10,6 +10,7 @@ import * as mockedData from "../data/credentials";
 import { EIDASSignatureOutput } from "../../src/dtos/eidas";
 import { EidasKeysData } from "../../src/dtos/redis";
 import { generateDid } from "../utils";
+import redis from "../../src/libs/storage/redis";
 
 jest.setTimeout(100000);
 
@@ -29,10 +30,11 @@ describe("eidas router API calls", () => {
     done();
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     if (server) {
       server.close();
     }
+    await redis.quit();
   });
 
   it("responds 404 to /", async () => {

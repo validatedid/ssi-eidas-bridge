@@ -6,8 +6,13 @@ import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as mockedData from "../data/credentials";
 import constants from "../../src/@types";
 import { Proof } from "../../src/dtos/eidas";
+import redis from "../../src/libs/storage/redis";
 
 describe("controller tests should", () => {
+  afterAll(async () => {
+    await redis.quit();
+  });
+
   const testFilePathSelfSigned = "../data/test1/";
   const p12File = "keyStore.p12";
   const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";

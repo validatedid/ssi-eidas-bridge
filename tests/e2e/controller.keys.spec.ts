@@ -4,8 +4,13 @@ import Controller from "../../src/api/eidas/controller";
 import { generateDid } from "../utils";
 import constants from "../../src/@types";
 import { EidasKeysData } from "../../src/dtos/redis";
+import redis from "../../src/libs/storage/redis";
 
 describe("eidas keys tests should", () => {
+  afterAll(async () => {
+    await redis.quit();
+  });
+
   let sameDid = "";
   const testFilePathSelfSigned = "../data/test1/";
   const p12File = "keyStore.p12";
