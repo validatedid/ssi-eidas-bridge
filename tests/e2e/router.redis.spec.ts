@@ -56,9 +56,11 @@ describe("eidas router API calls (mocking redis)", () => {
     });
     it("returns a 201 with a signature", async () => {
       expect.assertions(2);
-      const fileData = fs.readFileSync(
-        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-      );
+      const fileDataHex = Buffer.from(
+        fs.readFileSync(
+          path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+        )
+      ).toString("hex");
       const signPayload: SignPayload = {
         issuer: mockDid,
         payload: mockedData.mockCredential,
@@ -67,7 +69,7 @@ describe("eidas router API calls (mocking redis)", () => {
       };
       jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
         return JSON.stringify({
-          p12: fileData,
+          p12: fileDataHex,
           keyType: constants.KeyTypes.RSA,
         });
       });
@@ -83,9 +85,11 @@ describe("eidas router API calls (mocking redis)", () => {
 
     it("returns a 204 with a valid signature", async () => {
       expect.assertions(2);
-      const fileData = fs.readFileSync(
-        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-      );
+      const fileDataHex = Buffer.from(
+        fs.readFileSync(
+          path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+        )
+      ).toString("hex");
       const signPayload: SignPayload = {
         issuer: mockDid,
         payload: mockedData.mockCredential,
@@ -94,7 +98,7 @@ describe("eidas router API calls (mocking redis)", () => {
       };
       jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
         return JSON.stringify({
-          p12: fileData,
+          p12: fileDataHex,
           keyType: constants.KeyTypes.RSA,
         });
       });

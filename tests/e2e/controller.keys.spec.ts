@@ -9,16 +9,16 @@ describe("eidas keys tests should", () => {
   let sameDid = "";
   const testFilePathSelfSigned = "../data/test1/";
   const p12File = "keyStore.p12";
-  const fileData = fs.readFileSync(
-    path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-  );
+  const fileDataHex = Buffer.from(
+    fs.readFileSync(path.join(__dirname, `${testFilePathSelfSigned}${p12File}`))
+  ).toString("hex");
 
   it("store a given key for the first time", async () => {
     const did = await generateDid();
     sameDid = did;
     const opts: EidasKeysData = {
       did,
-      p12: fileData,
+      p12: fileDataHex,
       keyType: constants.KeyTypes.RSA,
     };
     expect.assertions(2);
@@ -32,7 +32,7 @@ describe("eidas keys tests should", () => {
   it("update key for same did", async () => {
     const opts: EidasKeysData = {
       did: sameDid,
-      p12: fileData,
+      p12: fileDataHex,
       keyType: constants.KeyTypes.RSA,
     };
     expect.assertions(2);

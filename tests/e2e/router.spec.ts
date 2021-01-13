@@ -46,18 +46,20 @@ describe("eidas router API calls", () => {
   describe("store keys", () => {
     const testFilePathSelfSigned = "../data/test1/";
     const p12File = "keyStore.p12";
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+      )
+    ).toString("hex");
     const opts: EidasKeysData = {
       did,
-      p12: fileData,
+      p12: fileDataHex,
       keyType: constants.KeyTypes.RSA,
     };
     it("returns a 201 for first key insertion", async () => {
       const randomOpts: EidasKeysData = {
         did: await generateDid(),
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       };
       expect.assertions(1);

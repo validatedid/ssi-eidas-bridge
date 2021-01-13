@@ -11,7 +11,6 @@ import { BadRequestError, ApiErrorMessages } from "../../errors";
 
 import { isEidasProof, signEidas, verifyEidas } from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
-import { KeyTypes } from "../../@types/constants";
 import { isVerifiableCredential } from "../../utils/ssi";
 
 export default class Controller {

@@ -17,15 +17,15 @@ describe("controller tests should", () => {
     payload: mockedData.mockCredential,
     password: "vidchain",
   };
-  const fileData = fs.readFileSync(
-    path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-  );
+  const fileDataHex = Buffer.from(
+    fs.readFileSync(path.join(__dirname, `${testFilePathSelfSigned}${p12File}`))
+  ).toString("hex");
 
   it("create a proof from a given credential", async () => {
     expect.assertions(3);
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });
@@ -49,7 +49,7 @@ describe("controller tests should", () => {
     signPayload.payload.proof = proof;
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });
@@ -85,7 +85,7 @@ describe("controller tests should", () => {
     signPayload.payload.proof = proofs;
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });

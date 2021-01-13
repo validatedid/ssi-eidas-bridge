@@ -40,12 +40,14 @@ describe("eidas e2e flow", () => {
     const did = await generateDid();
     const testFilePathSelfSigned = "../data/test1/";
     const p12File = "keyStore.p12";
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+      )
+    ).toString("hex");
     const opts: EidasKeysData = {
       did,
-      p12: fileData,
+      p12: fileDataHex,
       keyType: constants.KeyTypes.RSA,
     };
     const storeKeysResponse = await request(server)

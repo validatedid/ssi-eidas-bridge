@@ -19,12 +19,12 @@ describe("eidas enterprise wallet tests should", () => {
 
   it("create a new enterpriseWallet", async () => {
     expect.assertions(1);
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathWithCa}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(path.join(__dirname, `${testFilePathWithCa}${p12File}`))
+    ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });
@@ -180,12 +180,12 @@ describe("eidas enterprise wallet tests should", () => {
 
   it("throws a BadRequestError when seals a given payload not a credential", async () => {
     expect.assertions(1);
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathWithCa}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(path.join(__dirname, `${testFilePathWithCa}${p12File}`))
+    ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });
@@ -205,12 +205,12 @@ describe("eidas enterprise wallet tests should", () => {
 
   it("seals a given payload with a certificate with CA", async () => {
     expect.assertions(1);
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathWithCa}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(path.join(__dirname, `${testFilePathWithCa}${p12File}`))
+    ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });
@@ -227,12 +227,12 @@ describe("eidas enterprise wallet tests should", () => {
 
   it("verifies a seal with a given payload with a certificate with CA", async () => {
     expect.assertions(2);
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathWithCa}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(path.join(__dirname, `${testFilePathWithCa}${p12File}`))
+    ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });
@@ -251,12 +251,14 @@ describe("eidas enterprise wallet tests should", () => {
 
   it("verifies a seal with a given payload with a selfsigned certificate", async () => {
     expect.assertions(2);
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+      )
+    ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });
