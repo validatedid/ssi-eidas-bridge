@@ -502,7 +502,7 @@ paths:
               EIDAS QEC Example:
                 value:
                   did: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-                  p12: <buffer-input-of-your-certificate>
+                  p12: 308210f9020103308210bf06092a864886f70d010701a08210b0048210ac308210a8308206d706092a864886f70d010706a08206c8308206c...
                   keyType: RSA
         required: true
       responses:
@@ -1116,8 +1116,8 @@ components:
         p12:
           description: P12 file with a QEC to eSeal. RSA is the only keys algorithm currently supported.
           type: string
-          format: binary
-          example: <buffer-input-of-your-p12>
+          format: hexadecimal
+          example: 308210f9020103308210bf06092a864886f70d010701a08210b0048210ac308210a8308206d706092a864886f70d010706a08206c8308206c...
         keyType:
           type: string
           description: RSA is the only key type accepted.
@@ -1125,7 +1125,7 @@ components:
       example: 
         EIDAS QEC Example:
           did: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-          p12: <buffer-input-of-your-p12>
+          p12: 308210f9020103308210bf06092a864886f70d010701a08210b0048210ac308210a8308206d706092a864886f70d010706a08206c8308206c...
           keyType: RSA
       required:
         - did
@@ -1143,8 +1143,8 @@ components:
         p12:
           type: string
           description: P12 file with a QEC to eSeal. Supported keys algorithms are RSA and EC with secp256k1 curve
-          format: binary
-          example: <buffer-input-of-your-p12>
+          format: hexadecimal
+          example: 308210f9020103308210bf06092a864886f70d010701a08210b0048210ac308210a8308206d706092a864886f70d010706a08206c8308206c...
         keyType:
           type: string
           description: key type
@@ -1158,7 +1158,7 @@ components:
               example: OKP
       example: 
           did: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-          p12: <buffer-input-of-your-p12>
+          p12: 308210f9020103308210bf06092a864886f70d010701a08210b0048210ac308210a8308206d706092a864886f70d010706a08206c8308206c...
           keyType: RSA
     Problem:
       description: A Problem Details object (RFC 7807)
