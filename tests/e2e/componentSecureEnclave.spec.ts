@@ -30,12 +30,14 @@ describe("componentSecureEnclave test suite", () => {
     expect(() => se.exportPrivateKey("")).toThrow("Internal Server Error");
   });
 
-  it("should throw InternalError with no did: signJwt", () => {
+  it("should throw InternalError with no did: signJwt", async () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;
     se.enclaveDid = "";
 
-    expect(() => se.signJwt("", {} as never)).toThrow("Internal Server Error");
+    await expect(se.signJwt("", {} as never)).rejects.toThrow(
+      "Internal Server Error"
+    );
   });
 
   it("should throw InternalError with no did: encrypt", () => {
@@ -80,13 +82,13 @@ describe("componentSecureEnclave test suite", () => {
     expect(se.exportPrivateKey(did)).toBeDefined();
   });
 
-  it("should sign", () => {
+  it("should sign", async () => {
     expect.assertions(1);
     const se = ComponentSecureEnclave.Instance;
 
     const { did } = se.init(API_PRIVATE_KEY);
     const data = Buffer.from(JSON.stringify({ data: "some test data" }));
-    const signature = se.signJwt(did, data);
+    const signature = await se.signJwt(did, data);
     expect(signature).toBeDefined();
   });
 
