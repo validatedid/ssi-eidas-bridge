@@ -1,4 +1,7 @@
-import { JWT, JWK, JWKECKey } from "jose";
+import { JWK } from "jose/types";
+import SignJWT from "jose/jwt/sign";
+import fromKeyLike from "jose/jwk/from_key_like";
+import parseJwk from "jose/jwk/parse";
 import { encrypt, decrypt } from "eciesjs";
 import { ethers } from "ethers";
 import { WalletOptions } from "../../dtos/wallet";
@@ -26,16 +29,20 @@ export default class ComponentWallet {
 
   ethAddress: string;
 
-  protected jwk!: JWK.ECKey;
+  protected jwk!: JWK;
+
+  protected publicJwk!: JWK;
 
   protected wallet!: ethers.Wallet;
 
-  init(): void {
-    this.jwk = util.generateKeys();
+  async init(): Promise<void> {
+    const key = util.generateKeys();
+    this.jwk = await fromKeyLike(key.privateKey);
+    this.publicJwk = await fromKeyLike(key.publicKey);
     this.initFromECKeys(this.jwk);
   }
 
-  initFromECKeys(jwk: JWK.ECKey): void {
+  initFromECKeys(jwk: JWK): void {
     this.wallet = new ethers.Wallet(util.prefixWith0x(util.toHex(jwk.d)));
     this.ethAddress = this.wallet.address;
   }
@@ -49,6 +56,7 @@ export default class ComponentWallet {
     this.ethAddress = wallet.address;
     const signingKey = new ethers.utils.SigningKey(wallet.privateKey);
     this.jwk = getJWKfromHex(signingKey.publicKey, signingKey.privateKey);
+    this.publicJwk = getJWKfromHex(signingKey.publicKey);
 
     return wallet;
   }
@@ -57,15 +65,17 @@ export default class ComponentWallet {
     return this.privateKey;
   }
 
-  signJwt(payload: Buffer): string {
-    const jws = JWT.sign(JSON.parse(payload.toString()), this.jwk, {
-      header: {
+  async signJwt(payload: Buffer): Promise<string> {
+    const privateKey = await parseJwk(this.jwk, "ES256K");
+
+    const jwt = await new SignJWT(JSON.parse(payload.toString()))
+      .setProtectedHeader({
         alg: "ES256K",
         typ: "JWT",
-      },
-    });
+      })
+      .sign(privateKey);
 
-    return jws;
+    return jwt;
   }
 
   get publicKey(): string {
@@ -76,12 +86,9 @@ export default class ComponentWallet {
     return this.wallet.privateKey;
   }
 
-  hasJWK(): boolean {
-    return JWK.isKey(this.jwk);
-  }
-
-  toJWK(withPrivate = true): JWKECKey {
-    return this.jwk.toJWK(withPrivate);
+  toJWK(withPrivate = true): JWK {
+    if (withPrivate) return this.jwk;
+    return this.publicJwk;
   }
 
   getDid(): string {

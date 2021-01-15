@@ -10,6 +10,7 @@ import * as mockedData from "../data/credentials";
 import { EIDASSignatureOutput } from "../../src/dtos/eidas";
 import { EidasKeysData } from "../../src/dtos/redis";
 import { generateDid } from "../utils";
+import redis from "../../src/libs/storage/redis";
 
 jest.setTimeout(100000);
 
@@ -29,10 +30,11 @@ describe("eidas e2e flow", () => {
     done();
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     if (server) {
       server.close();
     }
+    await redis.quit();
   });
 
   it("stores keys, signs and verifies", async () => {
@@ -40,12 +42,13 @@ describe("eidas e2e flow", () => {
     const did = await generateDid();
     const testFilePathSelfSigned = "../data/test1/";
     const p12File = "keyStore.p12";
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+      )
+    ).toString("hex");
     const opts: EidasKeysData = {
-      did,
-      p12: fileData,
+      p12: fileDataHex,
       keyType: constants.KeyTypes.RSA,
     };
     const storeKeysResponse = await request(server)

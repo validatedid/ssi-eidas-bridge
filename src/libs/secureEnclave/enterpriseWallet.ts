@@ -43,7 +43,7 @@ export default class EnterpriseWallet {
       throw new InternalError(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
 
     const parsedData = eidasCrypto.parseP12File(
-      Buffer.from(storedData.p12).toString("binary"),
+      Buffer.from(storedData.p12, "hex").toString("binary"),
       options.password
     );
     if (!parsedData || !parsedData.pemCert || !parsedData.pemPrivateKey)

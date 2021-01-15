@@ -1,6 +1,9 @@
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
+  moduleNameMapper: {
+    "^jose/(.*)$": "<rootDir>/node_modules/jose/dist/node/cjs/$1",
+  },
   rootDir: ".",
   roots: ["<rootDir>/src/", "<rootDir>/tests/"],
   testMatch: ["**/?(*.)+(spec|test|tests).+(ts|tsx|js)"],

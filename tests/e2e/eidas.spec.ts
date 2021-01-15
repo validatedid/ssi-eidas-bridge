@@ -15,9 +15,11 @@ describe("eidas tests", () => {
   const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
   it("should sign (mocking redis) and verify signature", async () => {
     expect.assertions(3);
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+      )
+    ).toString("hex");
     const signPayload: SignPayload = {
       issuer: mockDid,
       payload: mockedData.mockVC,
@@ -26,7 +28,7 @@ describe("eidas tests", () => {
     };
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });

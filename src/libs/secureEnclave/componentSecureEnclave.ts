@@ -1,4 +1,4 @@
-import { JWKECKey } from "jose";
+import { JWK } from "jose/types";
 import Wallet, { WalletOptions } from "../../dtos/wallet";
 import ComponentWallet from "./componentWallet";
 import { ApiErrorMessages, InternalError } from "../../errors";
@@ -6,7 +6,7 @@ import { PRINT_DEBUG } from "../../utils/util";
 
 export interface InitComponent {
   did: string;
-  key: JWKECKey;
+  key: JWK;
 }
 
 /**
@@ -112,7 +112,7 @@ export default class ComponentSecureEnclave {
     return wallet.exportPrivateKey();
   }
 
-  signJwt(did: string, data: Buffer): string {
+  async signJwt(did: string, data: Buffer): Promise<string> {
     const wallet = this.wallets.get(did);
     if (!wallet)
       throw new InternalError(InternalError.defaultTitle, {

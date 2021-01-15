@@ -6,8 +6,13 @@ import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as mockedData from "../data/credentials";
 import constants from "../../src/@types";
 import { Proof } from "../../src/dtos/eidas";
+import redis from "../../src/libs/storage/redis";
 
 describe("controller tests should", () => {
+  afterAll(async () => {
+    await redis.quit();
+  });
+
   const testFilePathSelfSigned = "../data/test1/";
   const p12File = "keyStore.p12";
   const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
@@ -17,15 +22,15 @@ describe("controller tests should", () => {
     payload: mockedData.mockCredential,
     password: "vidchain",
   };
-  const fileData = fs.readFileSync(
-    path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-  );
+  const fileDataHex = Buffer.from(
+    fs.readFileSync(path.join(__dirname, `${testFilePathSelfSigned}${p12File}`))
+  ).toString("hex");
 
   it("create a proof from a given credential", async () => {
     expect.assertions(3);
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });
@@ -49,7 +54,7 @@ describe("controller tests should", () => {
     signPayload.payload.proof = proof;
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });
@@ -85,7 +90,7 @@ describe("controller tests should", () => {
     signPayload.payload.proof = proofs;
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       });
     });

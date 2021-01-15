@@ -1,4 +1,4 @@
-import { JWK, JWKECKey } from "jose";
+import { JWK } from "jose/types";
 import base64url from "base64url";
 import { Buffer } from "buffer";
 import { API_NAME } from "../config";
@@ -12,10 +12,7 @@ interface IJwk {
   kid?: string;
 }
 
-const getJWKfromHex = (
-  publicKeyHex: string,
-  privateKeyHex: string
-): JWK.ECKey => {
+const getJWKfromHex = (publicKeyHex: string, privateKeyHex?: string): JWK => {
   const jwk = <IJwk>{
     crv: "secp256k1",
     kty: "EC",
@@ -23,10 +20,12 @@ const getJWKfromHex = (
   };
 
   const cleanPublicKeyHex = publicKeyHex.replace("0x04", "");
-  const cleanPrivateKeyHex = privateKeyHex.replace("0x", "");
+  if (privateKeyHex) {
+    const cleanPrivateKeyHex = privateKeyHex.replace("0x", "");
 
-  const buf = Buffer.from(cleanPrivateKeyHex, "hex");
-  jwk.d = base64url(buf);
+    const buf = Buffer.from(cleanPrivateKeyHex, "hex");
+    jwk.d = base64url(buf);
+  }
 
   const X = cleanPublicKeyHex.substr(0, 64);
   const bufX = Buffer.from(X, "hex");
@@ -36,8 +35,7 @@ const getJWKfromHex = (
   const bufY = Buffer.from(Y, "hex");
   jwk.y = base64url(bufY);
 
-  const jwkEcKey = JWK.asKey(<JWKECKey>jwk);
-  return jwkEcKey;
+  return jwk;
 };
 
 export default getJWKfromHex;

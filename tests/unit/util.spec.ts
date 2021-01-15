@@ -1,4 +1,3 @@
-import { JWK } from "jose";
 import LOGGER from "../../src/logger";
 import {
   generateKeys,
@@ -10,10 +9,11 @@ import {
 
 describe("utils Test Suite", () => {
   it("should create a JWK key pair", () => {
-    expect.assertions(2);
+    expect.assertions(3);
     const key = generateKeys();
     expect(key).toBeDefined();
-    expect(JWK.isKey(key)).toBe(true);
+    expect(key.privateKey).toBeDefined();
+    expect(key.publicKey).toBeDefined();
   });
 
   it("should return an hex string encoded in base64", () => {
