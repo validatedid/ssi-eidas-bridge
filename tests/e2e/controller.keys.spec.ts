@@ -27,7 +27,7 @@ describe("eidas keys tests should", () => {
       keyType: constants.KeyTypes.RSA,
     };
     expect.assertions(2);
-    const response = await Controller.putEidasKeys(opts);
+    const response = await Controller.putEidasKeys(did, opts);
     expect(response).toBeDefined();
     expect(response).toStrictEqual({
       eidasKeysData: opts,
@@ -41,7 +41,7 @@ describe("eidas keys tests should", () => {
       keyType: constants.KeyTypes.RSA,
     };
     expect.assertions(2);
-    const response = await Controller.putEidasKeys(opts);
+    const response = await Controller.putEidasKeys(sameDid, opts);
     expect(response).toBeDefined();
     expect(response).toStrictEqual({
       eidasKeysData: opts,
