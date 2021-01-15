@@ -54,7 +54,7 @@ describe("eidas e2e flow", () => {
     };
     const storeKeysResponse = await request(server)
       .put(
-        `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`
+        `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}/${did}`
       )
       .send(opts);
     expect(storeKeysResponse.status).toStrictEqual(201);

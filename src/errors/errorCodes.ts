@@ -13,6 +13,7 @@ export enum ApiErrorMessages {
   NO_AUDIENCE = "No audience provided",
   INVALID_AUDIENCE = "Invalid audience. Should be a string",
   BAD_INPUT_EIDAS_KEYS_PARAMS = "Eidas keys call requires an EidasKeysData filled with the correct attributes",
+  MISSING_PUT_ID_PARAMS = "Missing store key id parameter",
   INVALID_HASH_ALG = "Hash algorithm not supported. Only supported algorithms are SHA1, SHA256 and SHA512.",
   NO_PEM_CADES = "PEM CADES Signature not provided.",
   ERROR_RETRIEVING_REDIS_DATA = "Error retrieving data from Redis",
