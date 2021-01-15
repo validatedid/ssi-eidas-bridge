@@ -1,14 +1,19 @@
 import { ethers } from "ethers";
+import fromKeyLike from "jose/jwk/from_key_like";
 import { WalletOptions } from "../../src/dtos/wallet";
 import { ComponentWallet } from "../../src/libs/secureEnclave";
 import { util } from "../../src/utils";
 import getJWKfromHex from "../../src/utils/jwk";
 import redis from "../../src/libs/storage/redis";
 
-const key = util.generateKeys();
-const ethWallet = new ethers.Wallet(util.prefixWith0x(util.toHex(key.d)));
-
 describe("component wallet test suite", () => {
+  let ethWallet: ethers.Wallet;
+
+  beforeAll(async () => {
+    const key = util.generateKeys();
+    const jwk = await fromKeyLike(key.privateKey);
+    ethWallet = new ethers.Wallet(util.prefixWith0x(util.toHex(jwk.d)));
+  });
   afterAll(async () => {
     await redis.quit();
   });
@@ -67,13 +72,6 @@ describe("component wallet test suite", () => {
       expect(privateKey).toMatch(ethWallet.privateKey);
     });
 
-    it("should return true on hasJWK from a loaded wallet", () => {
-      expect.assertions(1);
-      const wallet = new ComponentWallet();
-      wallet.loadFromPrivateKey(ethWallet.privateKey);
-      expect(wallet.hasJWK()).toBe(true);
-    });
-
     it("should return a JWKECKey from a loaded wallet", () => {
       expect.assertions(1);
       const wallet = new ComponentWallet();
@@ -83,7 +81,7 @@ describe("component wallet test suite", () => {
         signingKey.publicKey,
         signingKey.privateKey
       );
-      expect(wallet.toJWK()).toMatchObject(eidasKey.toJWK(true));
+      expect(wallet.toJWK()).toMatchObject(eidasKey);
     });
 
     it("should return the correct did from a loaded wallet", () => {

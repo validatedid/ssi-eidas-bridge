@@ -1,4 +1,4 @@
-import { JWK } from "jose";
+import crypto from "crypto";
 import * as util from "util";
 import { AxiosError } from "axios";
 import { decodeJWT } from "did-jwt";
@@ -9,8 +9,14 @@ import { BadRequestError, ProblemDetailsError } from "../errors";
 const toHex = (data: string): string =>
   Buffer.from(data, "base64").toString("hex");
 
-const generateKeys = (): JWK.ECKey =>
-  JWK.generateSync("EC", "secp256k1", { use: "sig" });
+const generateKeys = (): {
+  publicKey: crypto.KeyObject;
+  privateKey: crypto.KeyObject;
+} => {
+  return crypto.generateKeyPairSync("ec", {
+    namedCurve: "secp256k1",
+  });
+};
 
 const prefixWith0x = (key: string): string =>
   key.startsWith("0x") ? key : `0x${key}`;
