@@ -48,7 +48,6 @@ describe("eidas e2e flow", () => {
       )
     ).toString("hex");
     const opts: EidasKeysData = {
-      did,
       p12: fileDataHex,
       keyType: constants.KeyTypes.RSA,
     };

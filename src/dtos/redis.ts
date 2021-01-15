@@ -6,8 +6,8 @@ export interface RedisInsertion {
 }
 
 export interface EidasKeysData {
-  did: string; // As soon as auth is implemented this info can be retrieved from token
   p12: string; // hexadecimal string
   keyType: constants.KeyType;
   keyCurve?: constants.Curves;
+  did?: string;
 }
