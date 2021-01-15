@@ -1,9 +1,10 @@
-import { JWK } from "jose";
+import crypto from "crypto";
+import fromKeyLike from "jose/jwk/from_key_like";
+import { JWK } from "jose/types";
 import { ethers } from "ethers";
 import { DID } from "dids";
 import { Ed25519Provider } from "key-did-provider-ed25519";
 import KeyResolver from "@ceramicnetwork/key-did-resolver";
-import crypto from "crypto";
 import { resolver } from "@transmute/did-key.js";
 import { DIDDocument } from "did-resolver";
 import constants from "../src/@types";
@@ -12,34 +13,26 @@ const prefixWith0x = (key: string): string => {
   return key.startsWith("0x") ? key : `0x${key}`;
 };
 
-const generateTestKeys = (
+const generateTestKeys = async (
   keyType: constants.KeyType,
   curveType: constants.Curves
-): {
+): Promise<{
   hexPrivateKey: string;
   did: string;
-  jwk: JWK.ECKey;
-} => {
-  let jwk: JWK.ECKey;
-  let wallet: ethers.Wallet;
-  let did: string;
-  let hexPrivateKey: string;
+  jwk: JWK;
+}> => {
+  if (keyType !== "EC") throw new Error("EC only keyType supported");
+  if (curveType !== "secp256k1")
+    throw new Error("secp256k1 only curveType supported");
 
-  switch (keyType) {
-    case "EC":
-      switch (curveType) {
-        case "secp256k1":
-          jwk = JWK.generateSync(keyType, curveType, { use: "sig" });
-          hexPrivateKey = Buffer.from(jwk.d, "base64").toString("hex");
-          wallet = new ethers.Wallet(prefixWith0x(hexPrivateKey));
-          did = `did:vid:${wallet.address}`;
-          return { hexPrivateKey, did, jwk };
-        default:
-          throw new Error("secp256k1 only curveType supported");
-      }
-    default:
-      throw new Error("EC only keyType supported");
-  }
+  const { privateKey } = crypto.generateKeyPairSync("ec", {
+    namedCurve: "secp256k1",
+  });
+  const jwk = await fromKeyLike(privateKey);
+  const hexPrivateKey = Buffer.from(jwk.d, "base64").toString("hex");
+  const wallet = new ethers.Wallet(prefixWith0x(hexPrivateKey));
+  const did = `did:vid:${wallet.address}`;
+  return { hexPrivateKey, did, jwk };
 };
 
 const generateDid = async (inputSeed?: Uint8Array): Promise<string> => {

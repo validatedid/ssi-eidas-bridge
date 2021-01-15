@@ -12,8 +12,10 @@ import { generateDid } from "../utils";
 jest.setTimeout(100000);
 
 describe("eidas e2e flow towards vidchain", () => {
+  // LOCAL
+  const server = "http://localhost:9002";
   // DEV
-  const server = "https://dev.vidchain.net";
+  // const server = "https://dev.vidchain.net";
   // PRO
   // const server = "https://api.vidchain.net";
 
@@ -22,12 +24,13 @@ describe("eidas e2e flow towards vidchain", () => {
     const did = await generateDid();
     const testFilePathSelfSigned = "../data/test1/";
     const p12File = "keyStore.p12";
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+      )
+    ).toString("hex");
     const opts: EidasKeysData = {
-      did,
-      p12: fileData,
+      p12: fileDataHex,
       keyType: constants.KeyTypes.RSA,
     };
     const storeKeysResponse = await axios.put(

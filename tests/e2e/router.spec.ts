@@ -10,6 +10,7 @@ import * as mockedData from "../data/credentials";
 import { EIDASSignatureOutput } from "../../src/dtos/eidas";
 import { EidasKeysData } from "../../src/dtos/redis";
 import { generateDid } from "../utils";
+import redis from "../../src/libs/storage/redis";
 
 jest.setTimeout(100000);
 
@@ -29,10 +30,11 @@ describe("eidas router API calls", () => {
     done();
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     if (server) {
       server.close();
     }
+    await redis.quit();
   });
 
   it("responds 404 to /", async () => {
@@ -46,18 +48,20 @@ describe("eidas router API calls", () => {
   describe("store keys", () => {
     const testFilePathSelfSigned = "../data/test1/";
     const p12File = "keyStore.p12";
-    const fileData = fs.readFileSync(
-      path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-    );
+    const fileDataHex = Buffer.from(
+      fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
+      )
+    ).toString("hex");
     const opts: EidasKeysData = {
       did,
-      p12: fileData,
+      p12: fileDataHex,
       keyType: constants.KeyTypes.RSA,
     };
     it("returns a 201 for first key insertion", async () => {
       const randomOpts: EidasKeysData = {
         did: await generateDid(),
-        p12: fileData,
+        p12: fileDataHex,
         keyType: constants.KeyTypes.RSA,
       };
       expect.assertions(1);

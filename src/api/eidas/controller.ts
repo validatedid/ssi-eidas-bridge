@@ -11,8 +11,8 @@ import { BadRequestError, ApiErrorMessages } from "../../errors";
 
 import { isEidasProof, signEidas, verifyEidas } from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
-import { KeyTypes } from "../../@types/constants";
 import { isVerifiableCredential } from "../../utils/ssi";
+import constants from "../../@types";
 
 export default class Controller {
   /**
@@ -85,21 +85,27 @@ export default class Controller {
   }
 
   static async putEidasKeys(
-    id: string,
+    did: string,
     opts: EidasKeysData
   ): Promise<RedisInsertion> {
-    if (!opts || !opts.p12 || !opts.keyType || opts.keyType !== KeyTypes.RSA)
+    if (
+      !opts ||
+      !opts.p12 ||
+      !opts.keyType ||
+      opts.keyType !== constants.KeyTypes.RSA
+    )
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
-    if (!id)
+    if (!did)
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.MISSING_PUT_ID_PARAMS,
       });
-    const previousKeys = await redis.get(id);
-    await redis.set(id, JSON.stringify(opts));
+    const previousKeys = await redis.get(did);
+    await redis.set(did, JSON.stringify(opts));
+    const returnOpts = { ...opts, did };
     return {
-      eidasKeysData: opts,
+      eidasKeysData: returnOpts,
       firstInsertion: !previousKeys,
     };
   }
