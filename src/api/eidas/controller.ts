@@ -90,6 +90,7 @@ export default class Controller {
   ): Promise<RedisInsertion> {
     if (
       !opts ||
+      !opts.did ||
       !opts.p12 ||
       !opts.keyType ||
       opts.keyType !== constants.KeyTypes.RSA
