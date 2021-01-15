@@ -23,7 +23,7 @@
     "lint:openapi": "openapi lint api/openapi.yaml",
     "full-lint": "tsc --noEmit && eslint 'src/**/*.{js,ts}' --quiet --fix && prettier --write 'src/**/*.{js,ts}'",
     "format": "prettier --write 'src/**/*.{js,ts}' 'tests/**/*.{js,ts}'",
-    "test": "jest --runInBand --verbose false",
+    "test": "jest --runInBand --verbose false --testPathIgnorePatterns=deployed",
     "test:unit": "jest --clearCache && jest --runInBand --verbose false --testPathPattern=unit",
     "test:e2e": "jest --clearCache && jest --runInBand --verbose false --testPathPattern=e2e",
     "clearCache": "jest --clearCache"
