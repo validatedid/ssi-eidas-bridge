@@ -1,8 +1,8 @@
 import Redis from "ioredis";
 import fs from "fs";
 import path from "path";
+import { v4 as uuid } from "uuid";
 import { EnterpriseWallet } from "../../src/libs/secureEnclave";
-import constants from "../../src/@types";
 import { ApiErrorMessages, InternalError } from "../../src/errors";
 import { eidasCrypto } from "../../src/utils";
 import * as mockedData from "../data/credentials";
@@ -24,8 +24,9 @@ describe("eidas enterprise wallet tests should", () => {
     ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
+        did: mockDid,
+        eidasQecId: uuid(),
       });
     });
     const wallet = await EnterpriseWallet.createInstance({
@@ -90,53 +91,13 @@ describe("eidas enterprise wallet tests should", () => {
     jest.restoreAllMocks();
   });
 
-  it("throw InternalError when redis returns a EidasKeysData data without keytype", async () => {
-    expect.assertions(1);
-    jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
-      return JSON.stringify({
-        p12: "some data",
-      });
-    });
-    await expect(
-      EnterpriseWallet.createInstance({ did: mockDid, password } as never)
-    ).rejects.toThrow(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
-    jest.restoreAllMocks();
-  });
-
-  it("throw InternalError when redis returns a EidasKeysData data with keytype = EC but not keyCurve", async () => {
-    expect.assertions(1);
-    jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
-      return JSON.stringify({
-        p12: "some data",
-        keyType: constants.KeyTypes.EC,
-      });
-    });
-    await expect(
-      EnterpriseWallet.createInstance({ did: mockDid, password } as never)
-    ).rejects.toThrow(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
-    jest.restoreAllMocks();
-  });
-
-  it("throw InternalError when redis returns a EidasKeysData data with keytype = OKP but not keyCurve", async () => {
-    expect.assertions(1);
-    jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
-      return JSON.stringify({
-        p12: "some data",
-        keyType: constants.KeyTypes.OKP,
-      });
-    });
-    await expect(
-      EnterpriseWallet.createInstance({ did: mockDid, password } as never)
-    ).rejects.toThrow(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
-    jest.restoreAllMocks();
-  });
-
   it("throw InternalError when parseP12File does not return data", async () => {
     expect.assertions(1);
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: "some data",
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: "some data",
+        did: mockDid,
+        eidasQecId: uuid(),
       });
     });
     jest.spyOn(eidasCrypto, "parseP12File").mockReturnValue(undefined as never);
@@ -150,8 +111,9 @@ describe("eidas enterprise wallet tests should", () => {
     expect.assertions(1);
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: "some data",
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: "some data",
+        did: mockDid,
+        eidasQecId: uuid(),
       });
     });
     jest.spyOn(eidasCrypto, "parseP12File").mockReturnValue({} as never);
@@ -165,8 +127,9 @@ describe("eidas enterprise wallet tests should", () => {
     expect.assertions(1);
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: "some data",
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: "some data",
+        did: mockDid,
+        eidasQecId: uuid(),
       });
     });
     jest
@@ -185,12 +148,13 @@ describe("eidas enterprise wallet tests should", () => {
     ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
       });
     });
     const dataToSign = {
       data: "some data",
+      did: mockDid,
+      eidasQecId: uuid(),
     };
     const wallet = await EnterpriseWallet.createInstance({
       did: mockDid,
@@ -210,8 +174,9 @@ describe("eidas enterprise wallet tests should", () => {
     ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
+        did: mockDid,
+        eidasQecId: uuid(),
       });
     });
 
@@ -232,8 +197,9 @@ describe("eidas enterprise wallet tests should", () => {
     ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
+        did: mockDid,
+        eidasQecId: uuid(),
       });
     });
 
@@ -258,8 +224,9 @@ describe("eidas enterprise wallet tests should", () => {
     ).toString("hex");
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
+        did: mockDid,
+        eidasQecId: uuid(),
       });
     });
 

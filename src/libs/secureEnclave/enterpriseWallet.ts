@@ -4,16 +4,13 @@ import { ApiErrorMessages, BadRequestError, InternalError } from "../../errors";
 import { eidasCrypto } from "../../utils";
 import { signCadesRsa } from "./cades";
 import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
-import constants from "../../@types";
 import { WalletBuilderOptions } from "../../dtos/wallet";
 import { canonizeCredential } from "../../utils/ssi";
 
 export default class EnterpriseWallet {
   private constructor(
     private issuerPemCert: string[],
-    private issuerPemPrivateKey: string,
-    private issuerKeyType: constants.KeyType,
-    private issuerKeyCurve?: constants.Curves
+    private issuerPemPrivateKey: string
   ) {}
 
   static async createInstance(
@@ -34,34 +31,19 @@ export default class EnterpriseWallet {
       );
     }
 
-    if (
-      !storedData.p12 ||
-      !storedData.keyType ||
-      (storedData.keyType === constants.KeyTypes.EC && !storedData.keyCurve) ||
-      (storedData.keyType === constants.KeyTypes.OKP && !storedData.keyCurve)
-    )
+    if (!storedData.eidasQec)
       throw new InternalError(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
 
     const parsedData = eidasCrypto.parseP12File(
-      Buffer.from(storedData.p12, "hex").toString("binary"),
+      Buffer.from(storedData.eidasQec, "hex").toString("binary"),
       options.password
     );
     if (!parsedData || !parsedData.pemCert || !parsedData.pemPrivateKey)
       throw new InternalError(ApiErrorMessages.ERROR_PARSING_P12_DATA);
-    return new this(
-      parsedData.pemCert,
-      parsedData.pemPrivateKey,
-      storedData.keyType,
-      storedData.keyCurve
-    );
+    return new this(parsedData.pemCert, parsedData.pemPrivateKey);
   }
 
   async eSeal(payload: Record<string, unknown>): Promise<CadesSignatureOutput> {
-    if (this.issuerKeyType !== constants.KeyTypes.RSA)
-      throw new InternalError(InternalError.defaultTitle, {
-        detail: ApiErrorMessages.KEY_TYPE_NOT_SUPPORTED,
-      });
-
     // TODO: sign with all certificate list
     const inputCades: CadesSignatureInput = {
       data: await canonizeCredential(payload),

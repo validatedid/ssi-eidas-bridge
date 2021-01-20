@@ -6,9 +6,7 @@ import path from "path";
 import { startService } from "../../src/api/app";
 import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
-import constants from "../../src/@types";
 import * as mockedData from "../data/credentials";
-import { EIDASSignatureOutput } from "../../src/dtos/eidas";
 
 jest.setTimeout(100000);
 jest.mock("ioredis");
@@ -64,13 +62,11 @@ describe("eidas router API calls (mocking redis)", () => {
       const signPayload: SignPayload = {
         issuer: mockDid,
         payload: mockedData.mockCredential,
-        type: constants.SignatureTypes.CAdESRSASignature2020,
         password,
       };
       jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
         return JSON.stringify({
-          p12: fileDataHex,
-          keyType: constants.KeyTypes.RSA,
+          eidasQec: fileDataHex,
         });
       });
       const res = await request(server)
@@ -93,13 +89,11 @@ describe("eidas router API calls (mocking redis)", () => {
       const signPayload: SignPayload = {
         issuer: mockDid,
         payload: mockedData.mockCredential,
-        type: constants.SignatureTypes.CAdESRSASignature2020,
         password,
       };
       jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
         return JSON.stringify({
-          p12: fileDataHex,
-          keyType: constants.KeyTypes.RSA,
+          eidasQec: fileDataHex,
         });
       });
       const res = await request(server)
@@ -113,7 +107,7 @@ describe("eidas router API calls (mocking redis)", () => {
         .post(
           `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.SIGNATURE_VALIDATION}`
         )
-        .send((res.body as EIDASSignatureOutput).vc);
+        .send(res.body);
       expect(resSigValidation.status).toStrictEqual(204);
       jest.restoreAllMocks();
     });

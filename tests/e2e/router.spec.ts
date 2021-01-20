@@ -5,10 +5,8 @@ import path from "path";
 import { startService } from "../../src/api/app";
 import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
-import constants from "../../src/@types";
 import * as mockedData from "../data/credentials";
-import { EIDASSignatureOutput } from "../../src/dtos/eidas";
-import { EidasKeysData } from "../../src/dtos/redis";
+import { EidasKeysInput } from "../../src/dtos/redis";
 import { generateDid } from "../utils";
 import redis from "../../src/libs/storage/redis";
 
@@ -53,16 +51,14 @@ describe("eidas router API calls", () => {
         path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
       )
     ).toString("hex");
-    const opts: EidasKeysData = {
+    const opts: EidasKeysInput = {
       did,
-      p12: fileDataHex,
-      keyType: constants.KeyTypes.RSA,
+      eidasQec: fileDataHex,
     };
     it("returns a 201 for first key insertion", async () => {
-      const randomOpts: EidasKeysData = {
+      const randomOpts: EidasKeysInput = {
         did: await generateDid(),
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
       };
       expect.assertions(1);
       const res = await request(server)
@@ -103,7 +99,6 @@ describe("eidas router API calls", () => {
       const signPayload: SignPayload = {
         issuer: did,
         payload: mockedData.mockCredential,
-        type: constants.SignatureTypes.CAdESRSASignature2020,
         password,
       };
       const res = await request(server)
@@ -120,7 +115,6 @@ describe("eidas router API calls", () => {
       const signPayload: SignPayload = {
         issuer: did,
         payload: mockedData.mockCredential,
-        type: constants.SignatureTypes.CAdESRSASignature2020,
         password,
       };
       const res = await request(server)
@@ -134,7 +128,7 @@ describe("eidas router API calls", () => {
         .post(
           `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.SIGNATURE_VALIDATION}`
         )
-        .send((res.body as EIDASSignatureOutput).vc);
+        .send(res.body);
       expect(resSigValidation.status).toStrictEqual(204);
     });
   });

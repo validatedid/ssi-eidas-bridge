@@ -11,6 +11,7 @@ import {
   getKidFromDidAndPemCertificate,
 } from "../../utils/ssi";
 import { verifyCadesSignature } from "../secureEnclave/cades";
+import constants from "../../@types";
 
 const PROOF_REQUIRED_KEYS = [
   "type",
@@ -69,7 +70,6 @@ const signEidas = async (signPayload: SignPayload): Promise<EidasProof> => {
     !signPayload ||
     !signPayload.issuer ||
     !signPayload.payload ||
-    !signPayload.type ||
     !signPayload.password
   )
     throw new BadRequestError(ApiErrorMessages.SIGN_EIDAS_BAD_PARAMETERS);
@@ -86,7 +86,7 @@ const signEidas = async (signPayload: SignPayload): Promise<EidasProof> => {
 
   const cadesOuput = await wallet.eSeal(payloadToSign);
   return {
-    type: signPayload.type,
+    type: constants.SignatureTypes.CAdESRSASignature2020,
     created: cadesOuput.signingTime,
     proofPurpose: DEFAULT_PROOF_PURPOSE,
     verificationMethod: getKidFromDidAndPemCertificate({

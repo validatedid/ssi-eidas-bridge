@@ -1,6 +1,5 @@
 import { SignatureTypes } from "../../src/@types/constants";
 import Controller from "../../src/api/eidas/controller";
-import constants from "../../src/@types";
 import * as mockedData from "../data/credentials";
 import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as eidas from "../../src/libs/eidas/eidas";
@@ -64,9 +63,7 @@ describe("controller suite tests", () => {
       };
       await expect(
         Controller.EIDASsignature(signPayload as never)
-      ).rejects.toThrow(
-        "Sign Eidas requires a SignPayload with issuer, payload, type and password"
-      );
+      ).rejects.toThrow("Bad Request");
     });
 
     it("should return a value", async () => {
@@ -76,17 +73,13 @@ describe("controller suite tests", () => {
       const signPayload: SignPayload = {
         issuer: did,
         payload: mockedData.mockCredential,
-        type: constants.SignatureTypes.CAdESRSASignature2020,
         password,
       };
       jest.spyOn(eidas, "signEidas").mockResolvedValue({} as EidasProof);
       const response = await Controller.EIDASsignature(signPayload);
       const expectedResponse = {
-        issuer: signPayload.issuer,
-        vc: {
-          ...mockedData.mockCredential,
-          proof: {},
-        },
+        ...mockedData.mockCredential,
+        proof: {},
       };
       expect(response).toMatchObject(expectedResponse);
       jest.resetAllMocks();

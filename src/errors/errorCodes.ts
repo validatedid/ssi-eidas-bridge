@@ -8,7 +8,7 @@ export enum ApiErrorMessages {
   ERROR_SIGNATURE_CREATION = "Error on creating the JWS Signature",
   WALLET_OPTIONS_NOT_PROVIDED = "Wallet options parameters are not provided",
   BAD_CREDENTIAL_PARAMETERS = "Credential parameters are not valid.",
-  SIGNATURE_BAD_PARAMS = "Signature body requires issuer, payload and type.",
+  SIGNATURE_BAD_PARAMS = "Signature body requires did, issuer and payload.",
   SIGNATURE_BAD_TYPE = "Signature type  not supported.",
   NO_AUDIENCE = "No audience provided",
   INVALID_AUDIENCE = "Invalid audience. Should be a string",
