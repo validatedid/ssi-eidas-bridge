@@ -1,6 +1,6 @@
 import redis from "../storage/redis";
 import { EidasKeysData } from "../../dtos/redis";
-import { ApiErrorMessages, BadRequestError, InternalError } from "../../errors";
+import { ApiErrorMessages, BadRequestError } from "../../errors";
 import { eidasCrypto } from "../../utils";
 import { signCadesRsa } from "./cades";
 import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
@@ -24,23 +24,31 @@ export default class EnterpriseWallet {
       const data = await redis.get(options.did);
       storedData = JSON.parse(data) as EidasKeysData;
     } catch (error) {
-      throw new InternalError(
+      throw new BadRequestError(
         `${ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA} : ${
           (error as Error).message
         }`
       );
     }
 
-    if (!storedData.eidasQec)
-      throw new InternalError(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
+    if (!storedData || !storedData.eidasQec)
+      throw new BadRequestError(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
 
-    const parsedData = eidasCrypto.parseP12File(
-      Buffer.from(storedData.eidasQec, "hex").toString("binary"),
-      options.password
-    );
-    if (!parsedData || !parsedData.pemCert || !parsedData.pemPrivateKey)
-      throw new InternalError(ApiErrorMessages.ERROR_PARSING_P12_DATA);
-    return new this(parsedData.pemCert, parsedData.pemPrivateKey);
+    try {
+      const parsedData = eidasCrypto.parseP12File(
+        Buffer.from(storedData.eidasQec, "hex").toString("binary"),
+        options.password
+      );
+      if (!parsedData || !parsedData.pemCert || !parsedData.pemPrivateKey)
+        throw new BadRequestError(ApiErrorMessages.ERROR_PARSING_P12_DATA);
+      return new this(parsedData.pemCert, parsedData.pemPrivateKey);
+    } catch (error) {
+      throw new BadRequestError(
+        `${ApiErrorMessages.ERROR_PARSING_P12_DATA} : ${
+          (error as Error).message
+        }`
+      );
+    }
   }
 
   async eSeal(payload: Record<string, unknown>): Promise<CadesSignatureOutput> {
