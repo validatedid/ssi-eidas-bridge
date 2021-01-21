@@ -1,13 +1,13 @@
-import constants from "../@types";
-
 export interface RedisInsertion {
-  eidasKeysData: EidasKeysData;
+  id: string;
   firstInsertion: boolean;
 }
 
-export interface EidasKeysData {
-  p12: string; // hexadecimal string
-  keyType: constants.KeyType;
-  keyCurve?: constants.Curves;
-  did?: string;
+export interface EidasKeysInput {
+  did: string;
+  eidasQec: string; // hexadecimal string
+}
+
+export interface EidasKeysData extends EidasKeysInput {
+  eidasQecId: string;
 }

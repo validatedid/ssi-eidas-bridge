@@ -4,7 +4,6 @@ import path from "path";
 import Controller from "../../src/api/eidas/controller";
 import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as mockedData from "../data/credentials";
-import constants from "../../src/@types";
 import { Proof } from "../../src/dtos/eidas";
 import redis from "../../src/libs/storage/redis";
 
@@ -18,7 +17,6 @@ describe("controller tests should", () => {
   const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
   const signPayload: SignPayload = {
     issuer: mockDid,
-    type: "EidasSeal2019",
     payload: mockedData.mockCredential,
     password: "vidchain",
   };
@@ -27,23 +25,21 @@ describe("controller tests should", () => {
   ).toString("hex");
 
   it("create a proof from a given credential", async () => {
-    expect.assertions(3);
+    expect.assertions(2);
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
       });
     });
     const response = await Controller.EIDASsignature(signPayload);
     expect(response).toBeDefined();
-    expect(response.vc).toBeDefined();
-    expect(response.vc.proof).toBeDefined();
+    expect(response.proof).toBeDefined();
     jest.resetAllMocks();
   });
   it("create a proof from a given credential with proof", async () => {
-    expect.assertions(4);
+    expect.assertions(3);
     const proof: Proof = {
-      type: "EidasSeal2019",
+      type: "EcdsaSecp256k1Signature2019",
       created: "1970-01-19T13:56:26.946Z",
       proofPurpose: "assertionMethod",
       verificationMethod:
@@ -54,22 +50,20 @@ describe("controller tests should", () => {
     signPayload.payload.proof = proof;
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
       });
     });
     const response = await Controller.EIDASsignature(signPayload);
     expect(response).toBeDefined();
-    expect(response.vc).toBeDefined();
-    expect(response.vc.proof).toBeDefined();
-    expect(response.vc.proof).toHaveLength(2);
+    expect(response.proof).toBeDefined();
+    expect(response.proof).toHaveLength(2);
     jest.resetAllMocks();
   });
   it("create a proof from a given credential with multiple proofs", async () => {
-    expect.assertions(4);
+    expect.assertions(3);
     const proofs: Proof[] = [
       {
-        type: "EidasSeal2019",
+        type: "EcdsaSecp256k1Signature2019",
         created: "1970-01-19T13:56:26.946Z",
         proofPurpose: "assertionMethod",
         verificationMethod:
@@ -78,7 +72,7 @@ describe("controller tests should", () => {
           "eyJhbGciOiJFUzI1NkstUiIsInR5cCI6IkpXVCIsImtpZCI6ImRpZDp2aWQ6MHhCNTUxYjcwZDY1MDg5MmQyM2RFM0JlMjAxQTk1YzFGY0JlYTk4QTNEI2VpZGFzS2V5In0.eyJpYXQiOjE2MDUzODY5NDYsIkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly9hcGkudmlkY2hhaW4ubmV0L2NyZWRlbnRpYWxzL3ZlcmlmaWFibGVJZC92MSJdLCJpZCI6InZpZDp0eXBlLXZlcnNpb24tb2YtdGhlLWNyZWRlbnRpYWwiLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiVmVyaWZpYWJsZUlEIl0sImlzc3VlciI6ImRpZDp2aWQ6MHg1MjA4NDMxQzZFQzJlYzQwOTdhZUE3MTgyYkI5MmQwMTg3NjY0OThjIiwiaXNzdWFuY2VEYXRlIjoiMjAxOS0wNi0yMlQxNDoxMTo0NFoiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMTktMDYtMjJUMTQ6MTE6NDRaIiwiY3JlZGVudGlhbFN1YmplY3QiOnsiaWQiOiJkaWQ6dmlkOjB4ODcwN0NDYTgzNUM5NjEzMzREM0Y2NDUwQzZhNjFhMEFENjU5MjQ2MCIsImZpcnN0TmFtZSI6IkV2YSIsImxhc3ROYW1lIjoiTW9ucm9lIiwiZ2VuZGVyIjoiRmVtYWxlIiwiZGF0ZU9mQmlydGgiOiIxMi8xMS8xOTcwIiwicGxhY2VPZkJpcnRoIjoiTWFkcmlkIiwiY3VycmVudEFkZHJlc3MiOiJBcmFnbyAxNzkgNGEiLCJjaXR5IjoiQmFyY2Vsb25hIiwic3RhdGUiOiJDYXRhbHVueWEiLCJ6aXAiOiIwODAxMSJ9LCJpc3MiOiJkaWQ6dmlkOjB4QTUxMzVhYTA3ODg2MzVFZTQ5NTJERWFCRmEzZGE5OGJGNTk5OUJFMSJ9.CcIAc7C1Z1BsvjLO7y5XpSNqhvrcVXxSxpkRY0-o2mfSCebKhMK4f4g2lP-4Yf_fVzL_SmWKO05jeLAJnE6BBwA",
       },
       {
-        type: "EidasSeal2019",
+        type: "EcdsaSecp256k1Signature2019",
         created: "1970-01-19T13:56:27.203Z",
         proofPurpose: "assertionMethod",
         verificationMethod:
@@ -90,15 +84,13 @@ describe("controller tests should", () => {
     signPayload.payload.proof = proofs;
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
       });
     });
     const response = await Controller.EIDASsignature(signPayload);
     expect(response).toBeDefined();
-    expect(response.vc).toBeDefined();
-    expect(response.vc.proof).toBeDefined();
-    expect(response.vc.proof).toHaveLength(3);
+    expect(response.proof).toBeDefined();
+    expect(response.proof).toHaveLength(3);
     jest.resetAllMocks();
   });
 });

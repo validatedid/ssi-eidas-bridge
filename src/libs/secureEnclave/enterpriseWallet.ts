@@ -1,19 +1,16 @@
 import redis from "../storage/redis";
 import { EidasKeysData } from "../../dtos/redis";
-import { ApiErrorMessages, BadRequestError, InternalError } from "../../errors";
+import { ApiErrorMessages, BadRequestError } from "../../errors";
 import { eidasCrypto } from "../../utils";
 import { signCadesRsa } from "./cades";
 import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
-import constants from "../../@types";
 import { WalletBuilderOptions } from "../../dtos/wallet";
 import { canonizeCredential } from "../../utils/ssi";
 
 export default class EnterpriseWallet {
   private constructor(
     private issuerPemCert: string[],
-    private issuerPemPrivateKey: string,
-    private issuerKeyType: constants.KeyType,
-    private issuerKeyCurve?: constants.Curves
+    private issuerPemPrivateKey: string
   ) {}
 
   static async createInstance(
@@ -27,41 +24,34 @@ export default class EnterpriseWallet {
       const data = await redis.get(options.did);
       storedData = JSON.parse(data) as EidasKeysData;
     } catch (error) {
-      throw new InternalError(
+      throw new BadRequestError(
         `${ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA} : ${
           (error as Error).message
         }`
       );
     }
 
-    if (
-      !storedData.p12 ||
-      !storedData.keyType ||
-      (storedData.keyType === constants.KeyTypes.EC && !storedData.keyCurve) ||
-      (storedData.keyType === constants.KeyTypes.OKP && !storedData.keyCurve)
-    )
-      throw new InternalError(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
+    if (!storedData || !storedData.eidasQec)
+      throw new BadRequestError(ApiErrorMessages.ERROR_RETRIEVING_REDIS_DATA);
 
-    const parsedData = eidasCrypto.parseP12File(
-      Buffer.from(storedData.p12, "hex").toString("binary"),
-      options.password
-    );
-    if (!parsedData || !parsedData.pemCert || !parsedData.pemPrivateKey)
-      throw new InternalError(ApiErrorMessages.ERROR_PARSING_P12_DATA);
-    return new this(
-      parsedData.pemCert,
-      parsedData.pemPrivateKey,
-      storedData.keyType,
-      storedData.keyCurve
-    );
+    try {
+      const parsedData = eidasCrypto.parseP12File(
+        Buffer.from(storedData.eidasQec, "hex").toString("binary"),
+        options.password
+      );
+      if (!parsedData || !parsedData.pemCert || !parsedData.pemPrivateKey)
+        throw new BadRequestError(ApiErrorMessages.ERROR_PARSING_P12_DATA);
+      return new this(parsedData.pemCert, parsedData.pemPrivateKey);
+    } catch (error) {
+      throw new BadRequestError(
+        `${ApiErrorMessages.ERROR_PARSING_P12_DATA} : ${
+          (error as Error).message
+        }`
+      );
+    }
   }
 
   async eSeal(payload: Record<string, unknown>): Promise<CadesSignatureOutput> {
-    if (this.issuerKeyType !== constants.KeyTypes.RSA)
-      throw new InternalError(InternalError.defaultTitle, {
-        detail: ApiErrorMessages.KEY_TYPE_NOT_SUPPORTED,
-      });
-
     // TODO: sign with all certificate list
     const inputCades: CadesSignatureInput = {
       data: await canonizeCredential(payload),

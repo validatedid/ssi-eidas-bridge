@@ -23,13 +23,11 @@ describe("eidas tests", () => {
     const signPayload: SignPayload = {
       issuer: mockDid,
       payload: mockedData.mockVC,
-      type: constants.SignatureTypes.CAdESRSASignature2020,
       password,
     };
     jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
       return JSON.stringify({
-        p12: fileDataHex,
-        keyType: constants.KeyTypes.RSA,
+        eidasQec: fileDataHex,
       });
     });
     const expectedProof = {

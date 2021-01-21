@@ -2,17 +2,19 @@ import { SignPayload } from "../../dtos/secureEnclave";
 import {
   Credential,
   EidasProof,
-  EIDASSignatureOutput,
   Proof,
   VerifiableCredential,
 } from "../../dtos/eidas";
-import { EidasKeysData, RedisInsertion } from "../../dtos/redis";
+import {
+  EidasKeysData,
+  EidasKeysInput,
+  RedisInsertion,
+} from "../../dtos/redis";
 import { BadRequestError, ApiErrorMessages } from "../../errors";
 
 import { isEidasProof, signEidas, verifyEidas } from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
 import { isVerifiableCredential } from "../../utils/ssi";
-import constants from "../../@types";
 
 export default class Controller {
   /**
@@ -21,17 +23,17 @@ export default class Controller {
    */
   static async EIDASsignature(
     signPayload: SignPayload
-  ): Promise<EIDASSignatureOutput> {
+  ): Promise<VerifiableCredential> {
     if (
       !signPayload ||
       !signPayload.issuer ||
       !signPayload.payload ||
-      !signPayload.type
+      !signPayload.password
     )
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,
       });
-    const { issuer, payload } = signPayload;
+    const { payload } = signPayload;
     // sign with another keypair
     const eidasProof = await signEidas(signPayload);
 
@@ -48,10 +50,7 @@ export default class Controller {
       ...(payload as Credential),
       proof: proofs && proofs.length > 0 ? proofs : eidasProof,
     };
-    return {
-      issuer,
-      vc,
-    };
+    return vc;
   }
 
   /**
@@ -63,7 +62,7 @@ export default class Controller {
   ): Promise<void> {
     if (!isVerifiableCredential(verifiableCredential))
       throw new BadRequestError(BadRequestError.defaultTitle, {
-        detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,
+        detail: ApiErrorMessages.BAD_VERIFIABLE_CREDENTIAL,
       });
     const credential = (({ proof, ...o }) => o)(verifiableCredential);
     if (!Array.isArray(verifiableCredential.proof)) {
@@ -85,27 +84,26 @@ export default class Controller {
   }
 
   static async putEidasKeys(
-    did: string,
-    opts: EidasKeysData
+    eidasQecId: string,
+    opts: EidasKeysInput
   ): Promise<RedisInsertion> {
-    if (
-      !opts ||
-      !opts.p12 ||
-      !opts.keyType ||
-      opts.keyType !== constants.KeyTypes.RSA
-    )
+    if (!opts || !opts.did || !opts.eidasQec)
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });
-    if (!did)
+    if (!eidasQecId)
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.MISSING_PUT_ID_PARAMS,
       });
-    const previousKeys = await redis.get(did);
-    await redis.set(did, JSON.stringify(opts));
-    const returnOpts = { ...opts, did };
+    const previousKeys = await redis.get(opts.did);
+    const eidasKeysData: EidasKeysData = {
+      ...opts,
+      eidasQecId,
+    };
+    await redis.set(opts.did, JSON.stringify(eidasKeysData));
+
     return {
-      eidasKeysData: returnOpts,
+      id: opts.did,
       firstInsertion: !previousKeys,
     };
   }
