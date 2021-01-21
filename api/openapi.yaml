@@ -84,8 +84,8 @@ paths:
       operationId: post-eidas-bridge-v1-authentication-request-jwts
       tags:
         - Authentication Service
-      summary: Retrieves a JWT token Authentication Request
-      description: Retrieves a JWT token Authentication Request
+      summary: Retrieve a JWT token Authentication Request
+      description: Retrieve a JWT token Authentication Request
       requestBody:
         content:
           application/json:
@@ -139,7 +139,7 @@ paths:
       operationId: post-eidas-bridge-v1-authentication-sessions
       tags:
         - Authentication Service
-      summary: Requests a Sessions Token
+      summary: Request a Sessions Token
       description: | 
        Requests a Sessions Token to call the protected API calls. 
        This call requires to send an Authentication Response Token after
@@ -278,8 +278,8 @@ paths:
     post:
       tags:
         - SSI EIDAS Bridge
-      summary: Creates an eIDAS eSeal signature
-      description: Creates an eIDAS eSeal signature using the associated EIDAS keys with a DID
+      summary: Create an eIDAS eSeal signature
+      description: Create an eIDAS eSeal signature using the associated EIDAS keys with a DID
       operationId: post-eidas-bridge-v1-signatures
       security:
         - bearerAuth: []
@@ -454,8 +454,8 @@ paths:
     post:
       tags:
         - SSI EIDAS Bridge
-      summary: Validates a W3C Verifiable Credential eSealed with an EIDAS QEC
-      description: Validates a W3C Verifiable Credential eSealed with an EIDAS QEC
+      summary: Validate a W3C Verifiable Credential eSealed with an EIDAS QEC
+      description: Validate a W3C Verifiable Credential eSealed with an EIDAS QEC
       operationId: post-eidas-bridge-v1-signature-validations
       requestBody:
         description: W3C Verifiable Credential with an Ades Proof
