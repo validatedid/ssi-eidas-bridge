@@ -13,9 +13,9 @@ describe("eidas e2e flow towards vidchain", () => {
   // LOCAL
   // const server = "http://localhost:9002";
   // DEV
-  // const server = "https://dev.vidchain.net";
+  const server = "https://dev.vidchain.net";
   // PRO
-  const server = "https://api.vidchain.net";
+  // const server = "https://api.vidchain.net";
 
   it("stores keys, signs and verifies", async () => {
     expect.assertions(4);
