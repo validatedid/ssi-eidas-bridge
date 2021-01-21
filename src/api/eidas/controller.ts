@@ -62,7 +62,7 @@ export default class Controller {
   ): Promise<void> {
     if (!isVerifiableCredential(verifiableCredential))
       throw new BadRequestError(BadRequestError.defaultTitle, {
-        detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,
+        detail: ApiErrorMessages.BAD_VERIFIABLE_CREDENTIAL,
       });
     const credential = (({ proof, ...o }) => o)(verifiableCredential);
     if (!Array.isArray(verifiableCredential.proof)) {
