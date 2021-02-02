@@ -87,7 +87,7 @@ export default class Controller {
     eidasQecId: string,
     opts: EidasKeysInput
   ): Promise<RedisInsertion> {
-    if (!opts || !opts.did || !opts.eidasQec)
+    if (!opts || !opts.did || !opts.eidasQec || !opts.did.startsWith("did:"))
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.BAD_INPUT_EIDAS_KEYS_PARAMS,
       });

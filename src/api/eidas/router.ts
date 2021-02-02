@@ -2,6 +2,7 @@ import * as express from "express";
 import cors from "cors";
 import Controller from "./controller";
 import { BRIDGE_SERVICE } from "../../config";
+import LOGGER from "../../logger";
 
 class Router {
   constructor(server: express.Express) {
@@ -37,15 +38,28 @@ class Router {
     );
 
     router.put(
+      `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`,
+      cors(),
+      (req: express.Request, res: express.Response) => {
+        res.sendStatus(400);
+      }
+    );
+
+    router.put(
       `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}/:id`,
       cors(),
       async (req: express.Request, res: express.Response) => {
         const eidasQecId = req.params.id;
-        const { id, firstInsertion } = await Controller.putEidasKeys(
-          eidasQecId,
-          req.body
-        );
-        res.status(firstInsertion ? 201 : 200).json({ id });
+        try {
+          const { id, firstInsertion } = await Controller.putEidasKeys(
+            eidasQecId,
+            req.body
+          );
+          res.status(firstInsertion ? 201 : 200).json({ id });
+        } catch (error) {
+          LOGGER.error(`Error ${JSON.stringify(error)}`);
+          res.sendStatus(400);
+        }
       }
     );
     router.options("*", cors());
