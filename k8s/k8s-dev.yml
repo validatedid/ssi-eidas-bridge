@@ -32,6 +32,11 @@ spec:
             configMapKeyRef:
               name: eidas-bridge-configmap
               key: BRIDGE_ENV
+        - name: BRIDGE_API_EXTERNAL_URL
+          valueFrom:
+            configMapKeyRef:
+              name: eidas-bridge-configmap
+              key: BRIDGE_API_EXTERNAL_URL
         - name: DEBUG_LEVEL
           valueFrom:
             configMapKeyRef:

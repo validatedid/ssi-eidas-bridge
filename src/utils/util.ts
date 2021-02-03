@@ -22,7 +22,7 @@ const prefixWith0x = (key: string): string =>
   key.startsWith("0x") ? key : `0x${key}`;
 
 const PRINT = (data: unknown, level: string, operation?: string): void => {
-  if (ENVIRONMENT === "test") {
+  if (ENVIRONMENT === "local") {
     LOGGER.silent = true;
   }
 
@@ -42,7 +42,7 @@ const PRINT_DEBUG = (data: unknown, operation?: string): void => {
 };
 
 const PRINT_ERROR = (error: Error, operation?: string): void => {
-  if (ENVIRONMENT === "test") {
+  if (ENVIRONMENT === "local") {
     LOGGER.silent = true;
   }
 

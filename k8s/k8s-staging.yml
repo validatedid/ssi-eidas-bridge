@@ -21,7 +21,7 @@ spec:
         app: eidas-bridge
     spec:
       containers:
-      - image: k8scrvidchainpro.azurecr.io/eidas-bridge:latest
+      - image: k8scrvidchaindev.azurecr.io/eidas-bridge:latest
         imagePullPolicy: "Always"
         name: eidas-bridge
         ports:
@@ -95,7 +95,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: eidas-bridge-ingress
-  namespace: production
+  namespace: staging
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -104,10 +104,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - api.vidchain.net
-    secretName: tls-secret-production
+    - staging.vidchain.net
+    secretName: tls-secret-staging
   rules:
-  - host: api.vidchain.net
+  - host: staging.vidchain.net
     http:
       paths:
       - path: /eidas-bridge

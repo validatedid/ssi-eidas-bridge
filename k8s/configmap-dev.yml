@@ -8,3 +8,4 @@ data:
   EIDAS_TEST_MODE: "false"
   REDIS_URL: "redisbrige-service"
   REDIS_PORT: "6380"
+  BRIDGE_API_EXTERNAL_URL: "https://dev.vidchain.net"
