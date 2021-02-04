@@ -15,6 +15,7 @@ import { BadRequestError, ApiErrorMessages } from "../../errors";
 import { isEidasProof, signEidas, verifyEidas } from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
 import { isVerifiableCredential } from "../../utils/ssi";
+import { indication } from "../../dtos";
 
 export default class Controller {
   /**
@@ -61,13 +62,15 @@ export default class Controller {
     verifiableCredential: VerifiableCredential
   ): Promise<void> {
     if (!isVerifiableCredential(verifiableCredential))
-      throw new BadRequestError(BadRequestError.defaultTitle, {
+      throw new BadRequestError(indication.VERIFICATION_FAIL, {
         detail: ApiErrorMessages.BAD_VERIFIABLE_CREDENTIAL,
       });
     const credential = (({ proof, ...o }) => o)(verifiableCredential);
     if (!Array.isArray(verifiableCredential.proof)) {
       if (!isEidasProof(verifiableCredential.proof))
-        throw new BadRequestError(ApiErrorMessages.NO_EIDAS_PROOF);
+        throw new BadRequestError(indication.VERIFICATION_FAIL, {
+          detail: ApiErrorMessages.NO_EIDAS_PROOF,
+        });
       await verifyEidas(credential, verifiableCredential.proof as EidasProof);
     }
     if (Array.isArray(verifiableCredential.proof)) {
@@ -75,7 +78,9 @@ export default class Controller {
         isEidasProof(proof)
       );
       if (eidasProofs.length <= 0)
-        throw new BadRequestError(ApiErrorMessages.NO_EIDAS_PROOF);
+        throw new BadRequestError(indication.VERIFICATION_FAIL, {
+          detail: ApiErrorMessages.NO_EIDAS_PROOF,
+        });
       const resolves = eidasProofs.map(async (eidasProof) =>
         verifyEidas(credential, eidasProof as EidasProof)
       );

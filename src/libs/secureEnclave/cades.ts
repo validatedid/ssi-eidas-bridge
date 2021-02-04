@@ -5,6 +5,7 @@
 import { BadRequestError } from "@cef-ebsi/problem-details-errors";
 import { KJUR } from "jsrsasign";
 import constants from "../../@types";
+import { indication } from "../../dtos";
 import {
   CadesSignatureInput,
   CadesSignatureOutput,
@@ -81,7 +82,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
 
 const verifyCadesSignature = (pemCades: string): CadesVerificationOutput => {
   if (!pemCades)
-    throw new BadRequestError(BadRequestError.defaultTitle, {
+    throw new BadRequestError(indication.VERIFICATION_FAIL, {
       detail: ApiErrorMessages.NO_PEM_CADES,
     });
   const hexSignedData = pemtohex(pemCades, constants.DEFAULT_CMS_HEADER);

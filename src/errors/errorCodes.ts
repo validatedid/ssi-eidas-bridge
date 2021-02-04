@@ -7,6 +7,7 @@ export enum ApiErrorMessages {
   WALLET_NOT_FOUND = "Wallet not found",
   ERROR_SIGNATURE_CREATION = "Error on creating the JWS Signature",
   WALLET_OPTIONS_NOT_PROVIDED = "Wallet options parameters are not provided",
+  BAD_REQUEST_MISSING_BODY = "Bad request missing body",
   BAD_CREDENTIAL_PARAMETERS = "Credential parameters are not valid.",
   BAD_VERIFIABLE_CREDENTIAL = "Object is not a valid Verification Credential.",
   SIGNATURE_BAD_PARAMS = "Signature body requires issuer, payload and password.",

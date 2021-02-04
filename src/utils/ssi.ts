@@ -1,4 +1,6 @@
 import { Options, normalize } from "jsonld";
+import { indication } from "../dtos";
+import { VerifiableCredential } from "../dtos/eidas";
 import { ApiErrorMessages, BadRequestError } from "../errors";
 import { getPemPublicKeyfromPemCert } from "./crypto";
 import { replacePemHeaderAndNewLines } from "./util";
@@ -26,15 +28,37 @@ const isCredential = (object: Record<string, unknown>): boolean => {
   );
 };
 
+const isProof = (object: Record<string, unknown>): boolean => {
+  return (
+    "type" in object &&
+    "created" in object &&
+    "proofPurpose" in object &&
+    "verificationMethod" in object
+  );
+};
+
+const areProofs = (object: Record<string, unknown>): boolean => {
+  if (!Array.isArray(object)) return isProof(object);
+  return object.some((proof) => {
+    return isProof(proof);
+  });
+};
+
 const isVerifiableCredential = (object: Record<string, unknown>): boolean => {
-  return isCredential(object) && "proof" in object;
+  return (
+    isCredential(object) &&
+    "proof" in object &&
+    areProofs(object.proof as VerifiableCredential)
+  );
 };
 
 const canonizeCredential = async (
   payload: Record<string, unknown>
 ): Promise<string> => {
   if (!isCredential(payload))
-    throw new BadRequestError(ApiErrorMessages.CANONIZE_BAD_PARAMS);
+    throw new BadRequestError(indication.VERIFICATION_FAIL, {
+      detail: ApiErrorMessages.CANONIZE_BAD_PARAMS,
+    });
   const options: Options.Normalize = {
     algorithm: "URDNA2015",
     format: "application/n-quads",

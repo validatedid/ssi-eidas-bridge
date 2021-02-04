@@ -5,6 +5,7 @@ import { decodeJWT } from "did-jwt";
 import LOGGER from "../logger";
 import { ENVIRONMENT } from "../config";
 import { BadRequestError, ProblemDetailsError } from "../errors";
+import { indication } from "../dtos";
 
 const toHex = (data: string): string =>
   Buffer.from(data, "base64").toString("hex");
@@ -128,7 +129,9 @@ const b64nltohex = (s: string): string => {
  */
 const pemtohex = (s: string, sHead: string): string => {
   if (s.indexOf("-----BEGIN ") === -1)
-    throw new BadRequestError(`can't find PEM header: ${sHead}`);
+    throw new BadRequestError(indication.VERIFICATION_FAIL, {
+      detail: `can't find PEM header: ${sHead}`,
+    });
   let inputData = s;
   if (sHead !== undefined) {
     inputData = inputData.replace(

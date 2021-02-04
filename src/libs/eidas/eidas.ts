@@ -12,6 +12,7 @@ import {
 } from "../../utils/ssi";
 import { verifyCadesSignature } from "../secureEnclave/cades";
 import constants from "../../@types";
+import { indication } from "../../dtos";
 
 const PROOF_REQUIRED_KEYS = [
   "type",
@@ -39,19 +40,25 @@ export const compareCredentialKeys = (
 
 const validateEIDASProofType = (value: string): void => {
   if (value.length < 1 || !value.includes(DEFAULT_EIDAS_PROOF_TYPE)) {
-    throw new TypeError(`Proof type is missing '${DEFAULT_EIDAS_PROOF_TYPE}'`);
+    throw new BadRequestError(indication.VERIFICATION_FAIL, {
+      detail: `Proof type is missing ${DEFAULT_EIDAS_PROOF_TYPE}`,
+    });
   }
 };
 
 const validateProofPurpose = (value: string): void => {
   if (value.length < 1 || !value.includes(DEFAULT_PROOF_PURPOSE)) {
-    throw new TypeError(`Proof Purpose is missing '${DEFAULT_PROOF_PURPOSE}'`);
+    throw new BadRequestError(indication.VERIFICATION_FAIL, {
+      detail: `Proof Purpose is missing ${DEFAULT_PROOF_PURPOSE}`,
+    });
   }
 };
 
 const validateProofKeys = (value: Proof): void => {
   if (Object.keys(value).length === 0)
-    throw new TypeError("Proof must not be empty");
+    throw new BadRequestError(indication.VERIFICATION_FAIL, {
+      detail: `Proof must not be empty`,
+    });
 
   const arrKeys = Object.keys(value);
   if (!compareCredentialKeys(PROOF_REQUIRED_KEYS, arrKeys)) {
@@ -108,7 +115,9 @@ const verifyEidas = async (
   validateEIDASProofAttributes(eidasProof);
   const verificationOut = verifyCadesSignature(eidasProof.cades);
   if (!verificationOut || !verificationOut.isValid)
-    throw new BadRequestError(ApiErrorMessages.ERROR_VERIFYING_SIGNATURE);
+    throw new BadRequestError(indication.VERIFICATION_FAIL, {
+      detail: ApiErrorMessages.ERROR_VERIFYING_SIGNATURE,
+    });
   // check that the data signed is the same as the Verifiable Credential payload
   const canonizedCredential = await canonizeCredential(credential);
   const signedData = Buffer.from(
@@ -117,7 +126,7 @@ const verifyEidas = async (
   ).toString("utf-8");
   if (canonizedCredential !== signedData)
     throw new BadRequestError(
-      ApiErrorMessages.CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA
+      `${ApiErrorMessages.CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA}`
     );
 };
 
