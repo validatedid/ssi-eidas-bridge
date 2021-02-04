@@ -51,6 +51,6 @@ describe("eidas e2e flow towards vidchain", () => {
       `${server}${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.SIGNATURE_VALIDATION}`,
       signResponse.data
     );
-    expect(sigValidationResponse.status).toStrictEqual(204);
+    expect(sigValidationResponse.status).toStrictEqual(200);
   });
 });

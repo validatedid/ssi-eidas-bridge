@@ -5,6 +5,8 @@ import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as eidas from "../../src/libs/eidas/eidas";
 import { EidasProof } from "../../src/dtos/eidas";
 import redis from "../../src/libs/storage/redis";
+import { BadRequestError } from "../../src/errors";
+import { indication } from "../../src/dtos";
 
 jest.mock("did-jwt", () => ({
   decodeJWT: jest.fn(),
@@ -100,7 +102,7 @@ describe("controller suite tests", () => {
       const vc = {};
       await expect(
         Controller.EIDASvalidateSignature(vc as never)
-      ).rejects.toThrow("Bad Request");
+      ).rejects.toThrow(indication.VERIFICATION_FAIL);
     });
 
     it("should throw an error when is not a vc", async () => {
@@ -110,16 +112,17 @@ describe("controller suite tests", () => {
       };
       await expect(
         Controller.EIDASvalidateSignature(proof as never)
-      ).rejects.toThrow("Bad Request");
+      ).rejects.toThrow(indication.VERIFICATION_FAIL);
     });
 
     it("should throw an error when vc proof is not valid eidasProof", async () => {
       expect.assertions(1);
+      const expectedError = new BadRequestError(indication.VERIFICATION_FAIL, {
+        detail: "Verification Credential does not contain an Eidas Proof",
+      });
       await expect(
         Controller.EIDASvalidateSignature(mockedData.mockVC as never)
-      ).rejects.toThrow(
-        "Verification Credential does not contain an Eidas Proof"
-      );
+      ).rejects.toThrow(expectedError);
     });
   });
 });

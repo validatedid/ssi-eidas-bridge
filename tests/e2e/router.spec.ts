@@ -129,7 +129,7 @@ describe("eidas router API calls", () => {
           `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.SIGNATURE_VALIDATION}`
         )
         .send(res.body);
-      expect(resSigValidation.status).toStrictEqual(204);
+      expect(resSigValidation.status).toStrictEqual(200);
     });
   });
 });

@@ -5,6 +5,8 @@ import {
 } from "../../src/libs/eidas/eidas";
 import { mockVC } from "../data/credentials";
 import redis from "../../src/libs/storage/redis";
+import { ApiErrorMessages, BadRequestError } from "../../src/errors";
+import { indication } from "../../src/dtos";
 
 const DID_ENTITY = "did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D";
 const CADES =
@@ -41,9 +43,11 @@ describe("eidas test suite", () => {
         verificationMethod: mockProof.verificationMethod,
         jws: CADES,
       };
-
+      const expectedError = new BadRequestError(indication.VERIFICATION_FAIL, {
+        detail: `Proof type is missing ${constants.DEFAULT_EIDAS_PROOF_TYPE}`,
+      });
       expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
-        `Proof type is missing '${constants.DEFAULT_EIDAS_PROOF_TYPE}'`
+        expectedError
       );
     });
 
@@ -57,9 +61,12 @@ describe("eidas test suite", () => {
         verificationMethod: mockProof.verificationMethod,
         jws: CADES,
       };
+      const expectedError = new BadRequestError(indication.VERIFICATION_FAIL, {
+        detail: `Proof type is missing ${constants.DEFAULT_EIDAS_PROOF_TYPE}`,
+      });
 
       expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
-        `Proof type is missing '${constants.DEFAULT_EIDAS_PROOF_TYPE}'`
+        expectedError
       );
     });
 
@@ -73,9 +80,11 @@ describe("eidas test suite", () => {
         verificationMethod: mockProof.verificationMethod,
         jws: CADES,
       };
-
+      const expectedError = new BadRequestError(indication.VERIFICATION_FAIL, {
+        detail: `Proof Purpose is missing ${constants.DEFAULT_PROOF_PURPOSE}`,
+      });
       expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
-        `Proof Purpose is missing '${constants.DEFAULT_PROOF_PURPOSE}'`
+        expectedError
       );
     });
 
@@ -89,9 +98,11 @@ describe("eidas test suite", () => {
         verificationMethod: mockProof.verificationMethod,
         jws: CADES,
       };
-
+      const expectedError = new BadRequestError(indication.VERIFICATION_FAIL, {
+        detail: `Proof Purpose is missing ${constants.DEFAULT_PROOF_PURPOSE}`,
+      });
       expect(() => validateEIDASProofAttributes(proof as never)).toThrow(
-        `Proof Purpose is missing '${constants.DEFAULT_PROOF_PURPOSE}'`
+        expectedError
       );
     });
 
