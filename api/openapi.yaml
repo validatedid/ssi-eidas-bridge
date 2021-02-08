@@ -13,7 +13,9 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - url: https://api.vidchain.net
-    description: Validated ID API 
+    description: Validated ID API
+  - url: https://staging.vidchain.net
+    description: Validated ID API Staging
   - url: https://dev.vidchain.net
     description: Validated ID API Dev
   - url: http://localhost:9002

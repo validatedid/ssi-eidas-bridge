@@ -5,7 +5,7 @@ const startAll = async (): Promise<void> => {
   await startService(
     BRIDGE_SERVICE.NAME.EIDAS,
     BRIDGE_SERVICE.PORT.EIDAS,
-    ENVIRONMENT === "local" || ENVIRONMENT === "test"
+    ENVIRONMENT === "local"
       ? BRIDGE_SERVICE.SWAGGER_INTERNAL_URL.EIDAS
       : BRIDGE_SERVICE.SWAGGER_EXTERNAL_URL.EIDAS
   );

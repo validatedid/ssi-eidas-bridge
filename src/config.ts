@@ -4,9 +4,6 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const LOCALHOST = "http://localhost";
-const BRIDGE_API_DEV_URL = "https://dev.vidchain.net";
-const BRIDGE_API_INT_URL = "https://dev.vidchain.net";
-const BRIDGE_API_PROD_URL = "https://api.vidchain.net";
 const OPENAPI_PATH = "../../api/openapi.yaml";
 const API_VERSION = "v1";
 
@@ -15,41 +12,49 @@ const checkStrVar = (variable: string | undefined, name: string): string => {
   return variable;
 };
 
-// GLOBAL ENVIRONMENT CONFIG AND URLS PER EACH ENV
-const GLOBAL_CONFIG = {
+interface EnvironmentOptions {
+  logLevel: string;
+  [x: string]: string;
+}
+
+interface EnvironmentType {
+  production: EnvironmentOptions;
+  staging: EnvironmentOptions;
+  development: EnvironmentOptions;
+  local: EnvironmentOptions;
+  [x: string]: EnvironmentOptions;
+}
+
+const GLOBAL_CONFIG: EnvironmentType = {
   production: {
     logLevel: "info",
-    ebsiApiBaseUrl: BRIDGE_API_PROD_URL,
+  },
+  staging: {
+    logLevel: "info",
   },
   development: {
-    logLevel: "info",
-    ebsiApiBaseUrl: BRIDGE_API_DEV_URL,
-  },
-  integration: {
     logLevel: "debug",
-    ebsiApiBaseUrl: BRIDGE_API_INT_URL,
-  },
-  test: {
-    logLevel: "info",
-    ebsiApiBaseUrl: BRIDGE_API_INT_URL,
   },
   local: {
     logLevel: process.env.DEBUG_LEVEL ? process.env.DEBUG_LEVEL : "silly",
-    ebsiApiBaseUrl: BRIDGE_API_INT_URL,
+    bridgeApiBaseUrl: LOCALHOST,
   },
 };
 
 const ENVIRONMENT =
-  process.env.BRIDGE_ENV === "test" ||
   process.env.BRIDGE_ENV === "production" ||
+  process.env.BRIDGE_ENV === "staging" ||
   process.env.BRIDGE_ENV === "development" ||
   process.env.BRIDGE_ENV === "local"
     ? process.env.BRIDGE_ENV
-    : "integration"; // integration by default
+    : "local";
 
 const FINAL_CONFIG = GLOBAL_CONFIG[ENVIRONMENT];
 const LOG_LEVEL = FINAL_CONFIG.logLevel;
-const BRIDGE_EXTERNAL_API_BASE_URL = FINAL_CONFIG.ebsiApiBaseUrl;
+
+const BRIDGE_EXTERNAL_API_BASE_URL = FINAL_CONFIG.bridgeApiBaseUrl
+  ? FINAL_CONFIG.bridgeApiBaseUrl
+  : checkStrVar(process.env.BRIDGE_API_EXTERNAL_URL, "BRIDGE_API_EXTERNAL_URL");
 
 const BRIDGE_BASE_PATH = {
   API_DOCS: "/api-docs",

@@ -3,9 +3,9 @@ kind: ConfigMap
 metadata:
   name: eidas-bridge-configmap
 data:
-  BRIDGE_ENV: "production"
+  BRIDGE_ENV: "staging"
   DEBUG_LEVEL: "info" # { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
   EIDAS_TEST_MODE: "false"
   REDIS_URL: "redisbrige-service"
   REDIS_PORT: "6380"
-  BRIDGE_API_EXTERNAL_URL: "https://api.vidchain.net"
+  BRIDGE_API_EXTERNAL_URL: "https://staging.vidchain.net"
