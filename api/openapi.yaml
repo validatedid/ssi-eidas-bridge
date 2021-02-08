@@ -292,7 +292,7 @@ paths:
             examples:
               eSeal a Credential Payload:
                 value:
-                  issuer: did:key:z6MkkGj1UZAUjWzrt5zgdhxM4WcZE5bHKZogQKZHvt8hrXzE
+                  issuer: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
                   payload:
                     "@context":
                       - "https://www.w3.org/2018/credentials/v1"
