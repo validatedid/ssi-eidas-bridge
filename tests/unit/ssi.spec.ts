@@ -1,4 +1,5 @@
-import { ApiErrorMessages } from "../../src/errors";
+import { indication } from "../../src/dtos";
+import { ApiErrorMessages, BadRequestError } from "../../src/errors";
 import {
   canonizeCredential,
   getKidFromDidAndPemCertificate,
@@ -145,8 +146,11 @@ describe("ssi util tests should", () => {
   }, 30000);
   it("throw BadRequestError when canonize a non Credential", async () => {
     expect.assertions(1);
+    const expectedError = new BadRequestError(indication.VERIFICATION_FAIL, {
+      detail: ApiErrorMessages.CANONIZE_BAD_PARAMS,
+    });
     await expect(canonizeCredential({ data: "some data" })).rejects.toThrow(
-      ApiErrorMessages.CANONIZE_BAD_PARAMS
+      expectedError
     );
   });
 });

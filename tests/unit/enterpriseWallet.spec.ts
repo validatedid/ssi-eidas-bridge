@@ -3,10 +3,15 @@ import fs from "fs";
 import path from "path";
 import { v4 as uuid } from "uuid";
 import { EnterpriseWallet } from "../../src/libs/secureEnclave";
-import { ApiErrorMessages, InternalError } from "../../src/errors";
+import {
+  ApiErrorMessages,
+  BadRequestError,
+  InternalError,
+} from "../../src/errors";
 import { eidasCrypto } from "../../src/utils";
 import * as mockedData from "../data/credentials";
 import { verifyCadesSignature } from "../../src/libs/secureEnclave/cades";
+import { indication } from "../../src/dtos";
 
 jest.mock("ioredis");
 
@@ -160,10 +165,10 @@ describe("eidas enterprise wallet tests should", () => {
       did: mockDid,
       password,
     });
-
-    await expect(wallet.eSeal(dataToSign)).rejects.toThrow(
-      ApiErrorMessages.CANONIZE_BAD_PARAMS
-    );
+    const expectedError = new BadRequestError(indication.VERIFICATION_FAIL, {
+      detail: ApiErrorMessages.CANONIZE_BAD_PARAMS,
+    });
+    await expect(wallet.eSeal(dataToSign)).rejects.toThrow(expectedError);
     jest.restoreAllMocks();
   });
 
