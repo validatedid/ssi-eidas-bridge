@@ -530,7 +530,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/Verification"
+                $ref: "#/components/schemas/VerificationSucceed"
               examples:
                 TOTAL_SUCCESS:
                   $ref: "#/components/examples/TotalSuccess"
@@ -541,7 +541,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/Verification"
+                $ref: "#/components/schemas/VerificationFailed"
               examples:
                 Bad Request:
                   $ref: "#/components/examples/Indeterminate"
@@ -1116,15 +1116,41 @@ components:
           example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
       example:
           id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-    Verification:
+    VerificationSucceed:
       title: Verification result
       description: Result for Signature Verification
       type: object
       properties:
         indication:
-          description: Descriptor of the result obtained.
+          description: Descriptor of the result obtained
           type: string
+          enum:
+            - TOTAL_PASSED
+            - TOTAL_FAILED
           example: TOTAL_PASSED
+        checks:
+          description: String list
+          type: array
+          example:
+            - credential
+            - proof
+        warnings:
+          description: String list
+          type: array
+        errors:
+          description: String list
+          type: array
+    VerificationFailed:
+      title: Verification result
+      description: Result for Signature Verification
+      type: object
+      properties:
+        indication:
+          description: Descriptor of the result obtained
+          type: string
+          enum:
+            - INDETERMINATE
+          example: INDETERMINATE
         checks:
           description: String list
           type: array
