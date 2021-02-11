@@ -525,8 +525,19 @@ paths:
                       cades: "-----BEGIN PKCS7-----MIINPQYJKoZIhvcNAQcCoIINLjCCDSoCAQExDzANBglghkgBZQMEAgEFADCCAnQGCSqGSIb3DQEHAaCCAmUEggJhPGh0dHA6Ly9leGFtcGxlLmVkdS9jcmVkZW50aWFscy8xODcyPiA8aHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zI3R5cGU+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNWZXJpZmlhYmxlQ3JlZGVudGlhbD4gLgo8aHR0cDovL2V4YW1wbGUuZWR1L2NyZWRlbnRpYWxzLzE4NzI+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNjcmVkZW50aWFsU3ViamVjdD4gPGRpZDprZXk6elEzc2h0eFYxRnJKZmhxRTFkdnhZUmNDa25XTmpIYzNjNVgxeTNaU29QRGkyYXVyMj4gLgo8aHR0cDovL2V4YW1wbGUuZWR1L2NyZWRlbnRpYWxzLzE4NzI+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNpc3N1YW5jZURhdGU+ICIyMDE5LTEyLTMxVDIzOjU5OjYwWiJeXjxodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSNkYXRlVGltZT4gLgo8aHR0cDovL2V4YW1wbGUuZWR1L2NyZWRlbnRpYWxzLzE4NzI+IDxodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscyNpc3N1ZXI+IDxkaWQ6a2V5OnpRM3NodHhWMUZySmZocUUxZHZ4WVJjQ2tuV05qSGMzYzVYMXkzWlNvUERpMmF1cjI+IC4KoIIGNTCCBjEwggQZoAMCAQICFBy9lOj/nTeUD8ZU3bmkkskrgkPsMA0GCSqGSIb3DQEBCwUAMIGnMQswCQYDVQQGEwJFUzESMBAGA1UECAwJQ2F0YWxvbmlhMRIwEAYDVQQHDAlCYXJjZWxvbmExGDAWBgNVBAoMD1ZhbGlkYXRlZCBJZCBzbDERMA8GA1UECwwIVklEY2hhaW4xFTATBgNVBAMMDFZhbGlkYXRlZCBJZDEsMCoGCSqGSIb3DQEJARYddmlkY2hhaW4rdGVzdEB2YWxpZGF0ZWRpZC5jb20w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-----END PKCS7-----"
         required: true
       responses:
-        "204":
-          description: Valid
+        "200":
+          description: Verification performed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Verification"
+              examples:
+                TOTAL_PASSED:
+                  $ref: "#/components/examples/TotalSuccess"
+                TOTAL_FAILED:
+                  $ref: "#/components/examples/TotalFailed"
+                INDETERMINATE:
+                  $ref: "#/components/examples/Indeterminate"
         "400":
           description: Bad Request
           content:
@@ -1107,6 +1118,54 @@ components:
           example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
       example:
           id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
+    Verification:
+      title: Verification result
+      description: Result for Signature Verification
+      type: object
+      properties:
+        indication:
+          description: Descriptor of the result obtained
+          type: string
+          enum:
+            - TOTAL_PASSED
+            - TOTAL_FAILED
+            - INDETERMINATE
+          example: TOTAL_PASSED
+        checks:
+          description: String list
+          type: array
+          example:
+            - credential
+            - proof
+        warnings:
+          description: String list
+          type: array
+        errors:
+          description: String list
+          type: array
+    VerificationFailed:
+      title: Verification result
+      description: Result for Signature Verification
+      type: object
+      properties:
+        indication:
+          description: Descriptor of the result obtained
+          type: string
+          enum:
+            - INDETERMINATE
+          example: INDETERMINATE
+        checks:
+          description: String list
+          type: array
+          example:
+            - credential
+            - proof
+        warnings:
+          description: String list
+          type: array
+        errors:
+          description: String list
+          type: array
     Problem:
       description: A Problem Details object (RFC 7807)
       type: object
@@ -1189,6 +1248,36 @@ components:
           example: "1467841035013"
       description: Authentication JWT
   examples:
+    TotalSuccess:
+      value:
+        indication: "TOTAL_PASSED"
+        checks:
+          - "credential"
+          - "proof"
+        warnings:
+          - ""
+        errors: 
+          - ""
+    TotalFailed:
+      value:
+        indication: "TOTAL_FAILED"
+        checks:
+          - "credential"
+          - "proof"
+        warnings:
+          - ""
+        errors: 
+          - "Error message information"
+    Indeterminate:
+      value:
+        indication: "INDETERMINATE"
+        checks:
+          - "credential"
+          - "proof"
+        warnings:
+          - ""
+        errors: 
+          - "Error message information"
     BadRequest:
       value:
         title: Bad Request
