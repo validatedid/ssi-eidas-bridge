@@ -532,7 +532,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/VerificationSucceed"
               examples:
-                TOTAL_SUCCESS:
+                TOTAL_PASSED:
                   $ref: "#/components/examples/TotalSuccess"
                 TOTAL_FAILED:
                   $ref: "#/components/examples/TotalFailed"
