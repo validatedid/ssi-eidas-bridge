@@ -526,25 +526,27 @@ paths:
         required: true
       responses:
         "200":
-          description: Verification performed, i.e. suceess or fail
+          description: Verification performed
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/VerificationSucceed"
+                $ref: "#/components/schemas/Verification"
               examples:
                 TOTAL_PASSED:
                   $ref: "#/components/examples/TotalSuccess"
                 TOTAL_FAILED:
                   $ref: "#/components/examples/TotalFailed"
+                INDETERMINATE:
+                  $ref: "#/components/examples/Indeterminate"
         "400":
-          description: Indeterminate
+          description: Bad Request
           content:
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/VerificationFailed"
+                $ref: "#/components/schemas/Problem"
               examples:
                 Bad Request:
-                  $ref: "#/components/examples/Indeterminate"
+                  $ref: "#/components/examples/BadRequest"
         "401":
           description: Unauthorized
           content:
@@ -1116,7 +1118,7 @@ components:
           example: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
       example:
           id: did:key:zQ3shtxV1FrJfhqE1dvxYRcCknWNjHc3c5X1y3ZSoPDi2aur2
-    VerificationSucceed:
+    Verification:
       title: Verification result
       description: Result for Signature Verification
       type: object
@@ -1127,6 +1129,7 @@ components:
           enum:
             - TOTAL_PASSED
             - TOTAL_FAILED
+            - INDETERMINATE
           example: TOTAL_PASSED
         checks:
           description: String list
