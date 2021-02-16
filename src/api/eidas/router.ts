@@ -65,14 +65,6 @@ class Router {
     );
 
     router.put(
-      `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`,
-      cors(),
-      (req: express.Request, res: express.Response) => {
-        res.sendStatus(400);
-      }
-    );
-
-    router.put(
       `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}/:id`,
       cors(),
       async (req: express.Request, res: express.Response) => {
