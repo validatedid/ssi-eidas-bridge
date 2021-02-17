@@ -17,11 +17,6 @@ import { parseSigningTime } from "../../utils/ssi";
 import { pemtohex, replacePemNewLines } from "../../utils/util";
 
 const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
-  const dataDigest = KJUR.crypto.Util.hashString(
-    input.data,
-    constants.HashAlg.SHA256
-  );
-
   const date = new KJUR.asn1.DERUTCTime({
     date: new Date(Date.now()),
   }) as DerSigningTime;
@@ -31,7 +26,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
     hashalgs: [constants.HashAlg.SHA256],
     econtent: {
       type: "data",
-      content: { str: input.data },
+      content: { hex: input.data },
     },
     certs: [input.pemCert],
     sinfos: [
@@ -51,7 +46,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
             },
             {
               attr: "messageDigest",
-              hex: dataDigest,
+              hex: input.data,
             },
             {
               attr: "signingCertificateV2",

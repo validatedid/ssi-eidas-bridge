@@ -2,6 +2,7 @@ import Redis from "ioredis";
 import fs from "fs";
 import path from "path";
 import { v4 as uuid } from "uuid";
+import crypto from "crypto";
 import { EnterpriseWallet } from "../../src/libs/secureEnclave";
 import {
   ApiErrorMessages,
@@ -12,6 +13,7 @@ import { eidasCrypto } from "../../src/utils";
 import * as mockedData from "../data/credentials";
 import { verifyCadesSignature } from "../../src/libs/secureEnclave/cades";
 import { indication } from "../../src/dtos";
+import { canonizeCredential } from "../../src/utils/ssi";
 
 jest.mock("ioredis");
 
@@ -196,7 +198,7 @@ describe("eidas enterprise wallet tests should", () => {
   }, 40000);
 
   it("verifies a seal with a given payload with a certificate with CA", async () => {
-    expect.assertions(2);
+    expect.assertions(4);
     const fileDataHex = Buffer.from(
       fs.readFileSync(path.join(__dirname, `${testFilePathWithCa}${p12File}`))
     ).toString("hex");
@@ -215,13 +217,17 @@ describe("eidas enterprise wallet tests should", () => {
 
     const cadesOuput = await wallet.eSeal(mockedData.mockVC);
     const verificationOut = verifyCadesSignature(cadesOuput.cades);
+    const hash = crypto.createHash("sha256");
+    hash.update(await canonizeCredential(mockedData.mockVC));
     expect(verificationOut.isValid).toBe(true);
     expect(verificationOut.parse).toBeDefined();
+    expect(verificationOut.parse.econtent).toBeDefined();
+    expect(verificationOut.parse.econtent).toBe(hash.digest("hex"));
     jest.restoreAllMocks();
   }, 40000);
 
   it("verifies a seal with a given payload with a selfsigned certificate", async () => {
-    expect.assertions(2);
+    expect.assertions(4);
     const fileDataHex = Buffer.from(
       fs.readFileSync(
         path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
@@ -242,8 +248,12 @@ describe("eidas enterprise wallet tests should", () => {
 
     const cadesOuput = await wallet.eSeal(mockedData.mockVC);
     const verificationOut = verifyCadesSignature(cadesOuput.cades);
+    const hash = crypto.createHash("sha256");
+    hash.update(await canonizeCredential(mockedData.mockVC));
     expect(verificationOut.isValid).toBe(true);
     expect(verificationOut.parse).toBeDefined();
+    expect(verificationOut.parse.econtent).toBeDefined();
+    expect(verificationOut.parse.econtent).toBe(hash.digest("hex"));
     jest.restoreAllMocks();
   }, 40000);
 });
