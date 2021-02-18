@@ -32,7 +32,7 @@ class Router {
       async (req: express.Request, res: express.Response) => {
         try {
           if (Object.keys(req.body).length === 0)
-            throw new BadRequestError(indication.VERIFICATION_INDETERMINATE, {
+            throw new BadRequestError(BadRequestError.defaultTitle, {
               detail: ApiErrorMessages.BAD_REQUEST_MISSING_BODY,
             });
           await Controller.EIDASvalidateSignature(req.body);
@@ -44,36 +44,23 @@ class Router {
           });
         } catch (error) {
           LOGGER.error(`Error ${JSON.stringify(error)}`);
-          if (
-            (error as BadRequestError).title === indication.VERIFICATION_FAIL
-          ) {
+          const errorTitle = (error as BadRequestError).title;
+          const verificationPerformed =
+            errorTitle === indication.VERIFICATION_FAIL ||
+            errorTitle === indication.VERIFICATION_INDETERMINATE;
+          if (verificationPerformed) {
             res.status(200).json({
-              indication: indication.VERIFICATION_FAIL,
+              indication:
+                errorTitle === indication.VERIFICATION_FAIL
+                  ? indication.VERIFICATION_FAIL
+                  : indication.VERIFICATION_INDETERMINATE,
               checks: ["credential", "proof"],
               warnings: [],
               errors: [JSON.stringify(error)],
             });
           }
-          if (
-            (error as BadRequestError).title ===
-            indication.VERIFICATION_INDETERMINATE
-          ) {
-            res.status(400).json({
-              indication: indication.VERIFICATION_INDETERMINATE,
-              checks: ["credential", "proof"],
-              warnings: [],
-              errors: [JSON.stringify(error)],
-            });
-          }
+          if (!verificationPerformed) res.sendStatus(400);
         }
-      }
-    );
-
-    router.put(
-      `${BRIDGE_SERVICE.CALL.ADD_EIDAS_KEY}`,
-      cors(),
-      (req: express.Request, res: express.Response) => {
-        res.sendStatus(400);
       }
     );
 

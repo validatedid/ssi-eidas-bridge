@@ -28,6 +28,7 @@ export enum ApiErrorMessages {
   SIGN_EIDAS_BAD_PARAMETERS = "Sign Eidas requires a SignPayload with issuer, payload, type and password",
   NO_EIDAS_PROOF = "Verification Credential does not contain an Eidas Proof",
   CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA = "Verification Credential payload does not match signed data",
+  INDETERMINATE = "The certificate chain for signature is not trusted, it does not contain a trust anchor.",
 }
 
 export default { ApiErrorMessages };
