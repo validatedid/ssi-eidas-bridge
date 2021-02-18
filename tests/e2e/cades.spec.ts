@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { CadesSignatureInput } from "../../src/dtos/cades";
 import {
   signCadesRsa,
@@ -55,28 +56,34 @@ const SZ4_CERPEM = `-----BEGIN CERTIFICATE-----
   -----END CERTIFICATE-----`;
 
 describe("cades tests should", () => {
-  it("CADES-BES SHA256withRSA sign a given data and output a PEM CMS", () => {
-    expect.assertions(1);
-    const inputCades: CadesSignatureInput = {
-      data: "jsrsasign",
-      pemCert: SZ4_CERPEM,
-      pemPrivKey: SZ4_PRVP8PPEM,
-    };
-    const cadesOuput = signCadesRsa(inputCades);
-    expect(cadesOuput.cades).toBeDefined();
+  describe("sign", () => {
+    it("given data with CADES-BES SHA256withRSA and output a PEM CMS", () => {
+      expect.assertions(1);
+      const hash = crypto.createHash("sha256");
+      hash.update("jsrsasign");
+      const inputCades: CadesSignatureInput = {
+        data: hash.digest("hex"),
+        pemCert: SZ4_CERPEM,
+        pemPrivKey: SZ4_PRVP8PPEM,
+      };
+      const cadesOuput = signCadesRsa(inputCades);
+      expect(cadesOuput.cades).toBeDefined();
+    });
   });
-
-  it("verify a PEM CADES signature", () => {
-    expect.assertions(2);
-
-    const inputCades: CadesSignatureInput = {
-      data: "jsrsasign",
-      pemCert: SZ4_CERPEM,
-      pemPrivKey: SZ4_PRVP8PPEM,
-    };
-    const cadesOuput = signCadesRsa(inputCades);
-    const verificationOut = verifyCadesSignature(cadesOuput.cades);
-    expect(verificationOut.isValid).toBe(true);
-    expect(verificationOut.parse).toBeDefined();
+  describe("verify", () => {
+    it("PEM CADES signature", () => {
+      expect.assertions(2);
+      const hash = crypto.createHash("sha256");
+      hash.update("jsrsasign");
+      const inputCades: CadesSignatureInput = {
+        data: hash.digest("hex"),
+        pemCert: SZ4_CERPEM,
+        pemPrivKey: SZ4_PRVP8PPEM,
+      };
+      const cadesOuput = signCadesRsa(inputCades);
+      const verificationOut = verifyCadesSignature(cadesOuput.cades);
+      expect(verificationOut.isValid).toBe(true);
+      expect(verificationOut.parse).toBeDefined();
+    });
   });
 });

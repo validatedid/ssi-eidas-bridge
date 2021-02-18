@@ -5,7 +5,7 @@ import {
 } from "../../src/libs/eidas/eidas";
 import { mockVC } from "../data/credentials";
 import redis from "../../src/libs/storage/redis";
-import { ApiErrorMessages, BadRequestError } from "../../src/errors";
+import { BadRequestError } from "../../src/errors";
 import { indication } from "../../src/dtos";
 
 const DID_ENTITY = "did:vid:0xB551b70d650892d23dE3Be201A95c1FcBea98A3D";

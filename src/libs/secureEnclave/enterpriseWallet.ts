@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import redis from "../storage/redis";
 import { EidasKeysData } from "../../dtos/redis";
 import { ApiErrorMessages, BadRequestError } from "../../errors";
@@ -53,8 +54,10 @@ export default class EnterpriseWallet {
 
   async eSeal(payload: Record<string, unknown>): Promise<CadesSignatureOutput> {
     // TODO: sign with all certificate list
+    const hash = crypto.createHash("sha256");
+    hash.update(await canonizeCredential(payload));
     const inputCades: CadesSignatureInput = {
-      data: await canonizeCredential(payload),
+      data: hash.digest("hex"),
       pemCert: this.issuerPemCert[0],
       pemPrivKey: this.issuerPemPrivateKey,
     };

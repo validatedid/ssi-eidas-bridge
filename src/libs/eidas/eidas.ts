@@ -1,4 +1,4 @@
-import { Verify } from "crypto";
+import crypto from "crypto";
 import { SignPayload } from "../../dtos/secureEnclave";
 import { ApiErrorMessages, BadRequestError } from "../../errors";
 import { EnterpriseWallet } from "../secureEnclave";
@@ -127,13 +127,11 @@ const verifyEidas = async (
     throw new BadRequestError(indication.VERIFICATION_INDETERMINATE, {
       detail: ApiErrorMessages.INDETERMINATE,
     });
-  // check that the data signed is the same as the Verifiable Credential payload
+  // check that the hash of the data signed is the hash of the Verifiable Credential payload
   const canonizedCredential = await canonizeCredential(credential);
-  const signedData = Buffer.from(
-    verificationOut.parse.econtent,
-    "hex"
-  ).toString("utf-8");
-  if (canonizedCredential !== signedData)
+  const hash = crypto.createHash("sha256");
+  hash.update(canonizedCredential);
+  if (hash.digest("hex") !== verificationOut.parse.econtent)
     throw new BadRequestError(indication.VERIFICATION_FAIL, {
       detail: ApiErrorMessages.CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA,
     });
