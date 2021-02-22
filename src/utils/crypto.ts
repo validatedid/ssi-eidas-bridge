@@ -21,18 +21,23 @@ const getCertificateFromP12 = (
 ): { pemCertificate: string[] } => {
   const certData = p12.getBags({ bagType: pki.oids.certBag });
 
+  /*
   const pemCertificate = certData[pki.oids.certBag].map((certificate) =>
     pki.certificateToPem(certificate.cert).replace(/\r\n/g, "")
+  );
+  */
+  const pemCertificate = certData[pki.oids.certBag].map((certificate) =>
+    pki.certificateToPem(certificate.cert)
   );
 
   return { pemCertificate };
 };
 
 const convertToPem = (
-  p12base64: string,
+  p12binary: string,
   password: string
 ): { pemKey: string; pemCertificate: string[] } => {
-  const p12Asn1 = asn1.fromDer(p12base64);
+  const p12Asn1 = asn1.fromDer(p12binary);
   const p12 = pkcs12.pkcs12FromAsn1(p12Asn1, false, password);
 
   const pemKey = getKeyFromP12(p12);

@@ -7,7 +7,7 @@ import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as mockedData from "../data/credentials";
 import { EidasKeysInput } from "../../src/dtos/redis";
-import { generateDid } from "../utils";
+import { generateDid, ValidationResponse } from "../utils";
 import redis from "../../src/libs/storage/redis";
 
 jest.setTimeout(100000);
@@ -36,10 +36,10 @@ describe("eidas e2e flow", () => {
   });
 
   it("stores keys, signs and verifies", async () => {
-    expect.assertions(4);
+    expect.assertions(5);
     const did = await generateDid();
-    const testFilePathSelfSigned = "../data/test1/";
-    const p12File = "keyStore.p12";
+    const testFilePathSelfSigned = "../data/";
+    const p12File = "sello_entidad.p12";
     const fileDataHex = Buffer.from(
       fs.readFileSync(
         path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
@@ -58,7 +58,7 @@ describe("eidas e2e flow", () => {
     const signPayload: SignPayload = {
       issuer: did,
       payload: mockedData.mockCredential,
-      password: "vidchain",
+      password: "1234",
     };
     const signResponse = await request(server)
       .post(
@@ -73,5 +73,8 @@ describe("eidas e2e flow", () => {
       )
       .send(signResponse.body);
     expect(sigValidationResponse.status).toStrictEqual(200);
+    expect(
+      (sigValidationResponse.body as ValidationResponse).indication
+    ).toStrictEqual("TOTAL_PASSED");
   });
 });

@@ -7,6 +7,7 @@ import { startService } from "../../src/api/app";
 import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as mockedData from "../data/credentials";
+import { ValidationResponse } from "../utils";
 
 jest.setTimeout(100000);
 jest.mock("ioredis");
@@ -79,7 +80,7 @@ describe("eidas router API calls (mocking redis)", () => {
       jest.restoreAllMocks();
     });
 
-    it("returns a 204 with a valid signature", async () => {
+    it("returns a 200 with a valid signature", async () => {
       expect.assertions(2);
       const fileDataHex = Buffer.from(
         fs.readFileSync(
@@ -109,6 +110,9 @@ describe("eidas router API calls (mocking redis)", () => {
         )
         .send(res.body);
       expect(resSigValidation.status).toStrictEqual(200);
+      expect(
+        (resSigValidation.body as ValidationResponse).indication
+      ).toStrictEqual("TOTAL_PASSED");
       jest.restoreAllMocks();
     });
   });

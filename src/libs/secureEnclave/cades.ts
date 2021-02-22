@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { BadRequestError } from "@cef-ebsi/problem-details-errors";
+import { pki, util } from "node-forge";
 import { KJUR } from "jsrsasign";
 import constants from "../../@types";
 import { indication } from "../../dtos";
@@ -21,6 +22,22 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
     date: new Date(Date.now()),
   }) as DerSigningTime;
 
+  const cert = pki.certificateFromPem(input.pemCert);
+
+  const issuer = KJUR.asn1.x509.X500Name.ldapToCompat(
+    `OU=${util.decodeUtf8(
+      cert.issuer.getField("OU").value as string
+    )},O=${util.decodeUtf8(cert.issuer.getField("O").value as string)},C=${
+      cert.issuer.getField("C").value as string
+    }`
+  );
+
+  const issuerAndSerialNumber = new KJUR.asn1.cms.SignerIdentifier({
+    type: "isssn",
+    issuer: { str: issuer },
+    serial: { hex: cert.serialNumber },
+  });
+
   const param = {
     version: 1,
     hashalgs: [constants.HashAlg.SHA256],
@@ -32,7 +49,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
     sinfos: [
       {
         version: 1,
-        id: { type: "isssn", cert: input.pemCert },
+        id: issuerAndSerialNumber.params,
         hashalg: constants.HashAlg.SHA256,
         sattrs: {
           array: [

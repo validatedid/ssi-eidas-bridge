@@ -7,7 +7,7 @@ import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as mockedData from "../data/credentials";
 import { EidasKeysInput } from "../../src/dtos/redis";
-import { generateDid } from "../utils";
+import { generateDid, ValidationResponse } from "../utils";
 import redis from "../../src/libs/storage/redis";
 
 jest.setTimeout(100000);
@@ -111,7 +111,7 @@ describe("eidas router API calls", () => {
     });
 
     it("returns a 204 with a valid signature", async () => {
-      expect.assertions(2);
+      expect.assertions(3);
       const signPayload: SignPayload = {
         issuer: did,
         payload: mockedData.mockCredential,
@@ -130,6 +130,9 @@ describe("eidas router API calls", () => {
         )
         .send(res.body);
       expect(resSigValidation.status).toStrictEqual(200);
+      expect(
+        (resSigValidation.body as ValidationResponse).indication
+      ).toStrictEqual("TOTAL_PASSED");
     });
   });
 });

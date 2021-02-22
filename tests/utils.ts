@@ -9,6 +9,13 @@ import { resolver } from "@transmute/did-key.js";
 import { DIDDocument } from "did-resolver";
 import constants from "../src/@types";
 
+export interface ValidationResponse {
+  indication: string;
+  checks: string[];
+  warnings: string[];
+  errors: string[];
+}
+
 const prefixWith0x = (key: string): string => {
   return key.startsWith("0x") ? key : `0x${key}`;
 };
