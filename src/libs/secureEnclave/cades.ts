@@ -16,10 +16,29 @@ import { ApiErrorMessages } from "../../errors";
 import { parseSigningTime } from "../../utils/ssi";
 import { pemtohex, replacePemNewLines } from "../../utils/util";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { X509Certificate } = require("crypto");
+
+export const parseIssuerAndSerialNumberFromPemCert = (
+  pemCert: string
+): { issuer: string; serialNumber: string } => {
+  const x509 = new X509Certificate(pemCert);
+  const { issuer, serialNumber } = x509;
+  const finalIssuer = `/${issuer.replace(/\n/g, "/") as string}`;
+  return {
+    issuer: finalIssuer,
+    serialNumber,
+  };
+};
+
 const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
   const date = new KJUR.asn1.DERUTCTime({
     date: new Date(Date.now()),
   }) as DerSigningTime;
+
+  const { issuer, serialNumber } = parseIssuerAndSerialNumberFromPemCert(
+    input.pemCert
+  );
 
   const param = {
     version: 1,
@@ -32,7 +51,13 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
     sinfos: [
       {
         version: 1,
-        id: { type: "isssn", cert: input.pemCert },
+        id: {
+          type: "isssn",
+          issuer: {
+            str: issuer,
+          },
+          serial: { hex: serialNumber },
+        },
         hashalg: constants.HashAlg.SHA256,
         sattrs: {
           array: [
@@ -66,7 +91,6 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
     hexSignedData,
     "PKCS7"
   ) as string;
-
   const cadesOuput: CadesSignatureOutput = {
     cades: replacePemNewLines(pemSignedData, "PKCS7"),
     verificationMethod: input.pemCert,

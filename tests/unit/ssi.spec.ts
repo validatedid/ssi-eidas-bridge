@@ -5,7 +5,6 @@ import {
   getKidFromDidAndPemCertificate,
 } from "../../src/utils/ssi";
 import * as mockedData from "../data/credentials";
-import { generateDid, resolveDid } from "../utils";
 
 describe("ssi util tests should", () => {
   it("build a kid", () => {
@@ -19,108 +18,6 @@ describe("ssi util tests should", () => {
       pemCertificate,
     });
     expect(result).toStrictEqual(expectedResult);
-  });
-
-  it("generate a key did with a passed seed", async () => {
-    expect.assertions(1);
-    const seed = new Uint8Array(32);
-    const result = await generateDid(seed);
-    expect(result).toStrictEqual(
-      "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp"
-    );
-  });
-
-  it("generate a key did with no passed seed", async () => {
-    expect.assertions(2);
-    const result = await generateDid();
-    expect(result).toContain("did:key:z6Mk");
-    expect(result).toHaveLength(56);
-  });
-
-  it("resolves a specific did", async () => {
-    expect.assertions(1);
-    const expectedDidDoc = {
-      didDocument: {
-        "@context": [
-          "https://www.w3.org/ns/did/v1",
-          {
-            "@base": "did:key:z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP",
-          },
-        ],
-        assertionMethod: ["#z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP"],
-        authentication: ["#z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP"],
-        capabilityDelegation: [
-          "#z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP",
-        ],
-        capabilityInvocation: [
-          "#z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP",
-        ],
-        id: "did:key:z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP",
-        keyAgreement: ["#z6LScqmY9kirLuY22G6CuqBjuMpoqtgWk7bahWjuxFw5xH6G"],
-        verificationMethod: [
-          {
-            controller:
-              "did:key:z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP",
-            id: "#z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP",
-            publicKeyBase58: "dbDmZLTWuEYYZNHFLKLoRkEX4sZykkSLNQLXvMUyMB1",
-            type: "Ed25519VerificationKey2018",
-          },
-          {
-            controller:
-              "did:key:z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP",
-            id: "#z6LScqmY9kirLuY22G6CuqBjuMpoqtgWk7bahWjuxFw5xH6G",
-            publicKeyBase58: "2AbNdSuzFSpGvsiSPBfnamcKzk9Q3WRRpY2EToHZEuKW",
-            type: "X25519KeyAgreementKey2019",
-          },
-        ],
-      },
-      didDocumentMetaData: { "content-type": "application/did+ld+json" },
-      didResolutionMetaData: {},
-    };
-    const result = await resolveDid(
-      "did:key:z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP"
-    );
-    expect(result).toMatchObject(expectedDidDoc);
-  });
-
-  it("resolves a new did", async () => {
-    expect.assertions(1);
-    const did = await generateDid();
-    const kid = did.replace("did:key:", "");
-    const expectedDidDoc = {
-      didDocument: {
-        "@context": [
-          "https://www.w3.org/ns/did/v1",
-          {
-            "@base": did,
-          },
-        ],
-        assertionMethod: [`#${kid}`],
-        authentication: [`#${kid}`],
-        capabilityDelegation: [`#${kid}`],
-        capabilityInvocation: [`#${kid}`],
-        id: did,
-        keyAgreement: [expect.any(String)],
-        verificationMethod: [
-          {
-            controller: did,
-            id: `#${kid}`,
-            publicKeyBase58: expect.any(String) as string,
-            type: "Ed25519VerificationKey2018",
-          },
-          {
-            controller: did,
-            id: expect.any(String) as string,
-            publicKeyBase58: expect.any(String) as string,
-            type: "X25519KeyAgreementKey2019",
-          },
-        ],
-      },
-      didDocumentMetaData: { "content-type": "application/did+ld+json" },
-      didResolutionMetaData: {},
-    };
-    const result = await resolveDid(did);
-    expect(result).toMatchObject(expectedDidDoc);
   });
 
   it("canonize a given verifiable credential with context", async () => {
