@@ -7,6 +7,7 @@ import { startService } from "../../src/api/app";
 import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as mockedData from "../data/credentials";
+import { ValidationResponse } from "../utils";
 
 jest.setTimeout(100000);
 jest.mock("ioredis");
@@ -40,7 +41,7 @@ describe("eidas router API calls (mocking redis)", () => {
   });
 
   describe("secure enclave endpoints", () => {
-    const testFilePathSelfSigned = "../data/test1/";
+    const testFilePathSelfSigned = "../data/validatedid/";
     const p12File = "keyStore.p12";
     const password = "vidchain";
     const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
@@ -54,11 +55,10 @@ describe("eidas router API calls (mocking redis)", () => {
     });
     it("returns a 201 with a signature", async () => {
       expect.assertions(2);
-      const fileDataHex = Buffer.from(
-        fs.readFileSync(
-          path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-        )
-      ).toString("hex");
+      const fileDataHex = fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`),
+        "hex"
+      );
       const signPayload: SignPayload = {
         issuer: mockDid,
         payload: mockedData.mockCredential,
@@ -79,13 +79,12 @@ describe("eidas router API calls (mocking redis)", () => {
       jest.restoreAllMocks();
     });
 
-    it("returns a 204 with a valid signature", async () => {
-      expect.assertions(2);
-      const fileDataHex = Buffer.from(
-        fs.readFileSync(
-          path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-        )
-      ).toString("hex");
+    it("returns a 200 with a valid signature", async () => {
+      expect.assertions(3);
+      const fileDataHex = fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`),
+        "hex"
+      );
       const signPayload: SignPayload = {
         issuer: mockDid,
         payload: mockedData.mockCredential,
@@ -109,6 +108,9 @@ describe("eidas router API calls (mocking redis)", () => {
         )
         .send(res.body);
       expect(resSigValidation.status).toStrictEqual(200);
+      expect(
+        (resSigValidation.body as ValidationResponse).indication
+      ).toStrictEqual("TOTAL_PASSED");
       jest.restoreAllMocks();
     });
   });

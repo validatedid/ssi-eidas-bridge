@@ -5,7 +5,7 @@ import { BRIDGE_SERVICE } from "../../src/config";
 import { SignPayload } from "../../src/dtos/secureEnclave";
 import * as mockedData from "../data/credentials";
 import { EidasKeysInput } from "../../src/dtos/redis";
-import { generateDid } from "../utils";
+import { generateDid, ValidationResponse } from "../utils";
 
 jest.setTimeout(100000);
 
@@ -18,7 +18,7 @@ describe("eidas e2e flow towards vidchain", () => {
   // const server = "https://api.vidchain.net";
 
   it("stores keys, signs and verifies", async () => {
-    expect.assertions(4);
+    expect.assertions(5);
     const did = await generateDid();
     const testFilePathSelfSigned = "../data/test1/";
     const p12File = "keyStore.p12";
@@ -52,5 +52,8 @@ describe("eidas e2e flow towards vidchain", () => {
       signResponse.data
     );
     expect(sigValidationResponse.status).toStrictEqual(200);
+    expect(
+      (sigValidationResponse.data as ValidationResponse).indication
+    ).toStrictEqual("TOTAL_PASSED");
   });
 });

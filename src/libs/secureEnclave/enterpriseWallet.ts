@@ -37,7 +37,7 @@ export default class EnterpriseWallet {
 
     try {
       const parsedData = eidasCrypto.parseP12File(
-        Buffer.from(storedData.eidasQec, "hex").toString("binary"),
+        Buffer.from(storedData.eidasQec, "hex"),
         options.password
       );
       if (!parsedData || !parsedData.pemCert || !parsedData.pemPrivateKey)
