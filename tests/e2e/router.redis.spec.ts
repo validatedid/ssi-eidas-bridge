@@ -41,7 +41,7 @@ describe("eidas router API calls (mocking redis)", () => {
   });
 
   describe("secure enclave endpoints", () => {
-    const testFilePathSelfSigned = "../data/test1/";
+    const testFilePathSelfSigned = "../data/validatedid/";
     const p12File = "keyStore.p12";
     const password = "vidchain";
     const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
@@ -55,11 +55,10 @@ describe("eidas router API calls (mocking redis)", () => {
     });
     it("returns a 201 with a signature", async () => {
       expect.assertions(2);
-      const fileDataHex = Buffer.from(
-        fs.readFileSync(
-          path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-        )
-      ).toString("hex");
+      const fileDataHex = fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`),
+        "hex"
+      );
       const signPayload: SignPayload = {
         issuer: mockDid,
         payload: mockedData.mockCredential,
@@ -81,12 +80,11 @@ describe("eidas router API calls (mocking redis)", () => {
     });
 
     it("returns a 200 with a valid signature", async () => {
-      expect.assertions(2);
-      const fileDataHex = Buffer.from(
-        fs.readFileSync(
-          path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-        )
-      ).toString("hex");
+      expect.assertions(3);
+      const fileDataHex = fs.readFileSync(
+        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`),
+        "hex"
+      );
       const signPayload: SignPayload = {
         issuer: mockDid,
         payload: mockedData.mockCredential,

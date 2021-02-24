@@ -12,17 +12,18 @@ describe("controller tests should", () => {
     await redis.quit();
   });
 
-  const testFilePathSelfSigned = "../data/test1/";
-  const p12File = "keyStore.p12";
   const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
   const signPayload: SignPayload = {
     issuer: mockDid,
     payload: mockedData.mockCredential,
     password: "vidchain",
   };
-  const fileDataHex = Buffer.from(
-    fs.readFileSync(path.join(__dirname, `${testFilePathSelfSigned}${p12File}`))
-  ).toString("hex");
+  const testFilePathSelfSigned = "../data/validatedid/";
+  const p12File = "testValidatedId.p12";
+  const fileDataHex = fs.readFileSync(
+    path.join(__dirname, `${testFilePathSelfSigned}${p12File}`),
+    "hex"
+  );
 
   it("create a proof from a given credential", async () => {
     expect.assertions(2);

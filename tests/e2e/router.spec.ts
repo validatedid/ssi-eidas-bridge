@@ -44,13 +44,12 @@ describe("eidas router API calls", () => {
   const did = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
 
   describe("store keys", () => {
-    const testFilePathSelfSigned = "../data/test1/";
-    const p12File = "keyStore.p12";
-    const fileDataHex = Buffer.from(
-      fs.readFileSync(
-        path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
-      )
-    ).toString("hex");
+    const testFilePathSelfSigned = "../data/validatedid/";
+    const p12File = "testValidatedId.p12";
+    const fileDataHex = fs.readFileSync(
+      path.join(__dirname, `${testFilePathSelfSigned}${p12File}`),
+      "hex"
+    );
     const opts: EidasKeysInput = {
       did,
       eidasQec: fileDataHex,

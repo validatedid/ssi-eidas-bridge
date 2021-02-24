@@ -9,7 +9,7 @@ import { verifyCadesSignature } from "../../src/libs/secureEnclave/cades";
 
 jest.mock("ioredis");
 describe("eidas tests", () => {
-  const testFilePathSelfSigned = "../data/test1/";
+  const testFilePathSelfSigned = "../data/validatedid/";
   const p12File = "keyStore.p12";
   const password = "vidchain";
   const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
