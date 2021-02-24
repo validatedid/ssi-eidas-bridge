@@ -27,8 +27,7 @@
     "test": "jest --runInBand --verbose false --testPathIgnorePatterns=deployed",
     "test:unit": "jest --clearCache && jest --runInBand --verbose false --testPathPattern=unit",
     "test:e2e": "jest --clearCache && jest --runInBand --verbose false --testPathPattern=e2e",
-    "clearCache": "jest --clearCache",
-    "postinstall": "husky install"
+    "clearCache": "jest --clearCache"
   },
   "devDependencies": {
     "@ceramicnetwork/key-did-resolver": "^0.2.2",
