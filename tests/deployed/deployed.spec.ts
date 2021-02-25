@@ -20,8 +20,8 @@ describe("eidas e2e flow towards vidchain", () => {
   it("stores keys, signs and verifies", async () => {
     expect.assertions(5);
     const did = await generateDid();
-    const testFilePathSelfSigned = "../data/test1/";
-    const p12File = "keyStore.p12";
+    const testFilePathSelfSigned = "../data/fnmt/";
+    const p12File = "sello_entidad.p12";
     const fileDataHex = Buffer.from(
       fs.readFileSync(
         path.join(__dirname, `${testFilePathSelfSigned}${p12File}`)
@@ -39,7 +39,7 @@ describe("eidas e2e flow towards vidchain", () => {
     const signPayload: SignPayload = {
       issuer: did,
       payload: mockedData.mockCredential,
-      password: "vidchain",
+      password: "1234",
     };
     const signResponse = await axios.post(
       `${server}${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.SIGNATURE_CREATION}`,
