@@ -16,12 +16,13 @@ class Router {
     router.post(
       `${BRIDGE_SERVICE.CALL.SIGNATURE_CREATION}`,
       cors(),
-      async (req: express.Request, res: express.Response, next) => {
+      async (req: express.Request, res: express.Response) => {
         try {
           const result = await Controller.EIDASsignature(req.body);
           res.status(201).json(result);
         } catch (error) {
-          next(error);
+          LOGGER.error(`Error ${JSON.stringify(error)}`);
+          res.sendStatus(400);
         }
       }
     );
