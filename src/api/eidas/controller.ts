@@ -10,12 +10,13 @@ import {
   EidasKeysInput,
   RedisInsertion,
 } from "../../dtos/redis";
-import { BadRequestError, ApiErrorMessages } from "../../errors";
+import { ApiErrorMessages, BadRequestError } from "../../errors";
 
 import { isEidasProof, signEidas, verifyEidas } from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
 import { isVerifiableCredential } from "../../utils/ssi";
 import { indication } from "../../dtos";
+import { DssVerificationOutput } from "../../dtos/dss";
 
 export default class Controller {
   /**
@@ -60,7 +61,9 @@ export default class Controller {
    */
   static async EIDASvalidateSignature(
     verifiableCredential: VerifiableCredential
-  ): Promise<void> {
+  ): Promise<DssVerificationOutput[]> {
+    let dssVerificationOutput: DssVerificationOutput[];
+
     if (!isVerifiableCredential(verifiableCredential))
       throw new BadRequestError(indication.VERIFICATION_FAIL, {
         detail: ApiErrorMessages.BAD_VERIFIABLE_CREDENTIAL,
@@ -71,7 +74,10 @@ export default class Controller {
         throw new BadRequestError(indication.VERIFICATION_FAIL, {
           detail: ApiErrorMessages.NO_EIDAS_PROOF,
         });
-      await verifyEidas(credential, verifiableCredential.proof as EidasProof);
+
+      dssVerificationOutput = [
+        await verifyEidas(credential, verifiableCredential.proof as EidasProof),
+      ];
     }
     if (Array.isArray(verifiableCredential.proof)) {
       const eidasProofs = verifiableCredential.proof.filter((proof) =>
@@ -84,8 +90,10 @@ export default class Controller {
       const resolves = eidasProofs.map(async (eidasProof) =>
         verifyEidas(credential, eidasProof as EidasProof)
       );
-      await Promise.all(resolves);
+      dssVerificationOutput = await Promise.all(resolves);
     }
+
+    return dssVerificationOutput;
   }
 
   static async putEidasKeys(

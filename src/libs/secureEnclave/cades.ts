@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { BadRequestError } from "@cef-ebsi/problem-details-errors";
 import { KJUR } from "jsrsasign";
+import axios from "axios";
+import { pem } from "node-forge";
 import constants from "../../@types";
 import { indication } from "../../dtos";
 import {
@@ -14,7 +16,8 @@ import {
 } from "../../dtos/cades";
 import { ApiErrorMessages } from "../../errors";
 import { parseSigningTime } from "../../utils/ssi";
-import { pemtohex, replacePemNewLines } from "../../utils/util";
+import { removePemHeader, replacePemNewLines } from "../../utils/util";
+import { DssVerificationInput, DssVerificationOutput } from "../../dtos/dss";
 
 const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
   const date = new KJUR.asn1.DERUTCTime({
@@ -74,15 +77,74 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
   return cadesOuput;
 };
 
-const verifyCadesSignature = (pemCades: string): CadesVerificationOutput => {
+const prepareDssInput = (pemCades: string): DssVerificationInput => {
+  return {
+    signedDocument: {
+      bytes: removePemHeader(pemCades),
+      digestAlgorithm: null,
+      name: "cades.pem",
+    },
+    originalDocuments: null,
+    policy: null,
+    tokenExtractionStrategy: "NONE",
+    signatureId: null,
+  };
+};
+
+const getEcontentFromCAdES = async (pemCades: string): Promise<string> => {
+  const dssInput = {
+    signedDocument: {
+      bytes: removePemHeader(pemCades),
+      digestAlgorithm: null,
+      name: null,
+    },
+    originalDocuments: null,
+    policy: null,
+    tokenExtractionStrategy: "NONE",
+    signatureId: null,
+  };
+
+  const response = await axios.post(
+    "https://ec.europa.eu/cefdigital/DSS/webapp-demo/services/rest/validation/getOriginalDocuments",
+    dssInput
+  );
+
+  return response.data[0].bytes as string;
+};
+
+const prepareCadesVerifiationOutput = (
+  dssVerificationOutput: DssVerificationOutput,
+  eContent: string
+): CadesVerificationOutput => {
+  const output: CadesVerificationOutput = {
+    isValid:
+      dssVerificationOutput.SimpleReport.signatureOrTimestamp[0].Signature
+        .Indication === "TOTAL_PASSED",
+    DssVerificationOutput: dssVerificationOutput,
+    parse: {
+      econtent: eContent,
+    },
+  };
+  return output;
+};
+
+const verifyCadesSignature = async (
+  pemCades: string
+): Promise<CadesVerificationOutput> => {
   if (!pemCades)
     throw new BadRequestError(indication.VERIFICATION_FAIL, {
       detail: ApiErrorMessages.NO_PEM_CADES,
     });
-  const hexSignedData = pemtohex(pemCades, constants.DEFAULT_CMS_HEADER);
-  return KJUR.asn1.cms.CMSUtil.verifySignedData({
-    cms: hexSignedData,
-  }) as CadesVerificationOutput;
+  const dssVerificationInput: DssVerificationInput = prepareDssInput(pemCades);
+  const response = await axios.post(
+    "https://ec.europa.eu/cefdigital/DSS/webapp-demo/services/rest/validation/validateSignature",
+    dssVerificationInput
+  );
+  const eContent = await getEcontentFromCAdES(pemCades);
+  return prepareCadesVerifiationOutput(
+    response.data as DssVerificationOutput,
+    eContent
+  );
 };
 
 export { signCadesRsa, verifyCadesSignature };

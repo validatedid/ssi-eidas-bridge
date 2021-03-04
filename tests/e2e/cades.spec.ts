@@ -106,7 +106,7 @@ describe("cades tests should", () => {
     });
   });
   describe("verify", () => {
-    it("PEM CADES signature", () => {
+    it("PEM CADES signature", async () => {
       expect.assertions(2);
       const hash = crypto.createHash("sha256");
       hash.update("jsrsasign");
@@ -116,8 +116,11 @@ describe("cades tests should", () => {
         pemPrivKey: SZ4_PRVP8PPEM,
       };
       const cadesOuput = signCadesRsa(inputCades);
-      const verificationOut = verifyCadesSignature(cadesOuput.cades);
-      expect(verificationOut.isValid).toBe(true);
+      const verificationOut = await verifyCadesSignature(cadesOuput.cades);
+      expect(
+        verificationOut.DssVerificationOutput.DiagnosticData.Signature[0]
+          .BasicSignature.SignatureValid
+      ).toBe(true);
       expect(verificationOut.parse).toBeDefined();
     });
   });

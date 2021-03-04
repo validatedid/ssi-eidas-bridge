@@ -215,13 +215,16 @@ describe("eidas enterprise wallet tests should", () => {
     });
 
     const cadesOuput = await wallet.eSeal(mockedData.mockVC);
-    const verificationOut = verifyCadesSignature(cadesOuput.cades);
+    const verificationOut = await verifyCadesSignature(cadesOuput.cades);
     const hash = crypto.createHash("sha256");
     hash.update(await canonizeCredential(mockedData.mockVC));
-    expect(verificationOut.isValid).toBe(true);
+    expect(
+      verificationOut.DssVerificationOutput.DiagnosticData.Signature[0]
+        .BasicSignature.SignatureValid
+    ).toBe(true);
     expect(verificationOut.parse).toBeDefined();
     expect(verificationOut.parse.econtent).toBeDefined();
-    expect(verificationOut.parse.econtent).toBe(hash.digest("hex"));
+    expect(verificationOut.parse.econtent).toBe(hash.digest("base64"));
     jest.restoreAllMocks();
   }, 40000);
 
@@ -244,13 +247,16 @@ describe("eidas enterprise wallet tests should", () => {
     });
 
     const cadesOuput = await wallet.eSeal(mockedData.mockVC);
-    const verificationOut = verifyCadesSignature(cadesOuput.cades);
+    const verificationOut = await verifyCadesSignature(cadesOuput.cades);
     const hash = crypto.createHash("sha256");
     hash.update(await canonizeCredential(mockedData.mockVC));
-    expect(verificationOut.isValid).toBe(true);
+    expect(
+      verificationOut.DssVerificationOutput.DiagnosticData.Signature[0]
+        .BasicSignature.SignatureValid
+    ).toBe(true);
     expect(verificationOut.parse).toBeDefined();
     expect(verificationOut.parse.econtent).toBeDefined();
-    expect(verificationOut.parse.econtent).toBe(hash.digest("hex"));
+    expect(verificationOut.parse.econtent).toBe(hash.digest("base64"));
     jest.restoreAllMocks();
   }, 40000);
 });

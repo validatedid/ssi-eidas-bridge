@@ -41,9 +41,9 @@ describe("eidas router API calls (mocking redis)", () => {
   });
 
   describe("secure enclave endpoints", () => {
-    const testFilePathSelfSigned = "../data/validatedid/";
-    const p12File = "keyStore.p12";
-    const password = "vidchain";
+    const testFilePathSelfSigned = "../data/fnmt/";
+    const p12File = "sello_entidad.p12";
+    const password = "1234";
     const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
 
     it("returns a 400 without a body", async () => {

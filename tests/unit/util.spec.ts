@@ -5,6 +5,7 @@ import {
   pemtohex,
   PRINT_ERROR,
   prefixWith0x,
+  removePemHeader,
 } from "../../src/utils/util";
 
 describe("utils Test Suite", () => {
@@ -83,24 +84,59 @@ describe("utils Test Suite", () => {
   });
 });
 
+describe("removeHeaders test should", () => {
+  it("remove the PEM header", () => {
+    expect.assertions(1);
+    expect(
+      removePemHeader(
+        `-----BEGIN CMS-----
+MIIB+gYJKoZIhvcNAQcCoIIB6zCCAecCAQExDzANBglghkgBZQMEAgEFADAYBgkq
+hkiG9w0BBwGgCwQJanNyc2FzaWduMYIBtTCCAbECAQEwHzAaMQswCQYDVQQGEwJV
+UzELMAkGA1UECgwCWjQCAQEwDQYJYIZIAWUDBAIBBQCgaTAYBgkqhkiG9w0BCQMx
+CwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xMzEyMzEyMzU5NTlaMC8GCSqG
+SIb3DQEJBDEiBCCEwk3R2fVus6B65KI0Ra3U+suu14yJR1KWq3lUKE2c1DANBgkq
+hkiG9w0BAQsFAASCAQAuECknpVfs73lvw2tdhYIH6TknNDNh/lE2zjTmRTR3Zaxd
+4xYZCtV7yWv9/zTXgpx8tigEcKMsOjllFJrtnxAy+dT5LOy1A4wZtvCw+JTnMOE4
+zy9afOHyOVNbgpl3zhrUsvzyJpU+3sqr9qW3/NF5pea9G0TB8QE0GkrDj30tCGwt
+AMw8atf7B1Jc98t2ZCDl9ijDbdrvtwhwFmajAbyPG5wkyg5Qv0YmZI0Vssnu4bh0
+U/Fcon8+BYAJWUeli8w/9oW3xMLO2zrv53qH2O1X6rIqCCIg6QkIjPsY+VHGWpzT
+khP5p+OoGxO2E38Cg9qZ4DAqnCcjgJnjHLVlbjIA
+-----END CMS-----`
+      )
+    ).toStrictEqual(
+      "MIIB+gYJKoZIhvcNAQcCoIIB6zCCAecCAQExDzANBglghkgBZQMEAgEFADAYBgkq\n" +
+        "hkiG9w0BBwGgCwQJanNyc2FzaWduMYIBtTCCAbECAQEwHzAaMQswCQYDVQQGEwJV\n" +
+        "UzELMAkGA1UECgwCWjQCAQEwDQYJYIZIAWUDBAIBBQCgaTAYBgkqhkiG9w0BCQMx\n" +
+        "CwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xMzEyMzEyMzU5NTlaMC8GCSqG\n" +
+        "SIb3DQEJBDEiBCCEwk3R2fVus6B65KI0Ra3U+suu14yJR1KWq3lUKE2c1DANBgkq\n" +
+        "hkiG9w0BAQsFAASCAQAuECknpVfs73lvw2tdhYIH6TknNDNh/lE2zjTmRTR3Zaxd\n" +
+        "4xYZCtV7yWv9/zTXgpx8tigEcKMsOjllFJrtnxAy+dT5LOy1A4wZtvCw+JTnMOE4\n" +
+        "zy9afOHyOVNbgpl3zhrUsvzyJpU+3sqr9qW3/NF5pea9G0TB8QE0GkrDj30tCGwt\n" +
+        "AMw8atf7B1Jc98t2ZCDl9ijDbdrvtwhwFmajAbyPG5wkyg5Qv0YmZI0Vssnu4bh0\n" +
+        "U/Fcon8+BYAJWUeli8w/9oW3xMLO2zrv53qH2O1X6rIqCCIg6QkIjPsY+VHGWpzT\n" +
+        "khP5p+OoGxO2E38Cg9qZ4DAqnCcjgJnjHLVlbjIA\n"
+    );
+  });
+});
+
 describe("pemtohex tests should", () => {
   it("convert a pem to a hex string", () => {
     expect.assertions(1);
     expect(
       pemtohex(
         `-----BEGIN CMS-----
-    MIIB+gYJKoZIhvcNAQcCoIIB6zCCAecCAQExDzANBglghkgBZQMEAgEFADAYBgkq
-    hkiG9w0BBwGgCwQJanNyc2FzaWduMYIBtTCCAbECAQEwHzAaMQswCQYDVQQGEwJV
-    UzELMAkGA1UECgwCWjQCAQEwDQYJYIZIAWUDBAIBBQCgaTAYBgkqhkiG9w0BCQMx
-    CwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xMzEyMzEyMzU5NTlaMC8GCSqG
-    SIb3DQEJBDEiBCCEwk3R2fVus6B65KI0Ra3U+suu14yJR1KWq3lUKE2c1DANBgkq
-    hkiG9w0BAQsFAASCAQAuECknpVfs73lvw2tdhYIH6TknNDNh/lE2zjTmRTR3Zaxd
-    4xYZCtV7yWv9/zTXgpx8tigEcKMsOjllFJrtnxAy+dT5LOy1A4wZtvCw+JTnMOE4
-    zy9afOHyOVNbgpl3zhrUsvzyJpU+3sqr9qW3/NF5pea9G0TB8QE0GkrDj30tCGwt
-    AMw8atf7B1Jc98t2ZCDl9ijDbdrvtwhwFmajAbyPG5wkyg5Qv0YmZI0Vssnu4bh0
-    U/Fcon8+BYAJWUeli8w/9oW3xMLO2zrv53qH2O1X6rIqCCIg6QkIjPsY+VHGWpzT
-    khP5p+OoGxO2E38Cg9qZ4DAqnCcjgJnjHLVlbjIA
-    -----END CMS-----`,
+MIIB+gYJKoZIhvcNAQcCoIIB6zCCAecCAQExDzANBglghkgBZQMEAgEFADAYBgkq
+hkiG9w0BBwGgCwQJanNyc2FzaWduMYIBtTCCAbECAQEwHzAaMQswCQYDVQQGEwJV
+UzELMAkGA1UECgwCWjQCAQEwDQYJYIZIAWUDBAIBBQCgaTAYBgkqhkiG9w0BCQMx
+CwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xMzEyMzEyMzU5NTlaMC8GCSqG
+SIb3DQEJBDEiBCCEwk3R2fVus6B65KI0Ra3U+suu14yJR1KWq3lUKE2c1DANBgkq
+hkiG9w0BAQsFAASCAQAuECknpVfs73lvw2tdhYIH6TknNDNh/lE2zjTmRTR3Zaxd
+4xYZCtV7yWv9/zTXgpx8tigEcKMsOjllFJrtnxAy+dT5LOy1A4wZtvCw+JTnMOE4
+zy9afOHyOVNbgpl3zhrUsvzyJpU+3sqr9qW3/NF5pea9G0TB8QE0GkrDj30tCGwt
+AMw8atf7B1Jc98t2ZCDl9ijDbdrvtwhwFmajAbyPG5wkyg5Qv0YmZI0Vssnu4bh0
+U/Fcon8+BYAJWUeli8w/9oW3xMLO2zrv53qH2O1X6rIqCCIg6QkIjPsY+VHGWpzT
+khP5p+OoGxO2E38Cg9qZ4DAqnCcjgJnjHLVlbjIA
+-----END CMS-----`,
         "CMS"
       )
     ).toStrictEqual(

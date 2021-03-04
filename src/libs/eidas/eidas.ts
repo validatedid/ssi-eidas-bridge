@@ -15,6 +15,7 @@ import { verifyCadesSignature } from "../secureEnclave/cades";
 import constants from "../../@types";
 import { indication } from "../../dtos";
 import { CadesVerificationOutput } from "../../dtos/cades";
+import { DssVerificationOutput } from "../../dtos/dss";
 
 const PROOF_REQUIRED_KEYS = [
   "type",
@@ -113,11 +114,11 @@ const isEidasProof = (proof: Proof | EidasProof): boolean => {
 const verifyEidas = async (
   credential: Credential,
   eidasProof: EidasProof
-): Promise<void> => {
+): Promise<DssVerificationOutput> => {
   validateEIDASProofAttributes(eidasProof);
   let verificationOut: CadesVerificationOutput;
   try {
-    verificationOut = verifyCadesSignature(eidasProof.cades);
+    verificationOut = await verifyCadesSignature(eidasProof.cades);
   } catch (error) {
     throw new BadRequestError(indication.VERIFICATION_FAIL, {
       detail: ApiErrorMessages.ERROR_VERIFYING_SIGNATURE,
@@ -131,10 +132,13 @@ const verifyEidas = async (
   const canonizedCredential = await canonizeCredential(credential);
   const hash = crypto.createHash("sha256");
   hash.update(canonizedCredential);
-  if (hash.digest("hex") !== verificationOut.parse.econtent)
+  const digest = hash.digest("base64");
+  if (digest !== verificationOut.parse.econtent)
     throw new BadRequestError(indication.VERIFICATION_FAIL, {
       detail: ApiErrorMessages.CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA,
     });
+
+  return verificationOut.DssVerificationOutput;
 };
 
 export { validateEIDASProofAttributes, signEidas, verifyEidas, isEidasProof };

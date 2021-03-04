@@ -1,3 +1,5 @@
+import { DssVerificationOutput } from "./dss";
+
 export interface CadesSignatureOutput {
   cades: string;
   verificationMethod: string;
@@ -44,15 +46,16 @@ export interface CadesSignerInfo {
 }
 
 export interface CadesParsed {
-  cmsType: string;
+  cmsType?: string;
   econtent: string;
-  certsIdx: number;
-  signerinfosIdx: number;
-  signerInfos: CadesSignerInfo[];
-  signerInfoIdxList: number[];
+  certsIdx?: number;
+  signerinfosIdx?: number;
+  signerInfos?: CadesSignerInfo[];
+  signerInfoIdxList?: number[];
 }
 
 export interface CadesVerificationOutput {
   isValid: boolean;
   parse?: CadesParsed;
+  DssVerificationOutput?: DssVerificationOutput;
 }
