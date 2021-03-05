@@ -149,6 +149,17 @@ const pemtohex = (s: string, sHead: string): string => {
   return b64nltohex(inputData);
 };
 
+const removePemHeader = (s: string): string => {
+  if (s.indexOf("-----BEGIN ") === -1)
+    throw new BadRequestError(indication.VERIFICATION_FAIL, {
+      detail: `can't find PEM header:`,
+    });
+  let output = s;
+  output = output.replace(/^[^]*-----BEGIN [^-]+-----\n?/, "");
+  output = output.replace(/-----END [^-]+-----[^]*$/, "");
+  return output;
+};
+
 const replaceNewLines = (str: string): string =>
   str.replace(/[^0-9A-Za-z/+=]*/g, "");
 
@@ -174,6 +185,7 @@ export {
   PRINT_DEBUG,
   PRINT_ERROR,
   PRINT_SILLY,
+  removePemHeader,
   generateKeys,
   prefixWith0x,
   replaceNewLines,

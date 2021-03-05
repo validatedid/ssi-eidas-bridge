@@ -9,9 +9,9 @@ import { verifyCadesSignature } from "../../src/libs/secureEnclave/cades";
 
 jest.mock("ioredis");
 describe("eidas tests", () => {
-  const testFilePathSelfSigned = "../data/validatedid/";
-  const p12File = "keyStore.p12";
-  const password = "vidchain";
+  const testFilePathSelfSigned = "../data/fnmt/";
+  const p12File = "sello_entidad.p12";
+  const password = "1234";
   const mockDid = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
   it("should sign (mocking redis) and verify signature", async () => {
     expect.assertions(3);
@@ -39,7 +39,7 @@ describe("eidas tests", () => {
     };
     const proof = await signEidas(signPayload);
     expect(proof).toMatchObject(expectedProof);
-    const verificationOut = verifyCadesSignature(proof.cades);
+    const verificationOut = await verifyCadesSignature(proof.cades);
     expect(verificationOut.isValid).toBe(true);
     expect(verificationOut.parse).toBeDefined();
     jest.restoreAllMocks();

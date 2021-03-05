@@ -44,8 +44,8 @@ describe("eidas router API calls", () => {
   const did = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
 
   describe("store keys", () => {
-    const testFilePathSelfSigned = "../data/validatedid/";
-    const p12File = "testValidatedId.p12";
+    const testFilePathSelfSigned = "../data/fnmt/";
+    const p12File = "sello_entidad.p12";
     const fileDataHex = fs.readFileSync(
       path.join(__dirname, `${testFilePathSelfSigned}${p12File}`),
       "hex"
@@ -84,7 +84,7 @@ describe("eidas router API calls", () => {
   });
 
   describe("secure enclave endpoints", () => {
-    const password = "vidchain";
+    const password = "1234";
     it("returns a 400 without a body", async () => {
       expect.assertions(1);
       const res = await request(server).post(

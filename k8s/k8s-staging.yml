@@ -57,6 +57,11 @@ spec:
             configMapKeyRef:
               name: eidas-bridge-configmap
               key: REDIS_PORT
+        - name: DSS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: eidas-bridge-configmap
+              key: DSS_URL
         - name: DID_REGISTRY_SC_ADDRESS
           valueFrom:
             secretKeyRef:

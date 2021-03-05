@@ -5,6 +5,7 @@ import { BRIDGE_SERVICE } from "../../config";
 import LOGGER from "../../logger";
 import { ApiErrorMessages, BadRequestError } from "../../errors";
 import { indication } from "../../dtos";
+import { DssVerificationOutput } from "../../dtos/dss";
 
 class Router {
   constructor(server: express.Express) {
@@ -36,12 +37,17 @@ class Router {
             throw new BadRequestError(BadRequestError.defaultTitle, {
               detail: ApiErrorMessages.BAD_REQUEST_MISSING_BODY,
             });
-          await Controller.EIDASvalidateSignature(req.body);
+          const dssValidationOutput: DssVerificationOutput[] = await Controller.EIDASvalidateSignature(
+            req.body
+          );
           res.status(200).json({
             indication: indication.VERIFICATION_SUCCESS,
             checks: ["credential", "proof"],
             warnings: [],
             errors: [],
+            reports: dssValidationOutput.map((dss) => ({
+              SimpleReport: dss.SimpleReport,
+            })),
           });
         } catch (error) {
           LOGGER.error(`Error ${JSON.stringify(error)}`);

@@ -75,7 +75,7 @@ describe("eidas e2e flow", () => {
     expect(sigValidationResponse.status).toStrictEqual(200);
     expect(
       (sigValidationResponse.body as ValidationResponse).indication
-    ).toStrictEqual("TOTAL_PASSED");
+    ).toStrictEqual("INDETERMINATE");
   });
 
   it("stores keys, signs and verifies using fnmt certificate with accent marks", async () => {
