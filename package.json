@@ -11,7 +11,7 @@
   },
   "scripts": {
     "audit": "audit-ci --moderate",
-    "start": "node dist/start.js",
+    "start": "node dist/src/start.js",
     "start:dev": "nodemon --watch src --watch api -e ts,yaml --exec 'ts-node' src/start.ts",
     "start:openapi": "openapi preview-docs api/openapi.yaml",
     "build": "yarn clean && tsc -p tsconfig-build.json",
@@ -42,7 +42,7 @@
     "@types/express": "^4.17.11",
     "@types/ioredis": "^4.22.0",
     "@types/jest": "^26.0.20",
-    "@types/jsonld": "^1.5.2",
+    "@types/jsonld": "^1.5.5",
     "@types/node": "^14.14.31",
     "@types/node-forge": "^0.9.6",
     "@types/supertest": "^2.0.9",

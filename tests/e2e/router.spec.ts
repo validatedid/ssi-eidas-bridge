@@ -133,5 +133,17 @@ describe("eidas router API calls", () => {
         (resSigValidation.body as ValidationResponse).indication
       ).toStrictEqual("TOTAL_PASSED");
     });
+
+    it("returns 204 with a signature from off-blocks signed credential", async () => {
+      const resSigValidation = await request(server)
+        .post(
+          `${BRIDGE_SERVICE.BASE_PATH.EIDAS}${BRIDGE_SERVICE.CALL.SIGNATURE_VALIDATION}`
+        )
+        .send(mockedData.offblocksVerifiableCredential);
+      expect(resSigValidation.status).toStrictEqual(200);
+      expect(
+        (resSigValidation.body as ValidationResponse).indication
+      ).toStrictEqual("TOTAL_PASSED");
+    });
   });
 });

@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import { JsonLdDocument, normalize, Options } from "jsonld";
+import { KJUR } from "jsrsasign";
 import { SignPayload } from "../../dtos/secureEnclave";
 import { ApiErrorMessages, BadRequestError } from "../../errors";
 import { EnterpriseWallet } from "../secureEnclave";
@@ -8,8 +10,12 @@ import {
 } from "../../@types/constants";
 import { EidasProof, Proof, Credential } from "../../dtos/eidas";
 import {
+  calculateLdProofHashforVerification,
   canonizeCredential,
+  canonizeProofOptions,
   getKidFromDidAndPemCertificate,
+  parseSigningTime,
+  toISOStringSeconds,
 } from "../../utils/ssi";
 import { verifyCadesSignature } from "../secureEnclave/cades";
 import constants from "../../@types";
@@ -86,23 +92,26 @@ const signEidas = async (signPayload: SignPayload): Promise<EidasProof> => {
 
   let payloadToSign = signPayload.payload;
   if (signPayload.payload.proof) {
-    // removing proof
+    // removing proof if VC is already signed
     payloadToSign = (({ proof, ...o }) => o)(signPayload.payload);
   }
   const wallet = await EnterpriseWallet.createInstance({
     did: signPayload.issuer,
     password: signPayload.password,
   });
-
-  const cadesOuput = await wallet.eSeal(payloadToSign);
-  return {
+  const createdDate: string = toISOStringSeconds(new Date(Date.now()));
+  const proofOptions: EidasProof = {
     type: constants.SignatureTypes.CAdESRSASignature2020,
-    created: cadesOuput.signingTime,
+    created: createdDate,
     proofPurpose: DEFAULT_PROOF_PURPOSE,
     verificationMethod: getKidFromDidAndPemCertificate({
       did: signPayload.issuer,
-      pemCertificate: cadesOuput.verificationMethod,
+      pemCertificate: wallet.getIssuerPemCert(),
     }),
+  };
+  const cadesOuput = await wallet.eSeal(payloadToSign, proofOptions);
+  return {
+    ...proofOptions,
     cades: cadesOuput.cades,
   };
 };
@@ -129,11 +138,13 @@ const verifyEidas = async (
       detail: ApiErrorMessages.INDETERMINATE,
     });
   // check that the hash of the data signed is the hash of the Verifiable Credential payload
-  const canonizedCredential = await canonizeCredential(credential);
-  const hash = crypto.createHash("sha256");
-  hash.update(canonizedCredential);
-  const digest = hash.digest("base64");
-  if (digest !== verificationOut.parse.econtent)
+
+  const dataToBeSigned = await calculateLdProofHashforVerification(
+    credential,
+    eidasProof
+  );
+
+  if (dataToBeSigned.toString("base64") !== verificationOut.parse.econtent)
     throw new BadRequestError(indication.VERIFICATION_FAIL, {
       detail: ApiErrorMessages.CREDENTIAL_PAYLOAD_MISMATCH_SIGNED_DATA,
     });

@@ -18,6 +18,7 @@ export interface DerSigningTime {
 
 export interface CadesSignatureInput {
   issuer?: string;
+  created: string;
   data: string;
   pemCert: string;
   pemPrivKey: string;
