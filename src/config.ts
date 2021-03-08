@@ -166,6 +166,18 @@ const REDIS = {
   URL: process.env.REDIS_URL,
 };
 
+const DSS_REST_SERVICES = `/services/rest`;
+const DSS_URL = {
+  ORIGINAL_DOCUMENTS: `${checkStrVar(
+    process.env.DSS_URL,
+    "DSS_URL"
+  )}${DSS_REST_SERVICES}/validation/getOriginalDocuments`,
+  VALIDATE_SIGNATURE: `${checkStrVar(
+    process.env.DSS_URL,
+    "DSS_URL"
+  )}${DSS_REST_SERVICES}/validation/validateSignature`,
+};
+
 export {
   API_NAME,
   LOG_LEVEL,
@@ -177,4 +189,5 @@ export {
   WALLET,
   LEDGER,
   REDIS,
+  DSS_URL,
 };

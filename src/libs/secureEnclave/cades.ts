@@ -5,7 +5,6 @@
 import { BadRequestError } from "@cef-ebsi/problem-details-errors";
 import { KJUR } from "jsrsasign";
 import axios from "axios";
-import { pem } from "node-forge";
 import constants from "../../@types";
 import { indication } from "../../dtos";
 import {
@@ -17,6 +16,7 @@ import {
 import { ApiErrorMessages } from "../../errors";
 import { removePemHeader, replacePemNewLines } from "../../utils/util";
 import { DssVerificationInput, DssVerificationOutput } from "../../dtos/dss";
+import { DSS_URL } from "../../config";
 
 const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
   const date = new KJUR.asn1.DERUTCTime({
@@ -103,10 +103,7 @@ const getEcontentFromCAdES = async (pemCades: string): Promise<string> => {
     signatureId: null,
   };
 
-  const response = await axios.post(
-    "http://localhost:8080/services/rest/validation/getOriginalDocuments",
-    dssInput
-  );
+  const response = await axios.post(DSS_URL.ORIGINAL_DOCUMENTS, dssInput);
 
   return response.data[0].bytes as string;
 };
@@ -118,7 +115,7 @@ const prepareCadesVerifiationOutput = (
   const output: CadesVerificationOutput = {
     isValid:
       dssVerificationOutput.SimpleReport.signatureOrTimestamp[0].Signature
-        .Indication === "TOTAL_PASSED",
+        .Indication === indication.VERIFICATION_SUCCESS,
     DssVerificationOutput: dssVerificationOutput,
     parse: {
       econtent: eContent,
@@ -136,7 +133,7 @@ const verifyCadesSignature = async (
     });
   const dssVerificationInput: DssVerificationInput = prepareDssInput(pemCades);
   const response = await axios.post(
-    "https://ec.europa.eu/cefdigital/DSS/webapp-demo/services/rest/validation/validateSignature",
+    DSS_URL.VALIDATE_SIGNATURE,
     dssVerificationInput
   );
   const eContent = await getEcontentFromCAdES(pemCades);
