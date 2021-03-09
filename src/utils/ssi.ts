@@ -143,4 +143,5 @@ export {
   isVerifiableCredential,
   calculateLdProofHashforVerification,
   toISOStringSeconds,
+  isCredential,
 };
