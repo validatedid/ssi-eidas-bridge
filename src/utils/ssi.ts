@@ -62,29 +62,18 @@ const canonizeCredential = async (payload: Credential): Promise<string> => {
 };
 
 const canonizeProofOptions = async (
-  payload: Record<string, unknown>
+  credential: Credential,
+  proof: EidasProof
 ): Promise<string> => {
-  if (!isProof(payload))
-    throw new BadRequestError(indication.VERIFICATION_FAIL, {
-      detail: ApiErrorMessages.CANONIZE_BAD_PARAMS,
-    });
   const options: Options.Normalize = {
     algorithm: "URDNA2015",
     format: "application/n-quads",
     skipExpansion: false,
   };
-  const context = {
-    "@context": [
-      // vc context
-      "https://www.w3.org/2018/credentials/v1",
-      "https://www.w3.org/2018/credentials/examples/v1",
-      "https://validatedid.github.io/jsonld-contexts/ades-signatures/v1/",
-    ],
-  };
   // Delete signature or proof
-  const proofOption = (({ cades, jws, proofValue, ...o }) => o)(payload);
+  const proofOption = (({ cades, jws, proofValue, ...o }) => o)(proof);
   const proofToNormalize = {
-    ...context,
+    "@context": credential["@context"],
     ...proofOption,
   };
   return normalize(proofToNormalize, options);
@@ -97,7 +86,7 @@ const calculateLdProofHashforVerification = async (
   const canonizedCredential = await canonizeCredential(
     (({ proof, ...o }) => o)(credential)
   );
-  const canonizedProof = await canonizeProofOptions(eidasProof);
+  const canonizedProof = await canonizeProofOptions(credential, eidasProof);
 
   const hashCredential = crypto.createHash("sha256");
   const hashProof = crypto.createHash("sha256");

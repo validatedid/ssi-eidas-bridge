@@ -43,7 +43,10 @@ describe("ssi util tests should", () => {
   }, 30000);
 
   it("canonize a proofOption", async () => {
-    const canonized = await canonizeProofOptions(mockedData.proof);
+    const canonized = await canonizeProofOptions(
+      mockedData.offblocksVerifiableCredential,
+      mockedData.proof
+    );
     expect(canonized.length).toBeGreaterThan(0);
     expect(canonized)
       .toMatch(`_:c14n0 <http://purl.org/dc/terms/created> "2021-03-05T12:07:47Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
@@ -67,5 +70,5 @@ _:c14n0 <https://w3id.org/security#verificationMethod> <did:key:z6Mko3ZSkBCqcFJp
     );
 
     expect(concatenatedHashes.toString("base64")).toMatch(expectedResult);
-  });
+  }, 30000);
 });

@@ -74,7 +74,8 @@ export const offblocksVerifiableCredential = {
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
     "https://www.w3.org/2018/credentials/examples/v1",
-    "https://essif-lab.pages.grnet.gr/interoperability/eidas-generic-use-case/contexts/cades-signature.jsonld",
+    "https://validatedid.github.io/jsonld-contexts/ades-signatures/v1/",
+    // "https://essif-lab.pages.grnet.gr/interoperability/eidas-generic-use-case/contexts/cades-signature.jsonld",
   ],
   id: "http://example.gov/credentials/3732",
   type: ["VerifiableCredential", "UniversityDegreeCredential"],
