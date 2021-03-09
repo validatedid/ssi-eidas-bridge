@@ -6,7 +6,7 @@ import { signCadesRsa } from "./cades";
 import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
 import { WalletBuilderOptions } from "../../dtos/wallet";
 import { calculateLdProofHashforVerification } from "../../utils/ssi";
-import { EidasProof } from "../../dtos/eidas";
+import { EidasProof, Credential } from "../../dtos/eidas";
 
 export default class EnterpriseWallet {
   private constructor(
@@ -57,7 +57,7 @@ export default class EnterpriseWallet {
   }
 
   async eSeal(
-    payload: Record<string, unknown>,
+    payload: Credential,
     proofOptions: EidasProof
   ): Promise<CadesSignatureOutput> {
     // TODO: sign with all certificate list

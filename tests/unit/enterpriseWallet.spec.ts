@@ -147,34 +147,6 @@ describe("eidas enterprise wallet tests should", () => {
     jest.restoreAllMocks();
   });
 
-  it("throws a BadRequestError when seals a given payload not a credential", async () => {
-    expect.assertions(1);
-    const fileDataHex = Buffer.from(
-      fs.readFileSync(path.join(__dirname, `${testFilePath}${p12File}`))
-    ).toString("hex");
-    jest.spyOn(Redis.prototype, "get").mockImplementation(() => {
-      return JSON.stringify({
-        eidasQec: fileDataHex,
-      });
-    });
-    const dataToSign = {
-      data: "some data",
-      did: mockDid,
-      eidasQecId: uuid(),
-    };
-    const wallet = await EnterpriseWallet.createInstance({
-      did: mockDid,
-      password,
-    });
-    const expectedError = new BadRequestError(indication.VERIFICATION_FAIL, {
-      detail: ApiErrorMessages.CANONIZE_BAD_PARAMS,
-    });
-    await expect(
-      wallet.eSeal(dataToSign, mockedData.proofOptionsCades)
-    ).rejects.toThrow(expectedError);
-    jest.restoreAllMocks();
-  });
-
   it("seals a given payload with a certificate with CA", async () => {
     expect.assertions(1);
     const fileDataHex = Buffer.from(

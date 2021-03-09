@@ -1,6 +1,3 @@
-import crypto from "crypto";
-import { JsonLdDocument, normalize, Options } from "jsonld";
-import { KJUR } from "jsrsasign";
 import { SignPayload } from "../../dtos/secureEnclave";
 import { ApiErrorMessages, BadRequestError } from "../../errors";
 import { EnterpriseWallet } from "../secureEnclave";
@@ -11,10 +8,7 @@ import {
 import { EidasProof, Proof, Credential } from "../../dtos/eidas";
 import {
   calculateLdProofHashforVerification,
-  canonizeCredential,
-  canonizeProofOptions,
   getKidFromDidAndPemCertificate,
-  parseSigningTime,
   toISOStringSeconds,
 } from "../../utils/ssi";
 import { verifyCadesSignature } from "../secureEnclave/cades";

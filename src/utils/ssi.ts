@@ -1,7 +1,7 @@
 import { normalize, Options } from "jsonld";
 import crypto from "crypto";
 import { indication } from "../dtos";
-import { EidasProof, VerifiableCredential } from "../dtos/eidas";
+import { EidasProof, VerifiableCredential, Credential } from "../dtos/eidas";
 import { ApiErrorMessages, BadRequestError } from "../errors";
 import { getPemPublicKeyfromPemCert } from "./crypto";
 import { replacePemHeaderAndNewLines } from "./util";
@@ -53,18 +53,11 @@ const isVerifiableCredential = (object: Record<string, unknown>): boolean => {
   );
 };
 
-const canonizeCredential = async (
-  payload: Record<string, unknown>
-): Promise<string> => {
-  if (!isCredential(payload))
-    throw new BadRequestError(indication.VERIFICATION_FAIL, {
-      detail: ApiErrorMessages.CANONIZE_BAD_PARAMS,
-    });
+const canonizeCredential = async (payload: Credential): Promise<string> => {
   const options: Options.Normalize = {
     algorithm: "URDNA2015",
     format: "application/n-quads",
   };
-
   return normalize(payload, options);
 };
 
@@ -82,28 +75,28 @@ const canonizeProofOptions = async (
   };
   const context = {
     "@context": [
+      // vc context
       "https://www.w3.org/2018/credentials/v1",
       "https://www.w3.org/2018/credentials/examples/v1",
       "https://validatedid.github.io/jsonld-contexts/ades-signatures/v1/",
     ],
   };
   // Delete signature or proof
-  (({ cades, ...o }) => o)(payload);
-  (({ jws, ...o }) => o)(payload);
-  (({ proofValue, ...o }) => o)(payload);
+  const proofOption = (({ cades, jws, proofValue, ...o }) => o)(payload);
   const proofToNormalize = {
     ...context,
-    ...payload,
+    ...proofOption,
   };
   return normalize(proofToNormalize, options);
 };
 
 const calculateLdProofHashforVerification = async (
-  credential: Record<string, unknown>,
+  credential: Credential,
   eidasProof: EidasProof
 ): Promise<Buffer> => {
-  (({ proof, ...o }) => o)(credential);
-  const canonizedCredential = await canonizeCredential(credential);
+  const canonizedCredential = await canonizeCredential(
+    (({ proof, ...o }) => o)(credential)
+  );
   const canonizedProof = await canonizeProofOptions(eidasProof);
 
   const hashCredential = crypto.createHash("sha256");
