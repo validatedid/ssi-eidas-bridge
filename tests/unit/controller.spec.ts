@@ -1,3 +1,4 @@
+import { v4 as uuid } from "uuid";
 import { SignatureTypes } from "../../src/@types/constants";
 import Controller from "../../src/api/eidas/controller";
 import * as mockedData from "../data/credentials";
@@ -21,6 +22,20 @@ describe("controller suite tests", () => {
       expect.assertions(1);
       await expect(
         Controller.EIDASsignature(undefined as never)
+      ).rejects.toThrow("Bad Request");
+    });
+
+    it("throws an erronr when seals a given payload not a credential", async () => {
+      expect.assertions(1);
+      const mockDid =
+        "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
+      const dataToSign = {
+        data: "some data",
+        did: mockDid,
+        eidasQecId: uuid(),
+      };
+      await expect(
+        Controller.EIDASsignature(dataToSign as never)
       ).rejects.toThrow("Bad Request");
     });
 

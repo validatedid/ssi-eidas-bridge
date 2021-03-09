@@ -4,6 +4,7 @@ import {
   signCadesRsa,
   verifyCadesSignature,
 } from "../../src/libs/secureEnclave/cades";
+import { toISOStringSeconds } from "../../src/utils/ssi";
 
 const SZ4_PRVP8PPEM = `-----BEGIN PRIVATE KEY-----
 MIIJQgIBADANBgkqhkiG9w0BAQEFAASCCSwwggkoAgEAAoICAQCw95WlGzm/19nr
@@ -93,25 +94,28 @@ AF8gFHPBTMM8tq74EWdco7RfG61ZuH34S7LeZHAOeld0BldNnhHUje84B8FR1Mo=
 describe("cades tests should", () => {
   describe("sign", () => {
     it("given data with CADES-BES SHA256withRSA and output a PEM CMS", () => {
-      expect.assertions(1);
-      const hash = crypto.createHash("sha256");
-      hash.update("jsrsasign");
-      const inputCades: CadesSignatureInput = {
-        data: hash.digest("hex"),
-        pemCert: SZ4_CERPEM,
-        pemPrivKey: SZ4_PRVP8PPEM,
-      };
-      const cadesOuput = signCadesRsa(inputCades);
-      expect(cadesOuput.cades).toBeDefined();
-    });
-  });
-  describe("verify", () => {
-    it("PEM CADES signature", async () => {
       expect.assertions(2);
       const hash = crypto.createHash("sha256");
       hash.update("jsrsasign");
       const inputCades: CadesSignatureInput = {
         data: hash.digest("hex"),
+        created: toISOStringSeconds(new Date(Date.now())),
+        pemCert: SZ4_CERPEM,
+        pemPrivKey: SZ4_PRVP8PPEM,
+      };
+      const cadesOuput = signCadesRsa(inputCades);
+      expect(cadesOuput.cades).toBeDefined();
+      expect(cadesOuput.signingTime).toMatch(inputCades.created);
+    });
+  });
+  describe("verify", () => {
+    it("integrity of PEM CADES signature", async () => {
+      expect.assertions(2);
+      const hash = crypto.createHash("sha256");
+      hash.update("jsrsasign");
+      const inputCades: CadesSignatureInput = {
+        data: hash.digest("hex"),
+        created: toISOStringSeconds(new Date(Date.now())),
         pemCert: SZ4_CERPEM,
         pemPrivKey: SZ4_PRVP8PPEM,
       };

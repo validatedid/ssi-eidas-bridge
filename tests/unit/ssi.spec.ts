@@ -1,7 +1,7 @@
-import { indication } from "../../src/dtos";
-import { ApiErrorMessages, BadRequestError } from "../../src/errors";
 import {
+  calculateLdProofHashforVerification,
   canonizeCredential,
+  canonizeProofOptions,
   getKidFromDidAndPemCertificate,
 } from "../../src/utils/ssi";
 import * as mockedData from "../data/credentials";
@@ -41,13 +41,34 @@ describe("ssi util tests should", () => {
       "
     `);
   }, 30000);
-  it("throw BadRequestError when canonize a non Credential", async () => {
-    expect.assertions(1);
-    const expectedError = new BadRequestError(indication.VERIFICATION_FAIL, {
-      detail: ApiErrorMessages.CANONIZE_BAD_PARAMS,
-    });
-    await expect(canonizeCredential({ data: "some data" })).rejects.toThrow(
-      expectedError
+
+  it("canonize a proofOption", async () => {
+    const canonized = await canonizeProofOptions(
+      mockedData.offblocksVerifiableCredential,
+      mockedData.proof
     );
+    expect(canonized.length).toBeGreaterThan(0);
+    expect(canonized)
+      .toMatch(`_:c14n0 <http://purl.org/dc/terms/created> "2021-03-05T12:07:47Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+_:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#CAdESRSASignature2020> .
+_:c14n0 <https://w3id.org/security#creator> "did:key:z6Mko3ZSkBCqcFJpdxWqFhCHSuDoKnMVQFg9xip6htu6u4Xj" .
+_:c14n0 <https://w3id.org/security#proofPurpose> <https://w3id.org/security#assertionMethod> .
+_:c14n0 <https://w3id.org/security#verificationMethod> <did:key:z6Mko3ZSkBCqcFJpdxWqFhCHSuDoKnMVQFg9xip6htu6u4Xj#eidas-key> .
+`);
   });
+
+  it("calculate LD Proof hash for signature verification", async () => {
+    const credential = mockedData.offblocksVerifiableCredential;
+    const { proof } = credential;
+
+    const expectedResult =
+      "MWVUt3Lz5TdjYAqund/b3FqaSLYDkB6cA08KVM02M7kx6p9Bh8utllQ+b6nH6txElo/yDen7GWKt3eZsFOqVQw==";
+
+    const concatenatedHashes = await calculateLdProofHashforVerification(
+      credential,
+      proof
+    );
+
+    expect(concatenatedHashes.toString("base64")).toMatch(expectedResult);
+  }, 30000);
 });

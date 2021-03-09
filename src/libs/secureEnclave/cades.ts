@@ -14,14 +14,13 @@ import {
   DerSigningTime,
 } from "../../dtos/cades";
 import { ApiErrorMessages } from "../../errors";
-import { parseSigningTime } from "../../utils/ssi";
 import { removePemHeader, replacePemNewLines } from "../../utils/util";
 import { DssVerificationInput, DssVerificationOutput } from "../../dtos/dss";
 import { DSS_URL } from "../../config";
 
 const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
   const date = new KJUR.asn1.DERUTCTime({
-    date: new Date(Date.now()),
+    date: new Date(input.created),
   }) as DerSigningTime;
 
   const param = {
@@ -72,7 +71,7 @@ const signCadesRsa = (input: CadesSignatureInput): CadesSignatureOutput => {
   const cadesOuput: CadesSignatureOutput = {
     cades: replacePemNewLines(pemSignedData, "PKCS7"),
     verificationMethod: input.pemCert,
-    signingTime: parseSigningTime(date.s),
+    signingTime: input.created,
   };
   return cadesOuput;
 };
@@ -144,4 +143,4 @@ const verifyCadesSignature = async (
   );
 };
 
-export { signCadesRsa, verifyCadesSignature };
+export { signCadesRsa, verifyCadesSignature, getEcontentFromCAdES };

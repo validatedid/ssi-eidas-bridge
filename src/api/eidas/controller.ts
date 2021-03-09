@@ -14,7 +14,7 @@ import { ApiErrorMessages, BadRequestError } from "../../errors";
 
 import { isEidasProof, signEidas, verifyEidas } from "../../libs/eidas/eidas";
 import redis from "../../libs/storage/redis";
-import { isVerifiableCredential } from "../../utils/ssi";
+import { isVerifiableCredential, isCredential } from "../../utils/ssi";
 import { indication } from "../../dtos";
 import { DssVerificationOutput } from "../../dtos/dss";
 
@@ -30,7 +30,8 @@ export default class Controller {
       !signPayload ||
       !signPayload.issuer ||
       !signPayload.payload ||
-      !signPayload.password
+      !signPayload.password ||
+      !isCredential(signPayload.payload)
     )
       throw new BadRequestError(BadRequestError.defaultTitle, {
         detail: ApiErrorMessages.SIGNATURE_BAD_PARAMS,

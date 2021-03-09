@@ -1,6 +1,7 @@
-import { Options, normalize } from "jsonld";
+import { normalize, Options } from "jsonld";
+import crypto from "crypto";
 import { indication } from "../dtos";
-import { VerifiableCredential } from "../dtos/eidas";
+import { EidasProof, VerifiableCredential, Credential } from "../dtos/eidas";
 import { ApiErrorMessages, BadRequestError } from "../errors";
 import { getPemPublicKeyfromPemCert } from "./crypto";
 import { replacePemHeaderAndNewLines } from "./util";
@@ -52,19 +53,58 @@ const isVerifiableCredential = (object: Record<string, unknown>): boolean => {
   );
 };
 
-const canonizeCredential = async (
-  payload: Record<string, unknown>
-): Promise<string> => {
-  if (!isCredential(payload))
-    throw new BadRequestError(indication.VERIFICATION_FAIL, {
-      detail: ApiErrorMessages.CANONIZE_BAD_PARAMS,
-    });
+const canonizeCredential = async (payload: Credential): Promise<string> => {
   const options: Options.Normalize = {
     algorithm: "URDNA2015",
     format: "application/n-quads",
   };
-
   return normalize(payload, options);
+};
+
+const canonizeProofOptions = async (
+  credential: Credential,
+  proof: EidasProof
+): Promise<string> => {
+  const options: Options.Normalize = {
+    algorithm: "URDNA2015",
+    format: "application/n-quads",
+    skipExpansion: false,
+  };
+  // Delete signature or proof
+  const proofOption = (({ cades, jws, proofValue, ...o }) => o)(proof);
+  const proofToNormalize = {
+    "@context": credential["@context"],
+    ...proofOption,
+  };
+  return normalize(proofToNormalize, options);
+};
+
+const calculateLdProofHashforVerification = async (
+  credential: Credential,
+  eidasProof: EidasProof
+): Promise<Buffer> => {
+  const canonizedCredential = await canonizeCredential(
+    (({ proof, ...o }) => o)(credential)
+  );
+  const canonizedProof = await canonizeProofOptions(credential, eidasProof);
+
+  const hashCredential = crypto.createHash("sha256");
+  const hashProof = crypto.createHash("sha256");
+
+  hashCredential.update(canonizedCredential);
+  hashProof.update(canonizedProof);
+
+  const hashedCredential = hashCredential.digest();
+  const hashedProof = hashProof.digest();
+
+  return Buffer.concat([
+    Buffer.from(hashedProof.buffer, hashedProof.byteOffset, hashedProof.length),
+    Buffer.from(
+      hashedCredential.buffer,
+      hashedCredential.byteOffset,
+      hashedCredential.length
+    ),
+  ]);
 };
 
 function pad(number: number) {
@@ -98,6 +138,10 @@ export {
   getKidFromDidAndPemCertificate,
   KidInput,
   canonizeCredential,
+  canonizeProofOptions,
   parseSigningTime,
   isVerifiableCredential,
+  calculateLdProofHashforVerification,
+  toISOStringSeconds,
+  isCredential,
 };

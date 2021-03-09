@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import redis from "../storage/redis";
 import { EidasKeysData } from "../../dtos/redis";
 import { ApiErrorMessages, BadRequestError } from "../../errors";
@@ -6,7 +5,8 @@ import { eidasCrypto } from "../../utils";
 import { signCadesRsa } from "./cades";
 import { CadesSignatureInput, CadesSignatureOutput } from "../../dtos/cades";
 import { WalletBuilderOptions } from "../../dtos/wallet";
-import { canonizeCredential } from "../../utils/ssi";
+import { calculateLdProofHashforVerification } from "../../utils/ssi";
+import { EidasProof, Credential } from "../../dtos/eidas";
 
 export default class EnterpriseWallet {
   private constructor(
@@ -52,12 +52,23 @@ export default class EnterpriseWallet {
     }
   }
 
-  async eSeal(payload: Record<string, unknown>): Promise<CadesSignatureOutput> {
+  getIssuerPemCert(): string {
+    return this.issuerPemCert[0];
+  }
+
+  async eSeal(
+    payload: Credential,
+    proofOptions: EidasProof
+  ): Promise<CadesSignatureOutput> {
     // TODO: sign with all certificate list
-    const hash = crypto.createHash("sha256");
-    hash.update(await canonizeCredential(payload));
+    const dataToBeSigned: Buffer = await calculateLdProofHashforVerification(
+      payload,
+      proofOptions
+    );
+    const dataToBeSignedHex = dataToBeSigned.toString("hex");
     const inputCades: CadesSignatureInput = {
-      data: hash.digest("hex"),
+      created: proofOptions.created,
+      data: dataToBeSignedHex,
       pemCert: this.issuerPemCert[0],
       pemPrivKey: this.issuerPemPrivateKey,
     };
