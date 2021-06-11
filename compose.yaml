@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379"
+    networks:
+      - frontend
+
+  ssi-eidas-bridge:
+    networks:
+      - frontend
+    image: ssi-eidas-bridge
+    ports:
+      - "80:9002"
+    build:
+      context: .
+      args:
+        - BRIDGE_ENV=production
+        - REDIS_URL=redis
+        - REDIS_PORT=6379
+        - BRIDGE_API_EXTERNAL_URL=http://127.0.0.1
+        - DSS_URL=https://ec.europa.eu/cefdigital/DSS/webapp-demo
+    environment:
+      - BRIDGE_ENV=production
+      - REDIS_URL=redis
+      - REDIS_PORT=6379
+      - BRIDGE_API_EXTERNAL_URL=http://127.0.0.1
+      - DSS_URL=https://ec.europa.eu/cefdigital/DSS/webapp-demo
+
+networks:
+  frontend:

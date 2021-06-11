@@ -80,8 +80,18 @@ This command starts a node server exposing the SSI eIDAS Bridge Swagger API at <
 
 Copy .env.example to .env and set the following environment variables:
 
-- `BRIDGE_ENV` : set to test, local, integration, development or production
-- `API_PRIVATE_KEY` <-- TYPE HERE API PRIVATE KEY IN HEX FORMAT
+```
+# Set to test, local, integration, development or production
+BRIDGE_ENV=local
+
+# DSS service used to validate the URL. DSS webapp demo can be deployed locally using Docker too,
+# checkout this example: https://github.com/validatedid/dss-service
+DSS_URL="https://ec.europa.eu/cefdigital/DSS/webapp-demo"
+
+# REDIS key-value storage to store the p12 certificates.
+REDIS_URL=127.0.0.1
+REDIS_PORT=6379
+```
 
 ### Unit tests
 

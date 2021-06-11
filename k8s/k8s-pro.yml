@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       app: eidas-bridge
-  strategy: 
+  strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
@@ -37,16 +37,6 @@ spec:
             configMapKeyRef:
               name: eidas-bridge-configmap
               key: BRIDGE_API_EXTERNAL_URL
-        - name: DEBUG_LEVEL
-          valueFrom:
-            configMapKeyRef:
-              name: eidas-bridge-configmap
-              key: DEBUG_LEVEL
-        - name: EIDAS_TEST_MODE
-          valueFrom:
-            configMapKeyRef:
-              name: eidas-bridge-configmap
-              key: EIDAS_TEST_MODE
         - name: REDIS_URL
           valueFrom:
             configMapKeyRef:
@@ -62,21 +52,6 @@ spec:
             configMapKeyRef:
               name: eidas-bridge-configmap
               key: DSS_URL
-        - name: DID_REGISTRY_SC_ADDRESS
-          valueFrom:
-            secretKeyRef:
-              name: did-registry-sc-address
-              key: ethereum-did-registry-address
-        - name: DID_PROVIDER_RPC_URL
-          valueFrom:
-            secretKeyRef:
-              name: did-provider-rpc-url
-              key: ethereum-url
-        - name: API_PRIVATE_KEY
-          valueFrom:
-            secretKeyRef:
-              name: eidas-bridge
-              key: api-private-key
       restartPolicy: Always
 ---
 

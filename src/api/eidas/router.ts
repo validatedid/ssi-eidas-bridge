@@ -37,9 +37,8 @@ class Router {
             throw new BadRequestError(BadRequestError.defaultTitle, {
               detail: ApiErrorMessages.BAD_REQUEST_MISSING_BODY,
             });
-          const dssValidationOutput: DssVerificationOutput[] = await Controller.EIDASvalidateSignature(
-            req.body
-          );
+          const dssValidationOutput: DssVerificationOutput[] =
+            await Controller.EIDASvalidateSignature(req.body);
           res.status(200).json({
             indication: indication.VERIFICATION_SUCCESS,
             checks: ["credential", "proof"],

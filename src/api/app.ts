@@ -8,14 +8,12 @@ import YAML from "yamljs";
 import * as bodyParser from "body-parser";
 import EidasRouter from "./eidas/router";
 import { PRINT_INFO, PRINT_ERROR } from "../utils/util";
-import { BRIDGE_SERVICE, OPENAPI_PATH, API_PRIVATE_KEY } from "../config";
+import { BRIDGE_SERVICE, OPENAPI_PATH } from "../config";
 import {
-  InternalError,
   ApiErrorMessages,
   ServiceUnavailableError,
   handleError,
 } from "../errors";
-import ComponentSecureEnclave from "../libs/secureEnclave/componentSecureEnclave";
 
 class App {
   private connection!: http.Server;
@@ -47,13 +45,6 @@ class App {
   }
 
   public Start = async (port: number): Promise<http.Server> => {
-    const { did } = ComponentSecureEnclave.Instance.init(API_PRIVATE_KEY);
-    if (!did)
-      throw new InternalError(InternalError.defaultTitle, {
-        detail: ApiErrorMessages.ENCLAVE_DID_NULL,
-      });
-    PRINT_INFO(`Component Secure Enclave initialized with DID:${did}`);
-
     return new Promise((resolve, reject) => {
       this.connection = this.httpServer
         .listen(port, () => {

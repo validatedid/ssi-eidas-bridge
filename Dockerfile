@@ -8,6 +8,11 @@ COPY . .
 RUN yarn build
 
 FROM base
+ARG BRIDGE_ENV
+ARG REDIS_URL
+ARG REDIS_PORT
+ARG BRIDGE_API_EXTERNAL_URL
+ARG DSS_URL
 WORKDIR /usr/src/app
 COPY --from=builder dist dist
 COPY api api

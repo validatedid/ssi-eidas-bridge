@@ -83,8 +83,7 @@ export const offblocksVerifiableCredential = {
     "did:factom:testnet:ba7a64e48959a7d9fd76cb7cdd1c4b0f56be27407db2558964e670e48631915d",
   issuanceDate: "2020-03-10T04:24:12.164Z",
   credentialSubject: {
-    id:
-      "did:factom:5d0dd58757119dd437c70d92b44fbf86627ee275f0f2146c3d99e441da342d9f",
+    id: "did:factom:5d0dd58757119dd437c70d92b44fbf86627ee275f0f2146c3d99e441da342d9f",
     degree: {
       type: "BachelorDegree",
       name: "Bachelor of Science and Arts",
