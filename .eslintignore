@@ -1,3 +1,6 @@
 coverage
 dist
 log
+test_suite
+specs
+public

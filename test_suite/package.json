@@ -1,0 +1,29 @@
+{
+  "name": "eidas-bridge-test-suite",
+  "version": "0.0.0",
+  "description": "A test suite to check eIDAS Bridge specification compliance for eIDAS Bridge APIS.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha eidas.test.js  --require @babel/register --timeout 5000"
+  },
+  "keywords": [
+    "eidas"
+  ],
+  "presets": [
+    "es2015"
+  ],
+  "author": "Scott Malley (smalley@sphereon.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/node": "^7.12.6",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/register": "^7.12.1",
+    "chai": "^4.2.0",
+    "did-method-key": "^0.7.0",
+    "mocha": "^8.2.1",
+    "node-fetch": "^2.6.1",
+    "uuid": "^8.3.2"
+  }
+}
