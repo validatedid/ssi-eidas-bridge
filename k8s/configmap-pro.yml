@@ -9,4 +9,4 @@ data:
   REDIS_URL: "redisbrige-service"
   REDIS_PORT: "6380"
   BRIDGE_API_EXTERNAL_URL: "https://api.vidchain.net"
-  DSS_URL: "https://ec.europa.eu/cefdigital/DSS/webapp-demo"
+  DSS_URL: "https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo"
